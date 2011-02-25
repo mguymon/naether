@@ -12,7 +12,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
 # License for the specific language governing permissions and limitations under
 # the License.
-
+#
+require "ftools"
 require 'java'
 $CLASSPATH << "target/classes"
 Dir.glob('target/lib/*.jar').each do |jar|
@@ -21,7 +22,25 @@ end
 java_import com.slackworks.MavenProject
 
 maven_project = MavenProject.new('pom.xml')
+naether_jar = "naether-#{maven_project.get_version}.jar"
 
+unless File.exsts?( "target" )
+	
+end
+
+unless File.exists?( "target/gem" )
+	Dir.mkdir( "target/gem" )
+end
+
+File.copy( 'naether.gemspec', "target/gem/naether.gemspec" )
+File.copy( 'LICENSE', "target/gem/LICENSE" )
+File.copy( 'README.rdoc', "target/gem/README.rdoc" )
+File.copy( 'pom.xml', "target/gem/pom.xml" )
+File.copy( "target/#{naether_jar}", "target/gem/#{naether_jar}" )
+
+Dir.chdir( "target/gem" )
+
+puts "Creating gem in target/gem"
 
 Gem::Specification.new do |spec|
   spec.name           = 'naether'
@@ -37,9 +56,8 @@ Java Dependency Resolver for using Maven's Aether
 
   # Rakefile needs to create spec for both platforms (ruby and java), using the
   # $platform global variable.  In all other cases, we figure it out from RUBY_PLATFORM.
-  spec.platform       = $platform || RUBY_PLATFORM[/java/] || 'ruby'
+  spec.platform       = 'java'
 
-  spec.files          = Dir['pom.xml', '*.{gemspec}'] +
-                        ['LICENSE','README.rdoc']
+  spec.files          = ['naether.gemspec', 'LICENSE','README.rdoc','pom.xml', naether_jar]
 
 end
