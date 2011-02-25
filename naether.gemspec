@@ -13,33 +13,33 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
+require 'java'
+$CLASSPATH << "target/classes"
+Dir.glob('target/lib/*.jar').each do |jar|
+	require jar
+end
+java_import com.slackworks.MavenProject
+
+maven_project = MavenProject.new('pom.xml')
+
+
 Gem::Specification.new do |spec|
   spec.name           = 'naether'
-  spec.version        = 0.1
+  spec.version        = maven_project.get_version
   spec.author         = 'Michael Guymon'
   spec.email          = "michael.guymon@gmail.com"
-  spec.homepage       = "https://github.com/mguymon/buildr-naether"
-  spec.summary        = "Java Dependency Resolver for Buildr"
+  spec.homepage       = "https://github.com/mguymon/naether"
+  spec.summary        = "Java Dependency Resolver"
   spec.description    = <<-TEXT
-Java Dependency Resolver for Buildr using Maven's Aether
+Java Dependency Resolver for using Maven's Aether
   TEXT
-  spec.rubyforge_project  = 'buildr-naether'
+  spec.rubyforge_project  = 'naether'
 
   # Rakefile needs to create spec for both platforms (ruby and java), using the
   # $platform global variable.  In all other cases, we figure it out from RUBY_PLATFORM.
   spec.platform       = $platform || RUBY_PLATFORM[/java/] || 'ruby'
 
-  spec.files          = Dir['{lib,spec}/**/*', '*.{gemspec}'] +
+  spec.files          = Dir['pom.xml', '*.{gemspec}'] +
                         ['LICENSE','README.rdoc']
-  spec.require_paths  = 'lib'
-  
-  #spec.has_rdoc         = true
-  #spec.extra_rdoc_files = 'README.rdoc', 'LICENSE'
-  #spec.rdoc_options     = '--title', 'Buildr', '--main', 'README.rdoc',
-  #                        '--webcvs', 'http://svn.apache.org/repos/asf/buildr/trunk/'
-  #spec.post_install_message = "To get started run buildr --help"
 
-  # Tested against these dependencies.
-  spec.add_dependency 'buildr',               '1.4.4'
-  spec.add_development_dependency 'rspec',    '~> 2.1.0'
 end
