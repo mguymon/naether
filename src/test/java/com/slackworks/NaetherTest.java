@@ -1,14 +1,23 @@
 package com.slackworks;
 
+// Java SE
 import java.io.File;
 
+// JUnit
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+// Sonatype Aether
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 
+/**
+ * Test for {@link Naether}
+ * 
+ * @author Michael Guymon
+ *
+ */
 public class NaetherTest {
 	
 	@Test

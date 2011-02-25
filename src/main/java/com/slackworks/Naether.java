@@ -10,7 +10,6 @@ import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 
 // Codehaus Plexus IoC
 import org.codehaus.plexus.DefaultPlexusContainer;
-import org.jruby.RubyHash;
 
 // Sonatype Aether Dependency Management
 import org.sonatype.aether.RepositorySystem;
@@ -37,7 +36,7 @@ public class Naether {
 	private String repoPath;
 	private List<Dependency> dependencies;
 	private List<RemoteRepository> remoteRepositories;
-	public PreorderNodeListGenerator nlg;
+	private PreorderNodeListGenerator nlg;
 	
 	public Naether() {
 		dependencies = new ArrayList<Dependency>();
@@ -46,21 +45,6 @@ public class Naether {
 		
 		String userHome = System.getProperty("user.home");
 		setRepoPath(userHome + File.separator + ".m2" + File.separator + "repository");
-	}
-	
-	public Naether( RubyHash config ) {
-		dependencies = new ArrayList<Dependency>();
-		setRemoteRepositories(new ArrayList<RemoteRepository>());
-		getRemoteRepositories().add( new RemoteRepository( "central", "default", "http://repo1.maven.org/maven2/" ) );
-		
-		Object rawRepoPath = config.get("repoPath");
-		if ( rawRepoPath != null ) {
-			setRepoPath(rawRepoPath.toString());
-	
-		} else {
-			String userHome = System.getProperty("user.home");
-			setRepoPath(userHome + File.separator + ".m2" + File.separator + "repository");
-		}
 	}
 	
 	public void addDepedency( Dependency dependency ) {
