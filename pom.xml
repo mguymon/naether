@@ -36,6 +36,16 @@
             <artifactId>slf4j-api</artifactId>
             <version>${org.slf4j.version}</version>
         </dependency>
+		<dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${org.slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>${org.slf4j.version}</version>
+		</dependency>
   	<dependency>
 	  <groupId>org.codehaus.plexus</groupId>
 	  <artifactId>plexus-utils</artifactId>
@@ -91,6 +101,15 @@
       <artifactId>wagon-ssh</artifactId>
       <version>${wagonVersion}</version>
     </dependency>
+
+	
+	<!-- exclude commons logging -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
 
 	
   	<!-- Test Scope -->

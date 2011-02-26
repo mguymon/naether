@@ -23,6 +23,7 @@ import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyRequest;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 
 /**
@@ -52,6 +53,16 @@ public class Naether {
 		
 		String userHome = System.getProperty("user.home");
 		setRepoPath(userHome + File.separator + ".m2" + File.separator + "repository");
+	}
+	
+	public void addDependency( String notation) {
+		addDependency( notation, "compile" );
+	}
+	
+	public void addDependency( String notation, String scope ) {
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( notation ), scope );
+		addDependency( dependency );
 	}
 	
 	public void addDependency( Dependency dependency ) {
@@ -102,9 +113,8 @@ public class Naether {
         for ( RemoteRepository repo: getRemoteRepositories() ) {
         	collectRequest.addRepository( repo );
         }
-        
+        log.debug( "?" );
         DependencyNode node = repoSystem.collectDependencies( session, collectRequest ).getRoot();
-
         DependencyRequest dependencyRequest = new DependencyRequest( node, null );
 
         repoSystem.resolveDependencies( session, dependencyRequest  );
@@ -112,6 +122,7 @@ public class Naether {
         nlg = new PreorderNodeListGenerator();
         node.accept( nlg );
         
+        log.debug( "Setting resolved dependencies" );
         this.setDependencies( nlg.getDependencies(true) );
 	}
 	
@@ -137,9 +148,7 @@ public class Naether {
 	
 	public List<String> getDependenciesNotation() {
 		List<String> notations = new ArrayList<String>();
-		
 		for ( Dependency dependency: getDependencies() ) {
-			
 			notations.add( Notation.generate( dependency ) );
 		}
 		

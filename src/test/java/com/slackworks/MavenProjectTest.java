@@ -48,6 +48,8 @@ public class MavenProjectTest {
 		List<String> notations = new ArrayList<String>();
 		notations.add( "ch.qos.logback:logback-classic:jar:0.9.24" ); 
 		notations.add( "org.slf4j:slf4j-api:jar:1.6.1");
+		notations.add( "org.slf4j:jcl-over-slf4j:jar:1.6.1"); 
+		notations.add( "org.slf4j:log4j-over-slf4j:jar:1.6.1");
 		notations.add( "org.codehaus.plexus:plexus-utils:jar:1.5.8" );
 		notations.add( "org.apache.maven:maven-model-v3:jar:2.0" );
 		notations.add( "org.codehaus.plexus:plexus-container-default:jar:1.5.5" );
@@ -59,6 +61,16 @@ public class MavenProjectTest {
 		notations.add( "org.sonatype.aether:aether-connector-wagon:jar:1.11" );
 		notations.add( "org.apache.maven:maven-aether-provider:jar:3.0.2" );
 		notations.add( "org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-7" );
-		assertEquals(notations, mavenProject.getDependenciesNotation() );
+		
+		List<String> missingDeps = new ArrayList<String>();
+        for( String dep : mavenProject.getDependenciesNotation() ) {
+        	if ( notations.indexOf( dep ) == -1 ) {
+        		missingDeps.add( dep );
+        	}
+        }
+        
+        if ( missingDeps.size() > 0 ) {
+        	fail( "Missing Dependencies: " + missingDeps );
+        }
 	}
 }

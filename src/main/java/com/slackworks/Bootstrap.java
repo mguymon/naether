@@ -14,15 +14,14 @@ public class Bootstrap {
 		deps.add( "ch.qos.logback:logback-classic:jar:0.9.24");
 		deps.add( "ch.qos.logback:logback-core:jar:0.9.24");
 		deps.add( "org.slf4j:slf4j-api:jar:1.6.1");
+		deps.add( "org.slf4j:jcl-over-slf4j:jar:1.6.1"); 
+		deps.add( "org.slf4j:log4j-over-slf4j:jar:1.6.1");
 		deps.add( "org.codehaus.plexus:plexus-utils:jar:1.5.8");
 		deps.add( "org.apache.maven:maven-model-v3:jar:2.0");
 		deps.add( "org.codehaus.plexus:plexus-container-default:jar:1.5.5");
 		deps.add( "org.codehaus.plexus:plexus-classworlds:jar:2.2.2");
 		deps.add( "org.apache.xbean:xbean-reflect:jar:3.4");
-		deps.add( "log4j:log4j:jar:1.2.12");
-		deps.add( "commons-logging:commons-logging-api:jar:1.1");
 		deps.add( "com.google.collections:google-collections:jar:1.0");
-		deps.add( "junit:junit:jar:3.8.2");
 		deps.add( "org.sonatype.aether:aether-api:jar:1.11");
 		deps.add( "org.sonatype.aether:aether-util:jar:1.11");
 		deps.add( "org.sonatype.aether:aether-impl:jar:1.11");

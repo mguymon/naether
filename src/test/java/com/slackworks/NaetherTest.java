@@ -3,6 +3,7 @@ package com.slackworks;
 // Java SE
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 // JUnit
 import org.junit.Test;
@@ -24,6 +25,17 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 public class NaetherTest {
 	
 	private static Logger log = LoggerFactory.getLogger(NaetherTest.class);
+	
+	@Test
+	public void getDependenciesNotation() {
+		Naether naether = new Naether();
+		naether.setRepoPath( "target/test-repo" );
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
+        naether.addDependency(dependency);
+        
+        assertEquals( "junit:junit:jar:4.8.2", naether.getDependenciesNotation().get(0) );
+	}
 	
 	@Test
 	public void resolveDepedencies() throws Exception {
@@ -59,7 +71,23 @@ public class NaetherTest {
 			log.debug( "Dependency: {} {}", notation, dependency.getScope() );
 		}
 		
-        assertEquals( Bootstrap.dependencies, naether.getDependenciesNotation() );
+		List<String> completeDeps = Bootstrap.dependencies;
+		
+		// Jars excluded from bootstrap dependencies
+		completeDeps.add( "junit:junit:jar:3.8.2");
+		completeDeps.add( "log4j:log4j:jar:1.2.12");
+		completeDeps.add( "commons-logging:commons-logging-api:jar:1.1");
+		
+		List<String> missingDeps = new ArrayList<String>();
+        for( String dep : naether.getDependenciesNotation() ) {
+        	if ( completeDeps.indexOf( dep ) == -1 ) {
+        		missingDeps.add( dep );
+        	}
+        }
+        
+        if ( missingDeps.size() > 0 ) {
+        	fail( "Missing Dependencies: " + missingDeps );
+        }
 		
 	}
 
