@@ -113,7 +113,7 @@ public class Naether {
         for ( RemoteRepository repo: getRemoteRepositories() ) {
         	collectRequest.addRepository( repo );
         }
-        log.debug( "?" );
+        
         DependencyNode node = repoSystem.collectDependencies( session, collectRequest ).getRoot();
         DependencyRequest dependencyRequest = new DependencyRequest( node, null );
 
