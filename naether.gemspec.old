@@ -13,43 +13,36 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 #
-require "ftools"
-require 'java'
-$CLASSPATH << "target/classes"
-Dir.glob('target/lib/*.jar').each do |jar|
-	require jar
+
+platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
+
+if platform == 'java'
+	require 'java'
+	$CLASSPATH << "target/classes"
+	Dir.glob('target/lib/*.jar').each do |jar|
+		require jar
+	end
+	java_import com.slackworks.MavenProject
+	
+	maven_project = MavenProject.new('pom.xml')
+	naether_jar = "naether-#{maven_project.get_version}.jar"
+else
+	require 'rjb'
+	classpath = ["target/classes"]
+	Dir.glob('target/lib/*.jar').each do |jar|
+		classpath << jar
+	end
+	java_opts = (ENV['JAVA_OPTS'] || ENV['JAVA_OPTIONS']).to_s.split
+	Rjb::load(classpath.join(File::PATH_SEPARATOR), java_opts)
+	MavenProject = Rjb::import('com.slackworks.MavenProject')
+	maven_project = MavenProject.new
+	maven_project.loadPOM('pom.xml')
+	naether_jar = "naether-#{maven_project.getVersion()}.jar"
 end
-java_import com.slackworks.MavenProject
-
-maven_project = MavenProject.new('pom.xml')
-naether_jar = "naether-#{maven_project.get_version}.jar"
-
-unless File.exists?( "target" )
-	raise "Run `mvn package` to build java first"	
-end
-
-unless File.exists?( "target/gem" )
-	Dir.mkdir( "target/gem" )
-end
-
-unless File.exists?( "target/gem/lib" )
-	Dir.mkdir( "target/gem/lib" )
-end
-
-File.copy( 'src/main/ruby/naether.rb', "target/gem/lib/naether.rb" )
-File.copy( 'naether.gemspec', "target/gem/naether.gemspec" )
-File.copy( 'LICENSE', "target/gem/LICENSE" )
-File.copy( 'README.rdoc', "target/gem/README.rdoc" )
-File.copy( 'pom.xml', "target/gem/pom.xml" )
-File.copy( "target/#{naether_jar}", "target/gem/#{naether_jar}" )
-
-Dir.chdir( "target/gem" )
-
-puts "Creating gem in target/gem"
 
 Gem::Specification.new do |spec|
   spec.name           = 'naether'
-  spec.version        = maven_project.get_version
+  spec.version        = maven_project.getVersion
   spec.author         = 'Michael Guymon'
   spec.email          = "michael.guymon@gmail.com"
   spec.homepage       = "https://github.com/mguymon/naether"
@@ -61,8 +54,10 @@ Java Dependency Resolver for using Maven's Aether
 
   # Rakefile needs to create spec for both platforms (ruby and java), using the
   # $platform global variable.  In all other cases, we figure it out from RUBY_PLATFORM.
-  spec.platform       = 'java'
+  spec.platform       = platform
   spec.require_paths = %w[lib]
   spec.files          = ['naether.gemspec', 'LICENSE','README.rdoc','pom.xml', 'lib/naether.rb', naether_jar]
 
+  spec.add_dependency 'rjb',                  '1.3.3' if spec.platform.to_s == 'ruby'
+  spec.add_dependency 'rjb',                  '1.3.2' if spec.platform.to_s == 'x86-mswin32'
 end
