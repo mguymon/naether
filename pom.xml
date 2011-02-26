@@ -91,6 +91,7 @@
       <artifactId>wagon-ssh</artifactId>
       <version>${wagonVersion}</version>
     </dependency>
+
 	
   	<!-- Test Scope -->
     <dependency>

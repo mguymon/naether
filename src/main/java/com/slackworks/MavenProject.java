@@ -156,17 +156,8 @@ public class MavenProject {
 	public List<String> getDependenciesNotation(boolean substituteProperties) {
 		List<String> notations = new ArrayList<String>();
 		
-		for ( Dependency dependency: getDependencies() ) {
-			StringBuffer notation = new StringBuffer()
-				.append( dependency.getGroupId() )
-				.append( ":" )
-				.append( dependency.getArtifactId() )
-				.append( ":" )
-				.append( dependency.getType() )
-				.append( ":" )
-				.append( dependency.getVersion() );
-			
-			notations.add( notation.toString() );
+		for ( Dependency dependency: getDependencies(substituteProperties) ) {
+			notations.add( Notation.generate( dependency ) );
 		}
 		
 		return notations;

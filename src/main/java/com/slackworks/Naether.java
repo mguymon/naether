@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.graph.DependencyNode;
@@ -53,7 +54,7 @@ public class Naether {
 		setRepoPath(userHome + File.separator + ".m2" + File.separator + "repository");
 	}
 	
-	public void addDepedency( Dependency dependency ) {
+	public void addDependency( Dependency dependency ) {
 		dependencies.add( dependency );
 	}
 	
@@ -110,6 +111,8 @@ public class Naether {
 
         nlg = new PreorderNodeListGenerator();
         node.accept( nlg );
+        
+        this.setDependencies( nlg.getDependencies(true) );
 	}
 	
 	public String getResolvedClassPath() {
@@ -130,6 +133,17 @@ public class Naether {
 
 	public List<Dependency> getDependencies() {
 		return dependencies;
+	}
+	
+	public List<String> getDependenciesNotation() {
+		List<String> notations = new ArrayList<String>();
+		
+		for ( Dependency dependency: getDependencies() ) {
+			
+			notations.add( Notation.generate( dependency ) );
+		}
+		
+		return notations;
 	}
 	
 	public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {

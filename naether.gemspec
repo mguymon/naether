@@ -24,14 +24,19 @@ java_import com.slackworks.MavenProject
 maven_project = MavenProject.new('pom.xml')
 naether_jar = "naether-#{maven_project.get_version}.jar"
 
-unless File.exsts?( "target" )
-	
+unless File.exists?( "target" )
+	raise "Run `mvn package` to build java first"	
 end
 
 unless File.exists?( "target/gem" )
 	Dir.mkdir( "target/gem" )
 end
 
+unless File.exists?( "target/gem/lib" )
+	Dir.mkdir( "target/gem/lib" )
+end
+
+File.copy( 'src/main/ruby/naether.rb', "target/gem/lib/naether.rb" )
 File.copy( 'naether.gemspec', "target/gem/naether.gemspec" )
 File.copy( 'LICENSE', "target/gem/LICENSE" )
 File.copy( 'README.rdoc', "target/gem/README.rdoc" )
@@ -57,7 +62,7 @@ Java Dependency Resolver for using Maven's Aether
   # Rakefile needs to create spec for both platforms (ruby and java), using the
   # $platform global variable.  In all other cases, we figure it out from RUBY_PLATFORM.
   spec.platform       = 'java'
-
-  spec.files          = ['naether.gemspec', 'LICENSE','README.rdoc','pom.xml', naether_jar]
+  spec.require_paths = %w[lib]
+  spec.files          = ['naether.gemspec', 'LICENSE','README.rdoc','pom.xml', 'lib/naether.rb', naether_jar]
 
 end
