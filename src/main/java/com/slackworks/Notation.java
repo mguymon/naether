@@ -2,6 +2,14 @@ package com.slackworks;
 
 import org.sonatype.aether.artifact.Artifact;
 
+/**
+ * Helper for converting a Dependency object into String
+ * 
+ * groupId:artifactId:type:version
+ * 
+ * @author Michael Guymon
+ *
+ */
 public class Notation {
 	public static String generate( org.apache.maven.model.Dependency dependency ) {
 		StringBuffer notation = new StringBuffer()

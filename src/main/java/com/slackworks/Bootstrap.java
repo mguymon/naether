@@ -3,6 +3,12 @@ package com.slackworks;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Helper for bootstrapping Naether
+ * 
+ * @author Michael Guymon
+ *
+ */
 public class Bootstrap {
 	
 	/**

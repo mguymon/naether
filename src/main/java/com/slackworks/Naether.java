@@ -55,20 +55,45 @@ public class Naether {
 		setRepoPath(userHome + File.separator + ".m2" + File.separator + "repository");
 	}
 	
+	/**
+	 * Add dependency by String notation
+	 * 
+	 * groupId:artifactId:type:version
+	 * 
+	 * @param notation String
+	 */
 	public void addDependency( String notation) {
 		addDependency( notation, "compile" );
 	}
 	
+	/**
+	 * * Add dependency by String notation and Maven scope
+	 * 
+	 * groupId:artifactId:type:version
+	 * 
+	 * @param notation String
+	 * @param scope String
+	 */
 	public void addDependency( String notation, String scope ) {
 		Dependency dependency =
             new Dependency( new DefaultArtifact( notation ), scope );
 		addDependency( dependency );
 	}
 	
+	/**
+	 * Add Dependency
+	 * 
+	 * @param dependency {@link Dependency}
+	 */
 	public void addDependency( Dependency dependency ) {
 		dependencies.add( dependency );
 	}
 	
+	/**
+	 * Add RemoteRepository
+	 * 
+	 * @param remoteRepository
+	 */
 	public void addRemoteRepository( RemoteRepository remoteRepository ) {
 		getRemoteRepositories().add( remoteRepository );
 	}
