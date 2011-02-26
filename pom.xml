@@ -23,8 +23,19 @@
 	<aetherVersion>1.11</aetherVersion>
     <mavenVersion>3.0.2</mavenVersion>
     <wagonVersion>1.0-beta-7</wagonVersion>
+	<org.slf4j.version>1.6.1</org.slf4j.version>
   </properties>
   <dependencies>
+  	<dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>0.9.24</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${org.slf4j.version}</version>
+        </dependency>
   	<dependency>
 	  <groupId>org.codehaus.plexus</groupId>
 	  <artifactId>plexus-utils</artifactId>

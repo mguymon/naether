@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +18,8 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 // Codehause Plexus
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maven Project Model
@@ -28,8 +29,16 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  */
 public class MavenProject {
 
+	private static Logger log = LoggerFactory.getLogger(MavenProject.class);
+	
 	private Model mavenModel;
 	private Pattern propertyPattern = Pattern.compile("^\\$\\{(.+)\\}$");
+	
+	private boolean allowCompileScope = true;
+	private boolean allowRuntimeScope = true;
+	private boolean allowTestScope = false;
+	private boolean allowSystemScope = true;
+	private boolean allowProvidedScope = false;
 	
 	/**
 	 * New Instance
@@ -59,6 +68,7 @@ public class MavenProject {
 	 * @throws XmlPullParserException
 	 */
 	public void loadPOM( String pomPath ) throws FileNotFoundException, IOException, XmlPullParserException {
+		log.debug( "Loading pom {}", pomPath );
 		MavenXpp3Reader reader = new MavenXpp3Reader();
 		setMavenModel(reader.read( new BufferedReader( new FileReader( new File( pomPath ) ) ) ));
 	}
@@ -81,33 +91,54 @@ public class MavenProject {
 		return getDependencies(true);
 	}
 	
+	/**
+	 * Get List of {@link Depedencies} for the Maven Project, with boolean
+	 * to substitute Project Properties.
+	 * 
+	 * @param substituteProperties boolean
+	 * @return List<Dependency>
+	 */
 	public List<Dependency> getDependencies( boolean substituteProperties ) {
-		List<Dependency> dependencies = null;
+		List<Dependency> dependencies = new ArrayList<Dependency>();
 		
+		List<String> scopes = this.allowedScopes();
+		
+		log.info( "Allowed Maven Scopes: {}", scopes );
+		
+		// Substitute Properties
 		if ( substituteProperties ) {
 			// XXX: There has to be a way maven handles this automatically
-			dependencies = new ArrayList<Dependency>();
-			Properties properties = getMavenModel().getProperties();
 			for( Dependency dependency: getMavenModel().getDependencies() ) {
-				String artifactId = substituteProperty( dependency.getArtifactId() );
-				String groupId = substituteProperty( dependency.getGroupId() );
-				String version = substituteProperty( dependency.getVersion() );
 				
-				dependency.setArtifactId( artifactId );
-				dependency.setGroupId( groupId );
-				dependency.setVersion( version );
-				
-				dependencies.add( dependency );
+				// Check that scope of the Dependency has been marked allowed
+				if ( scopes.indexOf( dependency.getScope() ) >= 0 ) {
+			
+					String artifactId = substituteProperty( dependency.getArtifactId() );
+					String groupId = substituteProperty( dependency.getGroupId() );
+					String version = substituteProperty( dependency.getVersion() );
+					
+					dependency.setArtifactId( artifactId );
+					dependency.setGroupId( groupId );
+					dependency.setVersion( version );
+					dependencies.add( dependency );
+				}
 			}
+			
+		// Keep vals
 		} else {
-			dependencies = getMavenModel().getDependencies();
+			for( Dependency dependency: getMavenModel().getDependencies() ) {
+				// Check that scope of the Dependency has been marked allowed
+				if ( scopes.indexOf( dependency.getScope() ) >= 0 ) {
+					dependencies.add( dependency );
+				}
+			};
 		}
 		
 		return dependencies;
 	}
 	
 	/**
-	 * Return {@link List} of String dependencies in the format of
+	 * Return {@link List<String>} of dependencies in the format of
 	 * {@code groupId:artifactId:packageType:version}
 	 * 
 	 * @return List<String>
@@ -116,6 +147,12 @@ public class MavenProject {
 		return getDependenciesNotation(true);
 	}
 	
+	/**
+	 * Get List<String> of dependencies in format of {@link groupId:artifactId:packageType:version}
+	 * 
+	 * @param substituteProperties boolean
+	 * @return List<String>
+	 */
 	public List<String> getDependenciesNotation(boolean substituteProperties) {
 		List<String> notations = new ArrayList<String>();
 		
@@ -155,7 +192,7 @@ public class MavenProject {
 	
 	/**
 	 * Substitute a Maven Property expression, i.e. ${aetherVersion}, to its
-	 * corresponding Maven pom defination, i.e. {@code <aetherVersion>1.11</aetherVersion>}
+	 * corresponding Maven pom definition, i.e. 1.11 from {@code <aetherVersion>1.11</aetherVersion>}
 	 * 
 	 * @param field
 	 * @return
@@ -172,5 +209,81 @@ public class MavenProject {
 		} else {
 			return field;
 		}
+	}
+	
+	/**
+	 * List<String> of scopes allows scopes.
+	 * 
+	 * Possible scopes: compile, provided, runtime, system, test
+	 * 
+	 * The compile scope is represented by {@code compile} and {@code null}
+	 * 
+	 * @return List<String>
+	 */
+	private List<String> allowedScopes() {
+		List<String> scopes = new ArrayList<String>();
+		
+		if ( this.allowCompileScope ) {
+			scopes.add( "compile" );
+			scopes.add( null );
+		}
+		
+		if ( this.allowProvidedScope ) {
+			scopes.add( "provided" );
+		}
+		
+		if ( this.allowRuntimeScope ) {
+			scopes.add( "runtime" );
+		}
+		
+		if ( this.allowSystemScope ) {
+			scopes.add( "system" );
+		}
+		
+		if ( this.allowTestScope ) {
+			scopes.add( "test" );
+		}
+		
+		return scopes;
+	}
+
+	public void setAllowProvidedScope(boolean allowProvidedScope) {
+		this.allowProvidedScope = allowProvidedScope;
+	}
+
+	public boolean isAllowProvidedScope() {
+		return allowProvidedScope;
+	}
+
+	private void setAllowSystemScope(boolean allowSystemScope) {
+		this.allowSystemScope = allowSystemScope;
+	}
+
+	private boolean isAllowSystemScope() {
+		return allowSystemScope;
+	}
+
+	public void setAllowTestScope(boolean allowTestScope) {
+		this.allowTestScope = allowTestScope;
+	}
+
+	public boolean isAllowTestScope() {
+		return allowTestScope;
+	}
+
+	public void setAllowRuntimeScope(boolean allowRuntimeScope) {
+		this.allowRuntimeScope = allowRuntimeScope;
+	}
+
+	public boolean isAllowRuntimeScope() {
+		return allowRuntimeScope;
+	}
+
+	public void setAllowCompileScope(boolean allowCompileScope) {
+		this.allowCompileScope = allowCompileScope;
+	}
+
+	public boolean isAllowCompileScope() {
+		return allowCompileScope;
 	}
 }
