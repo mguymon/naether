@@ -12,6 +12,8 @@ import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.DefaultPlexusContainer;
 
 // Sonatype Aether Dependency Management
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.collection.CollectRequest;
@@ -20,7 +22,6 @@ import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyRequest;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 
 /**
@@ -33,6 +34,8 @@ import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
  */
 public class Naether {
 
+	private static Logger log = LoggerFactory.getLogger(Naether.class);
+	
 	private String repoPath;
 	private List<Dependency> dependencies;
 	private List<RemoteRepository> remoteRepositories;
@@ -69,6 +72,8 @@ public class Naether {
     }
 	
 	public void resolveDependencies() throws Exception {
+		log.info( "Repo Path: {}", repoPath );
+		
 		RepositorySystem repoSystem = newRepositorySystem();
 
         RepositorySystemSession session = newSession( repoSystem );
@@ -120,16 +125,6 @@ public class Naether {
 
 	public List<RemoteRepository> getRemoteRepositories() {
 		return remoteRepositories;
-	}
-
-	public static void main( String[] args ) throws Exception {
-		Naether naether = new Naether();
-		System.out.println( naether.getRepoPath() );
-		Dependency dependency =
-            new Dependency( new DefaultArtifact( "org.apache.activemq:activemq-spring:jar:5.4.2" ), "compile" );
-        naether.addDepedency(dependency);
-        naether.resolveDependencies();
-        System.out.println( naether.getResolvedClassPath() );
 	}
 
 }
