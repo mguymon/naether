@@ -101,10 +101,9 @@ Rake::Task["build"].enhance do
     Dir.mkdir( "../../pkg" )
   end
   
+  platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
   version = IO.read('VERSION').strip
-  Dir.glob('pkg/naether-#{version}*.gem').each do |gem|
-    File.copy( gem, "../../pkg/." )  
-  end
+  File.copy( "pkg/naether-#{version}#{"-java" if platform =='java'}.gem", "../../pkg/." )  
 end
 
 require 'rake/testtask'
