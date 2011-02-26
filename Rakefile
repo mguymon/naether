@@ -102,7 +102,9 @@ Rake::Task["build"].enhance do
   end
   
   version = IO.read('VERSION').strip
-  File.copy( "pkg/naether-#{version}.gem", "../../pkg/." )  
+  Dir.glob('pkg/naether-#{version}*.gem').each do |gem|
+    File.copy( gem, "../../pkg/." )  
+  end
 end
 
 require 'rake/testtask'

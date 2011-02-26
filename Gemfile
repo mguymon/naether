@@ -1,6 +1,7 @@
 source "http://rubygems.org"
 
-platforms :ruby do
+platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
+if platform != 'java'
 	gem 'rjb'
 end
 
