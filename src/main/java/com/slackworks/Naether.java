@@ -41,6 +41,9 @@ public class Naether {
 	private List<RemoteRepository> remoteRepositories;
 	private PreorderNodeListGenerator nlg;
 	
+	/**
+	 * Create new instance
+	 */
 	public Naether() {
 		dependencies = new ArrayList<Dependency>();
 		setRemoteRepositories(new ArrayList<RemoteRepository>());
@@ -71,8 +74,18 @@ public class Naether {
         return session;
     }
 	
+	/**
+	 * Resolve Dependencies 
+	 * 
+	 * @throws Exception
+	 */
 	public void resolveDependencies() throws Exception {
 		log.info( "Repo Path: {}", repoPath );
+		
+		log.info( "Remote Repositories:" );
+		for( RemoteRepository repo: getRemoteRepositories() ) {
+			log.info( "  {}", repo.toString() );
+		}
 		
 		RepositorySystem repoSystem = newRepositorySystem();
 
