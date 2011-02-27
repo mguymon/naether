@@ -1,9 +1,17 @@
 require "#{File.dirname(__FILE__)}/java"
 
 class Naether
+  # :title:Naether::Bootstrap
+  #
+  # Helper for bootstrapping Naether
+  #
+  # = Authors
+  # Michael Guymon
+  #
   class Bootstrap
     class << self
       
+      # List of Java dependencies for Naether
       def dependencies( jar_path = nil )
         Naether::Java.load_jar_dirs( jar_path || Naether::JAR_LIB )
         

@@ -1,11 +1,12 @@
 = Naether
 
-A Java Dependency Resolver using Maven's Aether
+A Java Dependency Resolver using Maven's {Aether}[https://github.com/sonatype/sonatype-aether]
 
 https://github.com/mguymon/naether
 
 
 === Install
+
 gem install naether
 
 
