@@ -36,8 +36,6 @@ Jeweler::Tasks.new do |gem|
     naether_jar = "naether-#{maven_project.getVersion()}.jar"
   end
   
-  Naether::Bootstrap.write_dependencies("target")
-  
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "naether"
   gem.rubyforge_project  = 'naether'
