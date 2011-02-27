@@ -71,7 +71,7 @@ class Naether
   #
   def dependencies=(dependencies)
     dependencies.each do |dependent|
-      add_ependency( dependent )  
+      add_dependency( dependent )  
     end
   end
   

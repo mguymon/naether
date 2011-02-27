@@ -1,4 +1,3 @@
-require 'src/test/spec/spec_helper'
 require 'src/main/ruby/naether'
 
 describe Naether::Java do

@@ -1,4 +1,3 @@
-require 'src/test/spec/spec_helper'
 require 'src/main/ruby/naether'
 
 describe Naether do
@@ -15,9 +14,14 @@ describe Naether do
       @naether.should_not be_nil
     end
     
-    it "should add dependency" do
+    it "should add a dependency" do
       @naether.add_dependency( "junit:junit:jar:4.8.2" )  
       @naether.dependencies.should eql ["junit:junit:jar:4.8.2"]
+    end
+    
+    it "should set a list of dependencies" do
+      @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.24" ]  
+      @naether.dependencies.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.24"]
     end
     
     it "should resolve dependencies" do

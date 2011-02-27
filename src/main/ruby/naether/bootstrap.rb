@@ -20,6 +20,7 @@ class Naether
         Dir.glob(File.expand_path("#{File.dirname(__FILE__)}/../../naether*.jar")).first
       end
       
+      # write bootstrap dependencies to yaml file
       def write_dependencies( jar_path = nil, dest = 'jar_dependencies.yml' )
         Naether::Java.load_jars_dir( jar_path || Naether::JAR_LIB )
         deps = {};
@@ -43,7 +44,7 @@ class Naether
         end
         
         if dep_file.nil?
-          dep_file = "#{File.dirname( __FILE__ )}../../jar_dependencies.yml"
+          dep_file = "#{File.dirname( __FILE__ )}/../../jar_dependencies.yml"
         end
         
         dep = YAML.load_file( dep_file )  
