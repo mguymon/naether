@@ -51,7 +51,8 @@ Jeweler::Tasks.new do |gem|
   gem.platform       = platform
   gem.require_paths = %w[lib]
   
-  gem.files = ['VERSION', 'naether.gemspec', 'LICENSE','README.rdoc','pom.xml', 'lib/naether.rb', naether_jar]
+  ruby_files = Dir.glob("lib/**/*.rb")
+  gem.files = ruby_files + ['VERSION', 'naether.gemspec', 'LICENSE','README.rdoc','pom.xml', naether_jar]
 
   
   # Include your dependencies below. Runtime dependencies are required when using your gem,
@@ -61,7 +62,7 @@ Jeweler::Tasks.new do |gem|
 end
 Jeweler::RubygemsDotOrgTasks.new
 
-require "ftools"
+require "fileutils"
 task :setup_naether_gem_build do
     unless File.exists?( "target" )
       raise "Run `mvn package` to build java first" 
@@ -72,20 +73,23 @@ task :setup_naether_gem_build do
     end
     
     unless File.exists?( "target/gem/lib" )
-      Dir.mkdir( "target/gem/lib" )
+      FileUtils.mkdir_p( "target/gem/lib/naether" )
     end
     
-    File.copy( 'src/main/ruby/naether.rb', "target/gem/lib/naether.rb" )
-    File.copy( 'LICENSE', "target/gem/LICENSE" )
-    File.copy( 'README.rdoc', "target/gem/README.rdoc" )
-    File.copy( 'pom.xml', "target/gem/pom.xml" )
-    File.copy( 'VERSION', "target/gem/VERSION" )
+    Dir.glob("src/main/ruby/**/*.rb") do |file|
+      FileUtils.copy( file, file.gsub("src/main/ruby", "target/gem/lib"))
+    end
+    
+    FileUtils.copy( 'LICENSE', "target/gem/LICENSE" )
+    FileUtils.copy( 'README.rdoc', "target/gem/README.rdoc" )
+    FileUtils.copy( 'pom.xml', "target/gem/pom.xml" )
+    FileUtils.copy( 'VERSION', "target/gem/VERSION" )
     
     # Rather than loading the Java for inspecting the Maven project, just copy all naether
     # jars into the target/gem. The gemspec will know the correct jar to use from inspecting
     # the Maven project.
     Dir.glob('target/naether*.jar').each do |jar|
-      File.copy( jar, "target/gem/#{File.basename(jar)}" )
+      FileUtils.copy( jar, "target/gem/#{File.basename(jar)}" )
     end
     
     # Change dir so relevant files have the correct paths
@@ -103,22 +107,15 @@ Rake::Task["build"].enhance do
   
   platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
   version = IO.read('VERSION').strip
-  File.copy( "pkg/naether-#{version}#{"-java" if platform =='java'}.gem", "../../pkg/." )  
+  FileUtils.copy( "pkg/naether-#{version}#{"-java" if platform =='java'}.gem", "../../pkg/." )  
 end
 
-require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
+require "rspec/core/rake_task"
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.pattern = 'src/test/spec/**/*_spec.rb'
 end
 
-require 'rcov/rcovtask'
-Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
-end
+task :test => :spec
 
 task :default => :test
 
