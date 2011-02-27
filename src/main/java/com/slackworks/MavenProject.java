@@ -18,13 +18,15 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 // Codehause Plexus
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+// SLF4J
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Maven Project Model
  * 
- * @author Michael
+ * @author Michael Guymon
  *
  */
 public class MavenProject {

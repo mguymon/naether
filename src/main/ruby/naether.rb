@@ -1,8 +1,9 @@
 require "#{File.dirname(__FILE__)}/naether/bootstrap"
-require "#{File.dirname(__FILE__)}/naether/classpath"
+require "#{File.dirname(__FILE__)}/naether/java"
 
 class Naether
   JAR_LIB = "#{File.dirname(__FILE__)}/.."
+  
   def self.platform
     platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
   end
@@ -11,13 +12,15 @@ class Naether
     Naether::Bootstrap.dependencies( jar_path )
   end
   
-  def initialize( jar_path )
-    Naether::Classpath.load_jars(jar_path)
+  def initialize( deps_jar_path, naether_jar_path = nil )
+    naether_jar_path = naether_jar_path || JAR_LIB
+    Naether::Java.load_jar_dirs( [deps_jar_path,naether_jar_path] )
     
     if Naether.platform == 'java'
       @resolver = com.slackworks.Naether.new 
     else
-      @resolver = Rjb::Import('com.slackworks.Naether.new') 
+      naetherClass = Rjb::import('com.slackworks.Naether') 
+      @resolver = naetherClass.new
     end
   end
   
@@ -37,6 +40,11 @@ class Naether
   end
   
   def dependencies
-    @resolver.get_dependencies_notation.to_a
+    if Naether.platform == 'java'
+      return @resolver.getDependenciesNotation().to_a
+    else
+      bootstrap = Rjb::import('com.slackworks.Bootstrap')
+      return @resolver.getDependenciesNotation().toArray().map{ |dep| dep.toString() }
+    end 
   end
 end

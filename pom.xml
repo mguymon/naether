@@ -101,6 +101,12 @@
       <artifactId>wagon-ssh</artifactId>
       <version>${wagonVersion}</version>
     </dependency>
+	<dependency>
+	    <groupId>org.apache.maven.wagon</groupId>
+	    <artifactId>wagon-http-lightweight</artifactId>
+	    <version>${wagonVersion}</version>
+	</dependency>
+
 
 	
 	<!-- exclude commons logging -->
@@ -108,6 +114,12 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+		<dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+            <version>1.1</version>
             <scope>provided</scope>
         </dependency>
 
@@ -144,5 +156,16 @@
 	  </plugin>
 	</plugins>
   </build>
+  
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.7.2</version>
+      </plugin>
+    </plugins>
+  </reporting>
+
 
 </project>

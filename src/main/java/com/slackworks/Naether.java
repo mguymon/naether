@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Apache Maven
+import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 
-// Codehaus Plexus IoC
-import org.codehaus.plexus.DefaultPlexusContainer;
-
-// Sonatype Aether Dependency Management
+// SL4J
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+// Sonatype Aether Dependency Management
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -23,8 +23,12 @@ import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyRequest;
+import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
+import org.sonatype.aether.connector.wagon.WagonProvider;
+import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
+
 
 /**
  * Dependency Resolver using Maven's Aether
@@ -99,7 +103,12 @@ public class Naether {
 	}
 	
 	public RepositorySystem newRepositorySystem() throws Exception {
-		return new DefaultPlexusContainer().lookup( RepositorySystem.class );
+		DefaultServiceLocator locator = new DefaultServiceLocator();
+        locator.setServices( WagonProvider.class, new ManualWagonProvider() );
+        locator.addService( RepositoryConnectorFactory.class, WagonRepositoryConnectorFactory.class );
+
+        return locator.getService( RepositorySystem.class );
+
 	}
 
 	public RepositorySystemSession newSession( RepositorySystem system ) {
@@ -142,6 +151,7 @@ public class Naether {
         DependencyNode node = repoSystem.collectDependencies( session, collectRequest ).getRoot();
         DependencyRequest dependencyRequest = new DependencyRequest( node, null );
 
+        log.info( "Resolving dependencies to files" );
         repoSystem.resolveDependencies( session, dependencyRequest  );
 
         nlg = new PreorderNodeListGenerator();
