@@ -109,9 +109,9 @@ Rake::Task["build"].enhance do
   FileUtils.copy( "pkg/naether-#{version}#{"-java" if platform =='java'}.gem", "../../pkg/." )  
 end
 
-require "rspec/core/rake_task"
-RSpec::Core::RakeTask.new(:spec) do |t|
-  t.pattern = 'src/test/spec/**/*_spec.rb'
+require 'spec/rake/spectask'
+Spec::Rake::SpecTask.new(:spec) do |t|
+  t.spec_files = FileList['src/test/spec/**/*_spec.rb']
 end
 
 task :test => :spec
