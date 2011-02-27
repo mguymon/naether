@@ -13,22 +13,35 @@ class Naether
   # Naether jar path will default to packaged in the gem
   JAR_LIB = "#{File.dirname(__FILE__)}/.."
   
-  # Helper to determine the platform
-  def self.platform
-    platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
-  end
-  
-  # Java dependencies needed to bootstrap Naether
-  def self.bootstrap_dependencies( jar_path = nil )
-    Naether::Bootstrap.dependencies( jar_path )
+  class << self
+    # Helper to determine the platform
+    def platform
+      $platform || RUBY_PLATFORM[/java/] || 'ruby'
+    end
+    
+    # Java dependencies needed to bootstrap Naether
+    def bootstrap_dependencies( dep_file=nil )
+      Naether::Bootstrap.dependencies( dep_file )
+    end
+    
+    def create_from_paths( deps_jar_dir, naether_jar_dir = nil )
+      naether_jar_dir = naether_jar_dir || JAR_LIB
+      Naether::Java.load_jars_dir( [deps_jar_dir, naether_jar_dir] )
+      
+      Naether.new
+    end
+    
+    def create_from_jars( jars )
+      Naether::Java.load_jars( jars )
+      
+      Naether.new
+    end
   end
   
   #
   # Create new instance
   #
-  def initialize( deps_jar_path, naether_jar_path = nil )
-    naether_jar_path = naether_jar_path || JAR_LIB
-    Naether::Java.load_jar_dirs( [deps_jar_path,naether_jar_path] )
+  def initialize()
     
     if Naether.platform == 'java'
       @resolver = com.slackworks.Naether.new 

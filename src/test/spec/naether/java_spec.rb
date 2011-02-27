@@ -4,7 +4,7 @@ require 'src/main/ruby/naether'
 describe Naether::Java do
   context "Class" do
     it "should load jars" do
-      Naether::Java.load_jar_dirs( 'target/lib' )
+      Naether::Java.load_jars_dir( 'target/lib' )
       loaded_jars = Naether::Java.loaded_jars
       
       missing = []

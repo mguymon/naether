@@ -21,13 +21,30 @@ class Naether
     end
     
     #
-    # Load all jars in path
     #
-    def self.load_jar_dirs(jar_paths)
+    #
+    def self.load_jars_dir(paths)
+      unless paths.is_a? Array
+        paths = [paths]
+      end
+      
+      jars = []
+      paths.each do |path|
+        jars = jars + Dir.glob( "#{File.expand_path(path)}/*.jar")
+      end
+      
+      Naether::Java.load_jars(jars)
+      
+    end
+    
+    #
+    # Load jars
+    #
+    def self.load_jars(jars)
       if Naether.platform == 'java'
-        Naether::Java::JRuby.instance.load_jar_dirs(jar_paths)
+        Naether::Java::JRuby.instance.load_jars(jars)
       else
-        Naether::Java::Ruby.instance.load_jar_dirs(jar_paths)
+        Naether::Java::Ruby.instance.load_jars(jars)
       end
     end
     
@@ -36,28 +53,27 @@ class Naether
     #
     class JRuby
       include Singleton
-
+      
       attr_reader :loaded_jars
-
+      
       def initialize
         require 'java'
         
         @loaded_jars = []
       end
-
-      def load_jar_dirs(jar_paths)
+      
+      def load_jars(jars)
         loaded_jars = []
-        unless jar_paths.is_a? Array
-          jar_paths = [jar_paths]
+        unless jars.is_a? Array
+          jars = [jars]
         end
         
-        jar_paths.each do |jar_path|
-          Dir.glob("#{File.expand_path(jar_path)}/*.jar") do |jar|
-            if !@loaded_jars.include? jar
-              require jar
-              loaded_jars << jar
-              @loaded_jars << jar
-            end
+        jars.each do |jar|
+          expanded_jar = File.expand_path(jar)
+          if !@loaded_jars.include? expanded_jar
+            require expanded_jar
+            loaded_jars << expanded_jar
+            @loaded_jars << expanded_jar
           end
         end
         
@@ -83,18 +99,17 @@ class Naether
         @loaded_jars = []
       end
       
-      def load_jar_dirs(jar_paths)
+      def load_jars(jars)
         loaded_jars = []
-        unless jar_paths.is_a?( Array )
-          jar_paths = [jar_paths]
+        unless jars.is_a?( Array )
+          jars = [jars]
         end
         
-        jar_paths.each do |jar_path|
-          Dir.glob("#{File.expand_path(jar_path)}/*.jar").each do |jar|
-            if !@loaded_jars.include? jar
-              loaded_jars << jar
-              @loaded_jars << jar
-            end
+        jars.each do |jar|
+          expanded_jar = File.expand_path(jar)
+          if !@loaded_jars.include? expanded_jar
+            loaded_jars << expanded_jar
+            @loaded_jars << expanded_jar
           end
         end
         

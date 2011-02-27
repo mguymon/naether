@@ -7,7 +7,7 @@ describe Naether do
     # XXX: Causes following tests to fail when using Rjb.
     if Naether.platform == 'java'
       it "should have bootstrap dependencies" do
-        Naether.bootstrap_dependencies("target").should include "org.sonatype.aether:aether-util:jar:1.11"
+        Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.11"
       end
       
     else
@@ -17,7 +17,7 @@ describe Naether do
   
   context "Instance" do
     before(:each) do
-      @naether = Naether.new("target/lib", 'target')
+      @naether = Naether.create_from_paths("target/lib", 'target')
       @naether.should_not be_nil
     end
     

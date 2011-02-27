@@ -9,35 +9,34 @@ rescue Bundler::BundlerError => e
 end
 require 'rake'
 
+require 'src/main/ruby/naether'
+namespace :naether do
+  task :write_dependencies do
+    Naether::Bootstrap.write_dependencies("target")
+  end
+end
+
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   
   platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
   naether_jar = nil
   
+  Naether::Java.load_jars_dir( ['target', 'target/lib'])
+  
   if platform == 'java'
-    require 'java'
-    $CLASSPATH << "target/classes"
-    Dir.glob('target/lib/*.jar').each do |jar|
-      require jar
-    end
     java_import com.slackworks.MavenProject
     
     maven_project = MavenProject.new('pom.xml')
     naether_jar = "naether-#{maven_project.get_version}.jar"
   else
-    require 'rjb'
-    classpath = ["target/classes"]
-    Dir.glob('target/lib/*.jar').each do |jar|
-      classpath << jar
-    end
-    java_opts = (ENV['JAVA_OPTS'] || ENV['JAVA_OPTIONS']).to_s.split
-    Rjb::load(classpath.join(File::PATH_SEPARATOR), java_opts)
-    MavenProject = Rjb::import('com.slackworks.MavenProject')
-    maven_project = MavenProject.new
+    mavenProjectClass = Rjb::import('com.slackworks.MavenProject')
+    maven_project = mavenProjectClass.new
     maven_project.loadPOM('pom.xml')
     naether_jar = "naether-#{maven_project.getVersion()}.jar"
   end
+  
+  Naether::Bootstrap.write_dependencies("target")
   
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "naether"
@@ -52,7 +51,7 @@ Jeweler::Tasks.new do |gem|
   gem.require_paths = %w[lib]
   
   ruby_files = Dir.glob("lib/**/*.rb")
-  gem.files = ruby_files + ['VERSION', 'naether.gemspec', 'LICENSE','README.rdoc','pom.xml', naether_jar]
+  gem.files = ruby_files + ['jar_dependencies.yml', 'VERSION', 'naether.gemspec', 'LICENSE','README.rdoc','pom.xml', naether_jar]
 
   
   # Include your dependencies below. Runtime dependencies are required when using your gem,
