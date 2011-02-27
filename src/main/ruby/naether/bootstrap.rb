@@ -15,6 +15,11 @@ class Naether
     
     class << self
       
+      # Find naether jar relative to the gem install
+      def naether_jar
+        Dir.glob(File.expand_path("#{File.dirname(__FILE__)}/../../naether*.jar")).first
+      end
+      
       def write_dependencies( jar_path = nil, dest = 'jar_dependencies.yml' )
         Naether::Java.load_jars_dir( jar_path || Naether::JAR_LIB )
         deps = {};
