@@ -4,14 +4,8 @@ require 'src/main/ruby/naether'
 describe Naether do
   
   context "Class" do
-    # XXX: Causes following tests to fail when using Rjb.
-    if Naether.platform == 'java'
-      it "should have bootstrap dependencies" do
-        Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.11"
-      end
-      
-    else
-      pending( "allow multiple calls to Rjb from tests" )
+    it "should have bootstrap dependencies" do
+      Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.11"
     end
   end
   
