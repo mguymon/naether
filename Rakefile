@@ -11,6 +11,42 @@ require 'rake'
 
 require 'src/main/ruby/naether'
 namespace :naether do
+  require "fileutils"
+  task :setup_naether_gem_build do
+      unless File.exists?( "target" )
+        raise "Run `mvn package` to build java first" 
+      end
+      
+      unless File.exists?( "target/gem" )
+        Dir.mkdir( "target/gem" )
+      end
+      
+      unless File.exists?( "target/gem/lib" )
+        FileUtils.mkdir_p( "target/gem/lib/naether" )
+      end
+      
+      Dir.glob("src/main/ruby/**/*.rb") do |file|
+        FileUtils.copy( file, file.gsub("src/main/ruby", "target/gem/lib"))
+      end
+      
+      FileUtils.copy( 'jar_dependencies.yaml', "target/gem/jar_dependencies.yaml" )
+      FileUtils.copy( 'LICENSE', "target/gem/LICENSE" )
+      FileUtils.copy( 'README.rdoc', "target/gem/README.rdoc" )
+      FileUtils.copy( 'pom.xml', "target/gem/pom.xml" )
+      FileUtils.copy( 'VERSION', "target/gem/VERSION" )
+      
+      # Rather than loading the Java for inspecting the Maven project, just copy all naether
+      # jars into the target/gem. The gemspec will know the correct jar to use from inspecting
+      # the Maven project.
+      Dir.glob('target/naether*.jar').each do |jar|
+        FileUtils.copy( jar, "target/gem/#{File.basename(jar)}" )
+      end
+      
+      # Change dir so relevant files have the correct paths
+      Dir.chdir( "target/gem" )
+      
+  end
+
   task :write_dependencies do
     Naether::Bootstrap.write_dependencies("target")
   end
@@ -72,43 +108,8 @@ Jeweler::Tasks.new do |gem|
 end
 Jeweler::RubygemsDotOrgTasks.new
 
-require "fileutils"
-task :setup_naether_gem_build do
-    unless File.exists?( "target" )
-      raise "Run `mvn package` to build java first" 
-    end
-    
-    unless File.exists?( "target/gem" )
-      Dir.mkdir( "target/gem" )
-    end
-    
-    unless File.exists?( "target/gem/lib" )
-      FileUtils.mkdir_p( "target/gem/lib/naether" )
-    end
-    
-    Dir.glob("src/main/ruby/**/*.rb") do |file|
-      FileUtils.copy( file, file.gsub("src/main/ruby", "target/gem/lib"))
-    end
-    
-    FileUtils.copy( 'LICENSE', "target/gem/LICENSE" )
-    FileUtils.copy( 'README.rdoc', "target/gem/README.rdoc" )
-    FileUtils.copy( 'pom.xml', "target/gem/pom.xml" )
-    FileUtils.copy( 'VERSION', "target/gem/VERSION" )
-    
-    # Rather than loading the Java for inspecting the Maven project, just copy all naether
-    # jars into the target/gem. The gemspec will know the correct jar to use from inspecting
-    # the Maven project.
-    Dir.glob('target/naether*.jar').each do |jar|
-      FileUtils.copy( jar, "target/gem/#{File.basename(jar)}" )
-    end
-    
-    # Change dir so relevant files have the correct paths
-    Dir.chdir( "target/gem" )
-    
-end
-
-Rake::Task["build"].enhance ["setup_naether_gem_build"]
-Rake::Task["release"].enhance ["setup_naether_gem_build", "build", "naether:copy_gem_from_target"]
+Rake::Task["build"].enhance ["naether:setup_naether_gem_build"]
+Rake::Task["release"].enhance ["naether:setup_naether_gem_build", "build", "naether:copy_gem_from_target"]
 
 Rake::Task["build"].enhance do
   Rake::Task['naether:copy_gem_from_target'].invoke
