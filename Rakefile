@@ -95,18 +95,7 @@ task :setup_naether_gem_build do
 end
 
 Rake::Task["build"].enhance ["setup_naether_gem_build"]
-Rake::Task["release"].enhance ["setup_naether_gem_build"]
-
-# XXX: Hack to copy new gem from target/gem/pkg/ to pkg/
-Rake::Task["build"].enhance do
-  unless File.exists?( "../../pkg" )
-    Dir.mkdir( "../../pkg" )
-  end
-  
-  platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
-  version = IO.read('VERSION').strip
-  FileUtils.copy( "pkg/naether-#{version}#{"-java" if platform =='java'}.gem", "../../pkg/." )  
-end
+Rake::Task["release"].enhance ["build"]
 
 Rake::Task["release"].enhance do
   unless File.exists?( "../../pkg" )
