@@ -22,8 +22,11 @@ namespace :naether do
     
     platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
     version = IO.read('VERSION').strip
-    FileUtils.copy( "pkg/naether-#{version}#{"-java" if platform =='java'}.gem", "../../pkg/." )   
-    end
+    source = File.expand_path("pkg/naether-#{version}#{"-java" if platform =='java'}.gem")
+    dest = File.expand_path( "../../pkg/." )
+    puts "copying #{source} to #{dest}"
+    FileUtils.copy( source, dest )   
+  end
 end
 
 require 'jeweler'
