@@ -14,6 +14,16 @@ namespace :naether do
   task :write_dependencies do
     Naether::Bootstrap.write_dependencies("target")
   end
+  
+  task :copy_gem_from_target do
+    unless File.exists?( "../../pkg" )
+      Dir.mkdir( "../../pkg" )
+    end
+    
+    platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
+    version = IO.read('VERSION').strip
+    FileUtils.copy( "pkg/naether-#{version}#{"-java" if platform =='java'}.gem", "../../pkg/." )   
+    end
 end
 
 require 'jeweler'
@@ -95,16 +105,10 @@ task :setup_naether_gem_build do
 end
 
 Rake::Task["build"].enhance ["setup_naether_gem_build"]
-Rake::Task["release"].enhance ["build"]
+Rake::Task["release"].enhance ["naether:copy_gem_from_target"]
 
-Rake::Task["release"].enhance do
-  unless File.exists?( "../../pkg" )
-    Dir.mkdir( "../../pkg" )
-  end
-  
-  platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
-  version = IO.read('VERSION').strip
-  FileUtils.copy( "pkg/naether-#{version}#{"-java" if platform =='java'}.gem", "../../pkg/." ) 
+Rake::Task["build"].enhance do
+  Rake::Task['naether:copy_gem_from_target'].invoke
 end
 
 require 'spec/rake/spectask'
