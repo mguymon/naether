@@ -27,7 +27,6 @@ namespace :naether do
       
             
       Dir.glob("src/main/ruby/**/*.rb") do |file|
-        puts file
         FileUtils.copy( file, file.gsub("src/main/ruby", "target/gem/lib"))
       end
       
@@ -41,7 +40,6 @@ namespace :naether do
       # jars into the target/gem. The gemspec will know the correct jar to use from inspecting
       # the Maven project.
       Dir.glob('target/naether*.jar').each do |jar|
-        puts jar
         FileUtils.copy( jar, "target/gem/#{File.basename(jar)}" )
       end
       
@@ -87,6 +85,8 @@ Jeweler::Tasks.new do |gem|
     maven_project.loadPOM('pom.xml')
     naether_jar = "naether-#{maven_project.getVersion()}.jar"
   end
+  
+  puts "Naether Jar: #{naether_jar}"
   
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "naether"
