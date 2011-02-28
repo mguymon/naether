@@ -105,7 +105,7 @@ task :setup_naether_gem_build do
 end
 
 Rake::Task["build"].enhance ["setup_naether_gem_build"]
-Rake::Task["release"].enhance ["naether:copy_gem_from_target"]
+Rake::Task["release"].enhance ["setup_naether_gem_build"]
 
 Rake::Task["build"].enhance do
   Rake::Task['naether:copy_gem_from_target'].invoke
