@@ -14,6 +14,12 @@ describe Naether do
       @naether.should_not be_nil
     end
     
+    it "should add a remote repository" do
+      @naether.add_remote_repository("http://test.net:7011")
+      @naether.remote_repositories[0].getId().should eql( "central" )
+      @naether.remote_repositories[1].getId().should eql( "test.net-7011" )
+    end
+    
     it "should add a dependency" do
       @naether.add_dependency( "junit:junit:jar:4.8.2" )  
       @naether.dependencies.should eql ["junit:junit:jar:4.8.2"]

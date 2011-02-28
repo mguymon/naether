@@ -51,24 +51,25 @@ class Naether
     end
   end
   
-  #
+  def clear_remote_repositories
+    @resolver.clearRemoteRepositories()
+  end
+  
+  # Add remote repository
+  def add_remote_repository( url )
+    @resolver.addRemoteRepository( url )
+  end
+  
+  def remote_repositories
+    @resolver.getRemoteRepositories()
+  end
+  
   # Add a dependency in the notation: groupId:artifactId:type:version
-  #
   def add_dependency( notation )
     @resolver.addDependency( notation )
   end
   
-  #
-  # Resolve dependencies, finding related additional dependencies
-  #
-  def resolve_dependencies
-    @resolver.resolveDependencies();
-    dependencies
-  end
-  
-  #
   # Set array of dependencies in the notation: groupId:artifactId:type:version
-  #
   def dependencies=(dependencies)
     dependencies.each do |dependent|
       add_dependency( dependent )  
@@ -83,5 +84,11 @@ class Naether
       bootstrap = Rjb::import('com.slackworks.Bootstrap')
       return @resolver.getDependenciesNotation().toArray().map{ |dep| dep.toString() }
     end 
+  end
+  
+  # Resolve dependencies, finding related additional dependencies
+  def resolve_dependencies
+    @resolver.resolveDependencies();
+    dependencies
   end
 end

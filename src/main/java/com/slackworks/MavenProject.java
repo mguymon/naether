@@ -27,54 +27,59 @@ import org.slf4j.LoggerFactory;
  * Maven Project Model
  * 
  * @author Michael Guymon
- *
+ * 
  */
 public class MavenProject {
 
 	private static Logger log = LoggerFactory.getLogger(MavenProject.class);
-	
+
 	private Model mavenModel;
 	private Pattern propertyPattern = Pattern.compile("^\\$\\{(.+)\\}$");
-	
+
 	private boolean allowCompileScope = true;
 	private boolean allowRuntimeScope = true;
 	private boolean allowTestScope = false;
 	private boolean allowSystemScope = true;
 	private boolean allowProvidedScope = false;
-	
+
 	/**
 	 * New Instance
 	 */
 	public MavenProject() {
-		
+
 	}
-	
+
 	/**
 	 * New Instance loading Maven pom
 	 * 
-	 * @param pomPath String path
+	 * @param pomPath
+	 *            String path
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	public MavenProject( String pomPath ) throws FileNotFoundException, IOException, XmlPullParserException {
-		loadPOM( pomPath );
+	public MavenProject(String pomPath) throws FileNotFoundException,
+			IOException, XmlPullParserException {
+		loadPOM(pomPath);
 	}
-	
+
 	/**
 	 * Load Maven pom
 	 * 
-	 * @param pomPath String path
+	 * @param pomPath
+	 *            String path
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	public void loadPOM( String pomPath ) throws FileNotFoundException, IOException, XmlPullParserException {
-		log.debug( "Loading pom {}", pomPath );
+	public void loadPOM(String pomPath) throws FileNotFoundException,
+			IOException, XmlPullParserException {
+		log.debug("Loading pom {}", pomPath);
 		MavenXpp3Reader reader = new MavenXpp3Reader();
-		setMavenModel(reader.read( new BufferedReader( new FileReader( new File( pomPath ) ) ) ));
+		setMavenModel(reader.read(new BufferedReader(new FileReader(new File(
+				pomPath)))));
 	}
-	
+
 	/**
 	 * Get version of Maven project
 	 * 
@@ -83,7 +88,7 @@ public class MavenProject {
 	public String getVersion() {
 		return getMavenModel().getVersion();
 	}
-	
+
 	/**
 	 * Get List of {@link Dependency} for Maven Project
 	 * 
@@ -92,53 +97,56 @@ public class MavenProject {
 	public List<Dependency> getDependencies() {
 		return getDependencies(true);
 	}
-	
+
 	/**
-	 * Get List of {@link Depedencies} for the Maven Project, with boolean
-	 * to substitute Project Properties.
+	 * Get List of {@link Depedencies} for the Maven Project, with boolean to
+	 * substitute Project Properties.
 	 * 
-	 * @param substituteProperties boolean
+	 * @param substituteProperties
+	 *            boolean
 	 * @return List<Dependency>
 	 */
-	public List<Dependency> getDependencies( boolean substituteProperties ) {
+	public List<Dependency> getDependencies(boolean substituteProperties) {
 		List<Dependency> dependencies = new ArrayList<Dependency>();
-		
+
 		List<String> scopes = this.allowedScopes();
-		
-		log.info( "Allowed Maven Scopes: {}", scopes );
-		
+
+		log.info("Allowed Maven Scopes: {}", scopes);
+
 		// Substitute Properties
-		if ( substituteProperties ) {
+		if (substituteProperties) {
 			// XXX: There has to be a way maven handles this automatically
-			for( Dependency dependency: getMavenModel().getDependencies() ) {
-				
+			for (Dependency dependency : getMavenModel().getDependencies()) {
+
 				// Check that scope of the Dependency has been marked allowed
-				if ( scopes.indexOf( dependency.getScope() ) >= 0 ) {
-			
-					String artifactId = substituteProperty( dependency.getArtifactId() );
-					String groupId = substituteProperty( dependency.getGroupId() );
-					String version = substituteProperty( dependency.getVersion() );
-					
-					dependency.setArtifactId( artifactId );
-					dependency.setGroupId( groupId );
-					dependency.setVersion( version );
-					dependencies.add( dependency );
+				if (scopes.indexOf(dependency.getScope()) >= 0) {
+
+					String artifactId = substituteProperty(dependency
+							.getArtifactId());
+					String groupId = substituteProperty(dependency.getGroupId());
+					String version = substituteProperty(dependency.getVersion());
+
+					dependency.setArtifactId(artifactId);
+					dependency.setGroupId(groupId);
+					dependency.setVersion(version);
+					dependencies.add(dependency);
 				}
 			}
-			
-		// Keep vals
+
+			// Keep vals
 		} else {
-			for( Dependency dependency: getMavenModel().getDependencies() ) {
+			for (Dependency dependency : getMavenModel().getDependencies()) {
 				// Check that scope of the Dependency has been marked allowed
-				if ( scopes.indexOf( dependency.getScope() ) >= 0 ) {
-					dependencies.add( dependency );
+				if (scopes.indexOf(dependency.getScope()) >= 0) {
+					dependencies.add(dependency);
 				}
-			};
+			}
+			;
 		}
-		
+
 		return dependencies;
 	}
-	
+
 	/**
 	 * Return {@link List<String>} of dependencies in the format of
 	 * {@code groupId:artifactId:packageType:version}
@@ -148,27 +156,30 @@ public class MavenProject {
 	public List<String> getDependenciesNotation() {
 		return getDependenciesNotation(true);
 	}
-	
+
 	/**
-	 * Get List<String> of dependencies in format of {@link groupId:artifactId:packageType:version}
+	 * Get List<String> of dependencies in format of {@link groupId
+	 * :artifactId:packageType:version}
 	 * 
-	 * @param substituteProperties boolean
+	 * @param substituteProperties
+	 *            boolean
 	 * @return List<String>
 	 */
 	public List<String> getDependenciesNotation(boolean substituteProperties) {
 		List<String> notations = new ArrayList<String>();
-		
-		for ( Dependency dependency: getDependencies(substituteProperties) ) {
-			notations.add( Notation.generate( dependency ) );
+
+		for (Dependency dependency : getDependencies(substituteProperties)) {
+			notations.add(Notation.generate(dependency));
 		}
-		
+
 		return notations;
 	}
 
 	/**
 	 * Set the Maven {@link Model}
 	 * 
-	 * @param mavenModel {@link Model}
+	 * @param mavenModel
+	 *            {@link Model}
 	 */
 	public void setMavenModel(Model mavenModel) {
 		this.mavenModel = mavenModel;
@@ -182,28 +193,29 @@ public class MavenProject {
 	public Model getMavenModel() {
 		return mavenModel;
 	}
-	
+
 	/**
 	 * Substitute a Maven Property expression, i.e. ${aetherVersion}, to its
-	 * corresponding Maven pom definition, i.e. 1.11 from {@code <aetherVersion>1.11</aetherVersion>}
+	 * corresponding Maven pom definition, i.e. 1.11 from
+	 * {@code <aetherVersion>1.11</aetherVersion>}
 	 * 
 	 * @param field
 	 * @return
 	 */
-	private String substituteProperty( String field ) {
+	private String substituteProperty(String field) {
 		String property = null;
-		Matcher matcher = propertyPattern.matcher( field );
+		Matcher matcher = propertyPattern.matcher(field);
 		while (matcher.find()) {
 			property = matcher.group(1);
 		}
-		
-		if ( property != null ) {
-			return this.getMavenModel().getProperties().getProperty( property );
+
+		if (property != null) {
+			return this.getMavenModel().getProperties().getProperty(property);
 		} else {
 			return field;
 		}
 	}
-	
+
 	/**
 	 * List<String> of scopes allows scopes.
 	 * 
@@ -215,28 +227,28 @@ public class MavenProject {
 	 */
 	private List<String> allowedScopes() {
 		List<String> scopes = new ArrayList<String>();
-		
-		if ( this.allowCompileScope ) {
-			scopes.add( "compile" );
-			scopes.add( null );
+
+		if (this.allowCompileScope) {
+			scopes.add("compile");
+			scopes.add(null);
 		}
-		
-		if ( this.allowProvidedScope ) {
-			scopes.add( "provided" );
+
+		if (this.allowProvidedScope) {
+			scopes.add("provided");
 		}
-		
-		if ( this.allowRuntimeScope ) {
-			scopes.add( "runtime" );
+
+		if (this.allowRuntimeScope) {
+			scopes.add("runtime");
 		}
-		
-		if ( this.allowSystemScope ) {
-			scopes.add( "system" );
+
+		if (this.allowSystemScope) {
+			scopes.add("system");
 		}
-		
-		if ( this.allowTestScope ) {
-			scopes.add( "test" );
+
+		if (this.allowTestScope) {
+			scopes.add("test");
 		}
-		
+
 		return scopes;
 	}
 

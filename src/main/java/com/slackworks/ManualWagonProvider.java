@@ -26,7 +26,7 @@ public class ManualWagonProvider implements WagonProvider {
 	public Wagon lookup(String roleHint) throws Exception {
 		if ("http".equals(roleHint)) {
 			return new LightweightHttpWagon();
-		} else if ( "https".equals(roleHint)) {
+		} else if ("https".equals(roleHint)) {
 			return new LightweightHttpsWagon();
 		}
 		return null;

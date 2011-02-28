@@ -2,10 +2,12 @@ package com.slackworks;
 
 // Java SE
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
 // JUnit
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -25,11 +27,37 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 public class NaetherTest {
 	
 	private static Logger log = LoggerFactory.getLogger(NaetherTest.class);
+	private Naether naether;
+	
+	@Before
+	public void createNaether() {
+		naether = new Naether();
+		naether.setLocalRepoPath( "target/test-repo" );
+	}
+	
+//	@Test
+//	public void resolveArtifactNotInMainRepo() throws Exception {
+//		Dependency dependency =
+//            new Dependency( new DefaultArtifact( "org.springframework:org.springframework.orm:3.0.5.RELEASE" ), "compile" );
+//		naether.addRemoteRepository( "http://dev.faqventure.com:9091/artifactory/libs-releases-local" );
+//		naether.addDependency(dependency);
+//        naether.resolveDependencies();
+//        assertEquals( "", naether.getResolvedClassPath() );
+//	}
+	
+	@Test
+	public void addRemoteRepository() throws MalformedURLException {
+		assertEquals( "central", naether.getRemoteRepositories().get(0).getId() );
+		
+		naether.addRemoteRepository( "http://test.net:7011" );
+		assertEquals( "test.net-7011", naether.getRemoteRepositories().get(1).getId() );
+		
+		naether.addRemoteRepository( "test-id", "test-type", "http://test.net" );
+		assertEquals( "test-id", naether.getRemoteRepositories().get(2).getId() );
+	}
 	
 	@Test
 	public void getDependenciesNotation() {
-		Naether naether = new Naether();
-		naether.setRepoPath( "target/test-repo" );
 		Dependency dependency =
             new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
         naether.addDependency(dependency);
@@ -39,8 +67,6 @@ public class NaetherTest {
 	
 	@Test
 	public void resolveDepedencies() throws Exception {
-		Naether naether = new Naether();
-		naether.setRepoPath( "target/test-repo" );
 		Dependency dependency =
             new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
         naether.addDependency(dependency);
@@ -52,9 +78,6 @@ public class NaetherTest {
 	
 	@Test
 	public void resolveNaetherDependencies() throws Exception {
-		Naether naether = new Naether();
-		naether.setRepoPath( "target/test-repo" );
-		
 		MavenProject mavenProject = new MavenProject("pom.xml");
 		for( org.apache.maven.model.Dependency mavenDep : mavenProject.getDependencies() ) {
 			String notation = Notation.generate( mavenDep );
