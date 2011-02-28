@@ -35,15 +35,29 @@ public class NaetherTest {
 		naether.setLocalRepoPath( "target/test-repo" );
 	}
 	
-//	@Test
-//	public void resolveArtifactNotInMainRepo() throws Exception {
-//		Dependency dependency =
-//            new Dependency( new DefaultArtifact( "org.springframework:org.springframework.orm:3.0.5.RELEASE" ), "compile" );
-//		naether.addRemoteRepository( "http://repository.springsource.com/maven/bundles/release" );
-//		naether.addDependency(dependency);
-//        naether.resolveDependencies();
-//        assertEquals( "", naether.getResolvedClassPath() );
-//	}
+	@Test
+	public void resolveArtifactNotInMainRepo() throws Exception {
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( "org.springframework:org.springframework.orm:3.0.5.RELEASE" ), "compile" );
+		naether.addRemoteRepository( "http://repository.springsource.com/maven/bundles/release" );
+		naether.addRemoteRepository( "http://repository.springsource.com/maven/bundles/external" );
+		naether.addDependency(dependency);
+        naether.resolveDependencies();
+        
+        List results = new ArrayList<String>();
+        results.add("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.beans:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.asm:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.core:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE");
+        results.add("org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0");
+        results.add("org.springframework:org.springframework.aop:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.context:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.expression:jar:3.0.5.RELEASE");
+        		
+        assertEquals( results, naether.getDependenciesNotation() );
+	}
 	
 	@Test
 	public void addRemoteRepository() throws MalformedURLException {
