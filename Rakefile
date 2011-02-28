@@ -44,8 +44,12 @@ namespace :naether do
       end
       
       # Change dir so relevant files have the correct paths
-      Dir.chdir( "target/gem" )
-      
+      Dir.chdir( "target/gem" )      
+  end
+  
+  task :version_return_from_target do
+    FileUtils.copy( 'VERSION', "../../." )
+    Dir.chdir( "../../" )
   end
 
   task :write_dependencies do
@@ -115,6 +119,10 @@ Jeweler::RubygemsDotOrgTasks.new
 Rake::Task["build"].enhance ["naether:setup_naether_gem_build"]
 Rake::Task["version_required"].enhance ["naether:setup_naether_gem_build"]
 Rake::Task["gemspec:release"].enhance ["naether:setup_naether_gem_build"]
+
+Rake::Task["version:bump:major"].enhance ['naether:version_return_from_target']
+Rake::Task["version:bump:minor"].enhance ['naether:version_return_from_target']
+Rake::Task["version:bump:patch"].enhance ['naether:version_return_from_target']
 
 Rake::Task["build"].enhance do
   Rake::Task['naether:copy_gem_from_target'].invoke
