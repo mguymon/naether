@@ -29,7 +29,7 @@ namespace :naether do
         FileUtils.copy( file, file.gsub("src/main/ruby", "target/gem/lib"))
       end
       
-      FileUtils.copy( 'jar_dependencies.yaml', "target/gem/jar_dependencies.yaml" )
+      FileUtils.copy( 'jar_dependencies.yml', "target/gem/jar_dependencies.yml" )
       FileUtils.copy( 'LICENSE', "target/gem/LICENSE" )
       FileUtils.copy( 'README.rdoc', "target/gem/README.rdoc" )
       FileUtils.copy( 'pom.xml', "target/gem/pom.xml" )
