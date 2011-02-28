@@ -25,7 +25,9 @@ namespace :naether do
         FileUtils.mkdir_p( "target/gem/lib/naether" )
       end
       
+            
       Dir.glob("src/main/ruby/**/*.rb") do |file|
+        puts file
         FileUtils.copy( file, file.gsub("src/main/ruby", "target/gem/lib"))
       end
       
@@ -39,6 +41,7 @@ namespace :naether do
       # jars into the target/gem. The gemspec will know the correct jar to use from inspecting
       # the Maven project.
       Dir.glob('target/naether*.jar').each do |jar|
+        puts jar
         FileUtils.copy( jar, "target/gem/#{File.basename(jar)}" )
       end
       
