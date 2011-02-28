@@ -95,6 +95,7 @@ task :setup_naether_gem_build do
 end
 
 Rake::Task["build"].enhance ["setup_naether_gem_build"]
+Rake::Task["release"].enhance ["setup_naether_gem_build"]
 
 # XXX: Hack to copy new gem from target/gem/pkg/ to pkg/
 Rake::Task["build"].enhance do
