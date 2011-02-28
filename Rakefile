@@ -87,6 +87,7 @@ Jeweler::Tasks.new do |gem|
   end
   
   puts "Naether Jar: #{naether_jar}"
+  puts File.expand_path( "." )
   
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "naether"
@@ -101,7 +102,7 @@ Jeweler::Tasks.new do |gem|
   gem.require_paths = %w[lib]
   
   ruby_files = Dir.glob("lib/**/*.rb")
-  gem.files = ruby_files + ['jar_dependencies.yml', 'VERSION', 'naether.gemspec', 'LICENSE','README.rdoc','pom.xml', naether_jar]
+  gem.files = ruby_files + ['jar_dependencies.yml', 'VERSION', 'LICENSE','README.rdoc','pom.xml', naether_jar]
 
   
   # Include your dependencies below. Runtime dependencies are required when using your gem,
@@ -112,8 +113,7 @@ end
 Jeweler::RubygemsDotOrgTasks.new
 
 Rake::Task["build"].enhance ["naether:setup_naether_gem_build"]
-Rake::Task["gemspec"].enhance ["naether:setup_naether_gem_build"]
-Rake::Task["release"].enhance ["naether:setup_naether_gem_build", "build", "naether:copy_gem_from_target"]
+Rake::Task["version_required"].enhance ["naether:setup_naether_gem_build"]
 
 Rake::Task["build"].enhance do
   Rake::Task['naether:copy_gem_from_target'].invoke
