@@ -108,6 +108,16 @@ Rake::Task["build"].enhance do
   FileUtils.copy( "pkg/naether-#{version}#{"-java" if platform =='java'}.gem", "../../pkg/." )  
 end
 
+Rake::Task["release"].enhance do
+  unless File.exists?( "../../pkg" )
+    Dir.mkdir( "../../pkg" )
+  end
+  
+  platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
+  version = IO.read('VERSION').strip
+  FileUtils.copy( "pkg/naether-#{version}#{"-java" if platform =='java'}.gem", "../../pkg/." ) 
+end
+
 require 'spec/rake/spectask'
 Spec::Rake::SpecTask.new(:spec) do |t|
   t.spec_files = FileList['src/test/spec/**/*_spec.rb']
