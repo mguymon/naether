@@ -39,7 +39,7 @@ public class NaetherTest {
 //	public void resolveArtifactNotInMainRepo() throws Exception {
 //		Dependency dependency =
 //            new Dependency( new DefaultArtifact( "org.springframework:org.springframework.orm:3.0.5.RELEASE" ), "compile" );
-//		naether.addRemoteRepository( "http://dev.faqventure.com:9091/artifactory/libs-releases-local" );
+//		naether.addRemoteRepository( "http://repository.springsource.com/maven/bundles/release" );
 //		naether.addDependency(dependency);
 //        naether.resolveDependencies();
 //        assertEquals( "", naether.getResolvedClassPath() );
