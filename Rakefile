@@ -112,6 +112,7 @@ end
 Jeweler::RubygemsDotOrgTasks.new
 
 Rake::Task["build"].enhance ["naether:setup_naether_gem_build"]
+Rake::Task["gemspec:generate"].enhance ["naether:setup_naether_gem_build"]
 Rake::Task["release"].enhance ["naether:setup_naether_gem_build", "build", "naether:copy_gem_from_target"]
 
 Rake::Task["build"].enhance do
