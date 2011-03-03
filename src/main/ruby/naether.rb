@@ -61,7 +61,11 @@ class Naether
   end
   
   def remote_repositories
-    @resolver.getRemoteRepositories()
+    if Naether.platform == 'java'
+      return @resolver.getRemoteRepositories()
+    else
+      return @resolver.getRemoteRepositories().toArray()
+    end 
   end
   
   # Add a dependency in the notation: groupId:artifactId:type:version
@@ -81,7 +85,6 @@ class Naether
     if Naether.platform == 'java'
       return @resolver.getDependenciesNotation().to_a
     else
-      bootstrap = Rjb::import('com.slackworks.Bootstrap')
       return @resolver.getDependenciesNotation().toArray().map{ |dep| dep.toString() }
     end 
   end
