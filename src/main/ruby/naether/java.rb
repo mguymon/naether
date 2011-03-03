@@ -20,9 +20,8 @@ class Naether
       end
     end
     
-    #
-    #
-    #
+  
+    # Loads all jars from the array of paths
     def self.load_jars_dir(paths)
       unless paths.is_a? Array
         paths = [paths]
@@ -30,16 +29,14 @@ class Naether
       
       jars = []
       paths.each do |path|
-        jars = jars + Dir.glob( "#{File.expand_path(path)}/*.jar")
+        jars = jars + Dir.glob( "#{File.expand_path(path)}/*.jar", File::FNM_CASEFOLD)
       end
       
       Naether::Java.load_jars(jars)
       
     end
     
-    #
-    # Load jars
-    #
+    # Load jars for the runtime platform
     def self.load_jars(jars)
       if Naether.platform == 'java'
         Naether::Java::JRuby.instance.load_jars(jars)
@@ -49,7 +46,7 @@ class Naether
     end
     
     #
-    # Handle loading for JRuby
+    # Handle loading jars for JRuby
     #
     class JRuby
       include Singleton
