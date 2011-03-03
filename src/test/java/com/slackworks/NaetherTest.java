@@ -127,6 +127,8 @@ public class NaetherTest {
 		completeDeps.add( "log4j:log4j:jar:1.2.12");
 		completeDeps.add( "commons-logging:commons-logging-api:jar:1.1");
 		completeDeps.add( "commons-logging:commons-logging:jar:1.1.1");
+		completeDeps.add( "nekohtml:xercesMinimal:jar:1.9.6.2" );
+		completeDeps.add( "nekohtml:nekohtml:jar:1.9.6.2" );
 		
 		List<String> missingDeps = new ArrayList<String>();
         for( String dep : naether.getDependenciesNotation() ) {
