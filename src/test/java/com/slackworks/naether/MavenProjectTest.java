@@ -1,4 +1,4 @@
-package com.slackworks;
+package com.slackworks.naether;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,6 +28,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 // Junit
 import org.junit.Test;
+
+import com.slackworks.naether.MavenProject;
+
 import static org.junit.Assert.*;
 
 /**

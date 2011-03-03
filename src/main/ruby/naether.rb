@@ -46,9 +46,9 @@ class Naether
   def initialize()
     
     if Naether.platform == 'java'
-      @resolver = com.slackworks.Naether.new 
+      @resolver = com.slackworks.naether.Naether.new 
     else
-      naetherClass = Rjb::import('com.slackworks.Naether') 
+      naetherClass = Rjb::import('com.slackworks.naether.Naether') 
       @resolver = naetherClass.new
     end
   end

@@ -79,12 +79,12 @@ Jeweler::Tasks.new do |gem|
   Naether::Java.load_jars_dir( ['target', 'target/lib'])
   
   if platform == 'java'
-    java_import com.slackworks.MavenProject
+    java_import com.slackworks.naether.MavenProject
     
     maven_project = MavenProject.new('pom.xml')
     naether_jar = "naether-#{maven_project.get_version}.jar"
   else
-    mavenProjectClass = Rjb::import('com.slackworks.MavenProject')
+    mavenProjectClass = Rjb::import('com.slackworks.naether.MavenProject')
     maven_project = mavenProjectClass.new
     maven_project.loadPOM('pom.xml')
     naether_jar = "naether-#{maven_project.getVersion()}.jar"

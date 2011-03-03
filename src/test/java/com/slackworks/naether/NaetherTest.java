@@ -1,4 +1,4 @@
-package com.slackworks;
+package com.slackworks.naether;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -34,6 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
+
+import com.slackworks.naether.Bootstrap;
+import com.slackworks.naether.MavenProject;
+import com.slackworks.naether.Naether;
+import com.slackworks.naether.Notation;
 
 
 /**

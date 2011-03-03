@@ -1,4 +1,4 @@
-package com.slackworks;
+package com.slackworks.naether;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -32,7 +32,7 @@ import org.sonatype.aether.RepositoryEvent;
 public class LogRepositoryListener
     extends AbstractRepositoryListener {
 
-	private static Logger log = LoggerFactory.getLogger(LogRepositoryListener.class);
+	private static Logger log = LoggerFactory.getLogger("NaetherRepository");
 
     public void artifactDeployed( RepositoryEvent event )
     {

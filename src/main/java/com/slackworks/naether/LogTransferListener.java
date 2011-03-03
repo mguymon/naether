@@ -1,4 +1,4 @@
-package com.slackworks;
+package com.slackworks.naether;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -37,7 +37,7 @@ import org.sonatype.aether.transfer.TransferResource;
  */
 public class LogTransferListener extends AbstractTransferListener {
 
-	private Logger log = LoggerFactory.getLogger( LogTransferListener.class ); 
+	private Logger log = LoggerFactory.getLogger( "NaetherTransfer" ); 
     private Map<TransferResource, Long> downloads = new ConcurrentHashMap<TransferResource, Long>();
 
     private int lastLength;
