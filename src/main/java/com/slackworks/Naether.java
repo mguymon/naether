@@ -1,5 +1,23 @@
 package com.slackworks;
 
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+   *
+ * http://www.apache.org/licenses/LICENSE-2.0
+   *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // Java SE
 import java.io.File;
 import java.net.MalformedURLException;
@@ -18,18 +36,21 @@ import org.slf4j.LoggerFactory;
 // Sonatype Aether Dependency Management
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.collection.CollectRequest;
+import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.DependencyRequest;
+import org.sonatype.aether.resolution.DependencyResult;
 import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 import org.sonatype.aether.connector.wagon.WagonProvider;
 import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
+
 
 /**
  * Dependency Resolver using Maven's Aether
@@ -47,7 +68,7 @@ public class Naether {
 	private String localRepoPath;
 	private List<Dependency> dependencies;
 	private List<RemoteRepository> remoteRepositories;
-	private PreorderNodeListGenerator nlg;
+	private PreorderNodeListGenerator preorderedNodeList;
 
 	/**
 	 * Create new instance
@@ -55,12 +76,10 @@ public class Naether {
 	public Naether() {
 		dependencies = new ArrayList<Dependency>();
 		setRemoteRepositories(new ArrayList<RemoteRepository>());
-		addRemoteRepository("central", "default",
-				"http://repo1.maven.org/maven2/");
+		addRemoteRepository("central", "default", "http://repo1.maven.org/maven2/");
 
 		String userHome = System.getProperty("user.home");
-		setLocalRepoPath(userHome + File.separator + ".m2" + File.separator
-				+ "repository");
+		setLocalRepoPath(userHome + File.separator + ".m2" + File.separator + "repository");
 	}
 
 	/**
@@ -86,8 +105,7 @@ public class Naether {
 	 *            String
 	 */
 	public void addDependency(String notation, String scope) {
-		Dependency dependency = new Dependency(new DefaultArtifact(notation),
-				scope);
+		Dependency dependency = new Dependency(new DefaultArtifact(notation), scope);
 		addDependency(dependency);
 	}
 
@@ -108,12 +126,10 @@ public class Naether {
 	public void addRemoteRepository(String url) throws MalformedURLException {
 		URL parsedUrl = new URL(url);
 
-		String path = parsedUrl.getPath();
-		path = path.replaceFirst("/", "");
-		path = path.replaceAll("/", "-");
-
 		StringBuffer id = new StringBuffer(parsedUrl.getHost());
-		if (path.length() > 0) {
+		String path = parsedUrl.getPath();
+		if ( path.length() > 0 ) {
+			path = path.replaceFirst("/", "").replaceAll("/", "-").replaceAll(":","-");
 			id.append("-");
 			id.append(path);
 		}
@@ -129,12 +145,9 @@ public class Naether {
 	/**
 	 * Add RemoteRepository
 	 * 
-	 * @param id
-	 *            String
-	 * @param type
-	 *            String
-	 * @param url
-	 *            String
+	 * @param id  String
+	 * @param type  String
+	 * @param url String
 	 */
 	public void addRemoteRepository(String id, String type, String url) {
 		addRemoteRepository(new RemoteRepository(id, type, url));
@@ -152,8 +165,7 @@ public class Naether {
 	public RepositorySystem newRepositorySystem() throws Exception {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		locator.setServices(WagonProvider.class, new ManualWagonProvider());
-		locator.addService(RepositoryConnectorFactory.class,
-				WagonRepositoryConnectorFactory.class);
+		locator.addService(RepositoryConnectorFactory.class, WagonRepositoryConnectorFactory.class);
 
 		return locator.getService(RepositorySystem.class);
 
@@ -161,10 +173,10 @@ public class Naether {
 
 	public RepositorySystemSession newSession(RepositorySystem system) {
 		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
-
+		session.setTransferListener( new LogTransferListener() );
+        session.setRepositoryListener( new LogRepositoryListener() );
 		LocalRepository localRepo = new LocalRepository(getLocalRepoPath());
-		session.setLocalRepositoryManager(system
-				.newLocalRepositoryManager(localRepo));
+		session.setLocalRepositoryManager(system.newLocalRepositoryManager(localRepo));
 
 		return session;
 	}
@@ -175,6 +187,10 @@ public class Naether {
 	 * @throws Exception
 	 */
 	public void resolveDependencies() throws Exception {
+		resolveDependencies( true );
+	}
+	
+	public void resolveDependencies( boolean downloadArtifacts ) throws Exception {
 		log.info("Local Repo Path: {}", localRepoPath);
 
 		log.info("Remote Repositories:");
@@ -197,23 +213,26 @@ public class Naether {
 		for (RemoteRepository repo : getRemoteRepositories()) {
 			collectRequest.addRepository(repo);
 		}
-
-		DependencyNode node = repoSystem.collectDependencies(session,
-				collectRequest).getRoot();
-		DependencyRequest dependencyRequest = new DependencyRequest(node, null);
-
-		log.info("Resolving dependencies to files");
-		repoSystem.resolveDependencies(session, dependencyRequest);
-
-		nlg = new PreorderNodeListGenerator();
-		node.accept(nlg);
-
-		log.debug("Setting resolved dependencies");
-		this.setDependencies(nlg.getDependencies(true));
+		
+		CollectResult collectResult = repoSystem.collectDependencies( session, collectRequest );
+		preorderedNodeList = new PreorderNodeListGenerator();
+		if ( downloadArtifacts ) {
+			DependencyRequest dependencyRequest = new DependencyRequest( collectRequest, null );
+	
+			log.info("Resolving dependencies to files");
+			DependencyResult dependencyResult = repoSystem.resolveDependencies(session, dependencyRequest);
+			dependencyResult.getRoot().accept( preorderedNodeList );
+			
+		} else {
+			collectResult.getRoot().accept(preorderedNodeList);
+		}
+		
+		this.setDependencies(preorderedNodeList.getDependencies(true));
+		log.debug("Setting resolved dependencies: {}", this.getDependencies() );
 	}
 
 	public String getResolvedClassPath() {
-		return nlg.getClassPath();
+		return preorderedNodeList.getClassPath();
 	}
 
 	public void setLocalRepoPath(String repoPath) {

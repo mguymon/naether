@@ -1,5 +1,23 @@
 package com.slackworks;
 
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+   *
+ * http://www.apache.org/licenses/LICENSE-2.0
+   *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // Java SE
 import java.io.File;
 import java.net.MalformedURLException;
@@ -33,38 +51,20 @@ public class NaetherTest {
 	public void createNaether() {
 		naether = new Naether();
 		naether.setLocalRepoPath( "target/test-repo" );
+		
+		File dir = new File("target/test-repo");
+		if ( dir.exists() ) {
+			log.info( "Removing test maven repo: target/test-repo" );
+			dir.delete();
+		}
 	}
-	
-	@Test
-	public void resolveArtifactNotInMainRepo() throws Exception {
-		Dependency dependency =
-            new Dependency( new DefaultArtifact( "org.springframework:org.springframework.orm:3.0.5.RELEASE" ), "compile" );
-		naether.addRemoteRepository( "http://repository.springsource.com/maven/bundles/release" );
-		naether.addRemoteRepository( "http://repository.springsource.com/maven/bundles/external" );
-		naether.addDependency(dependency);
-        naether.resolveDependencies();
-        
-        List results = new ArrayList<String>();
-        results.add("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.beans:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.asm:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.core:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE");
-        results.add("org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0");
-        results.add("org.springframework:org.springframework.aop:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.context:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.expression:jar:3.0.5.RELEASE");
-        		
-        assertEquals( results, naether.getDependenciesNotation() );
-	}
-	
+
 	@Test
 	public void addRemoteRepository() throws MalformedURLException {
 		assertEquals( "central", naether.getRemoteRepositories().get(0).getId() );
 		
-		naether.addRemoteRepository( "http://test.net:7011" );
-		assertEquals( "test.net-7011", naether.getRemoteRepositories().get(1).getId() );
+		naether.addRemoteRepository( "http://test.net/hamster:7011" );
+		assertEquals( "test.net-hamster-7011", naether.getRemoteRepositories().get(1).getId() );
 		
 		naether.addRemoteRepository( "test-id", "test-type", "http://test.net" );
 		assertEquals( "test-id", naether.getRemoteRepositories().get(2).getId() );
@@ -80,14 +80,26 @@ public class NaetherTest {
 	}
 	
 	@Test
-	public void resolveDepedencies() throws Exception {
+	public void resolveDepedenciesAndDownloadArtifacts() throws Exception {
 		Dependency dependency =
             new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
         naether.addDependency(dependency);
         naether.resolveDependencies();
-        String classpath = System.getProperty("user.dir") + "/target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar";
+        String classpath = (new File( "target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar")).getAbsolutePath();
         assertEquals( classpath, naether.getResolvedClassPath() );
         assertTrue( (new File( classpath ).exists()) );
+	}
+	
+	@Test
+	public void resolveDepedenciesWithoutDownloadingArtifacts() throws Exception {
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( "org.testng:testng:jar:5.14" ), "compile" );
+        naether.addDependency(dependency);
+        naether.resolveDependencies(false);
+        assertEquals( "", naether.getResolvedClassPath() );
+        
+        String jarPath = "target/test-repo/org.testng/testng/5.14/testng-5.14.jar";
+        assertFalse( (new File( jarPath ).exists()) );
 	}
 	
 	@Test
@@ -127,6 +139,30 @@ public class NaetherTest {
         	fail( "Missing Dependencies: " + missingDeps );
         }
 		
+	}
+	
+	@Test
+	public void resolveArtifactsNotInMainRepo() throws Exception {
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( "org.springframework:org.springframework.orm:3.0.5.RELEASE" ), "compile" );
+		naether.addRemoteRepository( "http://repository.springsource.com/maven/bundles/release" );
+		naether.addRemoteRepository( "http://repository.springsource.com/maven/bundles/external" );
+		naether.addDependency(dependency);
+        naether.resolveDependencies(false);
+        
+        List<String> results = new ArrayList<String>();
+        results.add("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.beans:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.asm:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.core:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE");
+        results.add("org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0");
+        results.add("org.springframework:org.springframework.aop:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.context:jar:3.0.5.RELEASE");
+        results.add("org.springframework:org.springframework.expression:jar:3.0.5.RELEASE");
+        		
+        assertEquals( results, naether.getDependenciesNotation() );
 	}
 
 }
