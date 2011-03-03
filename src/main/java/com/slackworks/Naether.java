@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 // Apache Maven
 import org.apache.maven.repository.internal.DefaultServiceLocator;
@@ -71,15 +72,22 @@ public class Naether {
 	private PreorderNodeListGenerator preorderedNodeList;
 
 	/**
-	 * Create new instance
+	 * Create new instance. Default repository locations is environment M2_REPO setting
+	 * or user home .m2/
 	 */
 	public Naether() {
 		dependencies = new ArrayList<Dependency>();
 		setRemoteRepositories(new ArrayList<RemoteRepository>());
 		addRemoteRepository("central", "default", "http://repo1.maven.org/maven2/");
 
-		String userHome = System.getProperty("user.home");
-		setLocalRepoPath(userHome + File.separator + ".m2" + File.separator + "repository");
+		Map<String, String> env = System.getenv();
+		String m2Repo = env.get( "M2_REPO" );
+		if ( m2Repo == null ) {
+			String userHome = System.getProperty("user.home");
+			setLocalRepoPath(userHome + File.separator + ".m2" + File.separator + "repository");
+		} else {
+			setLocalRepoPath( (new File( m2Repo ) ).getAbsolutePath() );
+		}
 	}
 
 	/**
