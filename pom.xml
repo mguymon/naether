@@ -8,16 +8,8 @@
     <packaging>jar</packaging>
 
     <name>naether</name>
-    <url>http://maven.apache.org</url>
-
-    <repositories>
-        <repository>
-            <id>people.apache.org</id>
-            <name>Apache Snapshots</name>
-            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-        </repository>
-	</repositories>
-
+    <url>https://github.com/mguymon/naether</url>
+	
     <properties>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<aetherVersion>1.11</aetherVersion>
