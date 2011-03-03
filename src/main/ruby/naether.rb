@@ -72,6 +72,14 @@ class Naether
     end 
   end
   
+  def local_repo_path
+    @resolver.getLocalRepoPath()
+  end
+  
+  def local_repo_path=( path )
+    @resolver.setLocalRepoPath( path )
+  end
+  
   # Add a dependency in the notation: groupId:artifactId:type:version
   def add_dependency( notation )
     @resolver.addDependency( notation )

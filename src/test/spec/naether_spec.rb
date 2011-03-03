@@ -12,6 +12,11 @@ describe Naether do
     before(:each) do
       @naether = Naether.create_from_paths("target/lib", 'target')
       @naether.should_not be_nil
+      @naether.local_repo_path = 'target/test-repo'
+    end
+    
+    it "should have set local repo path" do
+      @naether.local_repo_path.should eql( 'target/test-repo' )
     end
     
     it "should add a remote repository" do
