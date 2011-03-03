@@ -93,7 +93,7 @@ class Naether
   end
   
   # Get dependencies
-  def dependencies
+  def dependencies()
     if Naether.platform == 'java'
       return @resolver.getDependenciesNotation().to_a
     else
@@ -102,8 +102,8 @@ class Naether
   end
   
   # Resolve dependencies, finding related additional dependencies
-  def resolve_dependencies
-    @resolver.resolveDependencies();
+  def resolve_dependencies( download_artifacts = true )
+    @resolver.resolveDependencies( download_artifacts );
     dependencies
   end
 end
