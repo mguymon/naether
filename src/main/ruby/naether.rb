@@ -14,6 +14,7 @@ class Naether
   JAR_LIB = "#{File.dirname(__FILE__)}/.."
   
   class << self
+    
     # Helper to determine the platform
     def platform
       $platform || RUBY_PLATFORM[/java/] || 'ruby'
@@ -24,6 +25,7 @@ class Naether
       Naether::Bootstrap.dependencies( dep_file )
     end
     
+    # Loads all jars from paths and creates a new instance of Naether
     def create_from_paths( deps_jar_dir, naether_jar_dir = nil )
       naether_jar_dir = naether_jar_dir || JAR_LIB
       Naether::Java.load_jars_dir( [deps_jar_dir, naether_jar_dir] )
@@ -31,6 +33,7 @@ class Naether
       Naether.new
     end
     
+    # Loads all jars creates a new instance of Naether
     def create_from_jars( jars )
       Naether::Java.load_jars( jars )
       
@@ -38,9 +41,8 @@ class Naether
     end
   end
   
-  #
-  # Create new instance
-  #
+  # Create new instance. Naether.create_from_paths and Naether.create_from_jars should be
+  # used instead of Naether.new
   def initialize()
     
     if Naether.platform == 'java'
@@ -51,6 +53,7 @@ class Naether
     end
   end
   
+  # Clear all remote repositories
   def clear_remote_repositories
     @resolver.clearRemoteRepositories()
   end
@@ -60,6 +63,7 @@ class Naether
     @resolver.addRemoteRepository( url )
   end
   
+  # Array of remote repositories
   def remote_repositories
     if Naether.platform == 'java'
       return @resolver.getRemoteRepositories()
