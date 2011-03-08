@@ -133,7 +133,7 @@ public class Naether {
 	
 	public void addRemoteRepositoryByUrl(String url, String username, String password) throws MalformedURLException {
 		RemoteRepository remoteRepo = RemoteRepoBuilder.createFromUrl(url);
-		remoteRepo.setAuthentication( new Authentication( username, password ) );
+		remoteRepo = remoteRepo.setAuthentication( new Authentication( username, password ) );
 		addRemoteRepository( remoteRepo );
 	}
 

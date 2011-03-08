@@ -50,5 +50,20 @@ describe Naether do
       
       File.exists?( 'target/test-repo/test/test/22.3/test-22.3.jar' ).should be_true
     end
+    
+    it "should write pom file" do
+      @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.24" ]
+      @naether.resolve_dependencies
+      @naether.write_pom( 'target/rb-pom.xml', 'test-rb:test-rb:jar:100.1')
+      
+      File.exists?( 'target/rb-pom.xml' ).should be_true
+      
+      xml = IO.read( 'target/rb-pom.xml' ) 
+      xml.should match /.+junit<\/groupId>\s+<artifactId>junit<\/artifactId>\s+<version>4.8.2.+/
+      xml.should match /.+ch.qos.logback<\/groupId>\s+<artifactId>logback-classic<\/artifactId>\s+<version>0.9.24.+/
+      xml.should match /.+ch.qos.logback<\/groupId>\s+<artifactId>logback-core<\/artifactId>\s+<version>0.9.24.+/
+      xml.should match /.+org.slf4j<\/groupId>\s+<artifactId>slf4j-api<\/artifactId>\s+<version>1.6.0.+/
+      
+    end
   end
 end

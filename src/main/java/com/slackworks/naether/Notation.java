@@ -18,6 +18,11 @@ package com.slackworks.naether;
  * limitations under the License.
  */
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.sonatype.aether.artifact.Artifact;
 
 /**
@@ -29,6 +34,10 @@ import org.sonatype.aether.artifact.Artifact;
  * 
  */
 public class Notation {
+	
+	// groupId:artifactId:extension:version
+	private static Pattern notationPattern = Pattern.compile("^(.+):(.+):(.+):(.+)$");
+	
 	public static String generate(org.apache.maven.model.Dependency dependency) {
 		StringBuffer notation = new StringBuffer()
 				.append(dependency.getGroupId()).append(":")
@@ -48,5 +57,19 @@ public class Notation {
 				.append(artifact.getVersion());
 
 		return notation.toString();
+	}
+	
+	public static Map<String,String> parse( String notation ) {
+		Matcher matcher = notationPattern.matcher(notation);
+		if ( matcher.find() ) {
+			Map<String,String> notationMap = new HashMap<String,String>();
+			notationMap.put( "groupId", matcher.group(1) );
+			notationMap.put( "artifactId", matcher.group(2) );
+			notationMap.put( "type", matcher.group(3) );
+			notationMap.put( "version", matcher.group(4) );
+			return notationMap;
+		} else {
+			return null;
+		}
 	}
 }

@@ -20,12 +20,16 @@ package com.slackworks.naether;
 
 // Java SE
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +37,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 
 // Codehause Plexus
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -64,7 +69,7 @@ public class MavenProject {
 	 * New Instance
 	 */
 	public MavenProject() {
-
+		setMavenModel( new Model() );
 	}
 
 	/**
@@ -76,8 +81,7 @@ public class MavenProject {
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	public MavenProject(String pomPath) throws FileNotFoundException,
-			IOException, XmlPullParserException {
+	public MavenProject(String pomPath) throws FileNotFoundException, IOException, XmlPullParserException {
 		loadPOM(pomPath);
 	}
 
@@ -90,12 +94,10 @@ public class MavenProject {
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	public void loadPOM(String pomPath) throws FileNotFoundException,
-			IOException, XmlPullParserException {
+	public void loadPOM(String pomPath) throws FileNotFoundException, IOException, XmlPullParserException {
 		log.debug("Loading pom {}", pomPath);
 		MavenXpp3Reader reader = new MavenXpp3Reader();
-		setMavenModel(reader.read(new BufferedReader(new FileReader(new File(
-				pomPath)))));
+		setMavenModel(reader.read(new BufferedReader(new FileReader(new File( pomPath )))));
 	}
 
 	/**
@@ -105,6 +107,42 @@ public class MavenProject {
 	 */
 	public String getVersion() {
 		return getMavenModel().getVersion();
+	}
+	
+	public void setVersion( String version ) {
+		getMavenModel().setVersion( version );
+	}
+	
+	public String getArtifactId() {
+		return getMavenModel().getArtifactId();
+	}
+	
+	public void setArtifactId( String artifactId ) {
+		getMavenModel().setArtifactId( artifactId );
+	}
+	
+	public String getGroupId() {
+		return getMavenModel().getGroupId();
+	}
+	
+	public void setGroupId( String groupId ) {
+		getMavenModel().setGroupId( groupId );
+	}
+	
+	public String getType() {
+		return getMavenModel().getPackaging();
+	}
+	
+	public void setType( String type ) {
+		getMavenModel().setPackaging( type );
+	}
+	
+	public void setNotation( String notation ) {
+		Map<String, String> notationMap = Notation.parse( notation );
+		this.setGroupId( notationMap.get( "groupId") );
+		this.setArtifactId( notationMap.get( "artifactId" ) );
+		this.setType( notationMap.get( "type") );
+		this.setVersion( notationMap.get( "version" ) );
 	}
 
 	/**
@@ -139,8 +177,7 @@ public class MavenProject {
 				// Check that scope of the Dependency has been marked allowed
 				if (scopes.indexOf(dependency.getScope()) >= 0) {
 
-					String artifactId = substituteProperty(dependency
-							.getArtifactId());
+					String artifactId = substituteProperty(dependency.getArtifactId());
 					String groupId = substituteProperty(dependency.getGroupId());
 					String version = substituteProperty(dependency.getVersion());
 
@@ -151,7 +188,7 @@ public class MavenProject {
 				}
 			}
 
-			// Keep vals
+		// Keep vals
 		} else {
 			for (Dependency dependency : getMavenModel().getDependencies()) {
 				// Check that scope of the Dependency has been marked allowed
@@ -176,8 +213,7 @@ public class MavenProject {
 	}
 
 	/**
-	 * Get List<String> of dependencies in format of {@link groupId
-	 * :artifactId:packageType:version}
+	 * Get List<String> of dependencies in format of groupId:artifactId:packageType:version
 	 * 
 	 * @param substituteProperties
 	 *            boolean
@@ -192,12 +228,25 @@ public class MavenProject {
 
 		return notations;
 	}
+	
+	public void addDependency( Dependency dependency) {
+		mavenModel.addDependency( dependency );
+	}
+	
+	public void addDependency( String notation ) {
+		Map<String, String> notationMap = Notation.parse( notation );
+		Dependency dependency = new Dependency();
+		dependency.setGroupId( notationMap.get( "groupId" ) );
+		dependency.setArtifactId( notationMap.get( "artifactId") );
+		dependency.setType( notationMap.get( "type" ) );
+		dependency.setVersion( notationMap.get( "version" ) );
+		mavenModel.addDependency( dependency );
+	}
 
 	/**
 	 * Set the Maven {@link Model}
 	 * 
-	 * @param mavenModel
-	 *            {@link Model}
+	 * @param mavenModel {@link Model}
 	 */
 	public void setMavenModel(Model mavenModel) {
 		this.mavenModel = mavenModel;
@@ -308,5 +357,11 @@ public class MavenProject {
 
 	public boolean isAllowCompileScope() {
 		return allowCompileScope;
+	}
+	
+	public void writePom( String filePath ) throws IOException {
+		Writer writer = new BufferedWriter(new FileWriter(filePath));
+		MavenXpp3Writer pomWriter = new MavenXpp3Writer();
+		pomWriter.write( writer, this.mavenModel );
 	}
 }

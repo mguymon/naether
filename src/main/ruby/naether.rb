@@ -60,7 +60,11 @@ class Naether
   
   # Add remote repository
   def add_remote_repository( url, username = nil, password = nil )
-    @resolver.addRemoteRepositoryByUrl( url, username, password )
+    if username
+      @resolver.addRemoteRepositoryByUrl( url, username, password )
+    else
+      @resolver.addRemoteRepositoryByUrl( url )
+    end
   end
   
   # Array of remote repositories
@@ -127,5 +131,27 @@ class Naether
     end
     
     @resolver.deployArtifact(@instance)
+  end
+  
+  # filePath to write the pom 
+  # notation of the pom, groupId:artifactId:type:version
+  #
+  # loads all resolved dependencies into pom
+  def write_pom( filePath, notation )
+    if Naether.platform == 'java'
+      @project_instance = com.slackworks.naether.MavenProject.new 
+    else
+      projectClass = Rjb::import('com.slackworks.naether.MavenProject') 
+      @project_instance = projectClass.new
+    end
+    
+    @project_instance.setNotation( notation )
+    
+    dependencies().each do |notation|
+      @project_instance.addDependency( notation )
+    end
+    
+    @project_instance.writePom( filePath )
+    
   end
 end
