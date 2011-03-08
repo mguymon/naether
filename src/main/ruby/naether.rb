@@ -107,7 +107,25 @@ class Naether
     dependencies
   end
   
-  def deploy_artifact(notation, file_path, pom_path = nil )
+  def deploy_artifact( notation, file_path, url, opts = {} )
+    if Naether.platform == 'java'
+      @instance = com.slackworks.naether.DeployArtifact.new 
+    else
+      deployArtifactClass = Rjb::import('com.slackworks.naether.DeployArtifact') 
+      @instance = deployArtifactClass.new
+    end
     
+    @instance.setRemoteRepo( url )
+    @instance.setNotation( notation )
+    @instance.setFilePath( file_path )
+    if opts[:pom_path]
+      @instance.setPomPath( pom_path )
+    end
+    
+    if opts[:user_name] || opts[:pub_key]
+      @instance.setAuth(opts[:user_name], opts[:password], opts[:pub_key], opts[:pub_key_passphrase] )
+    end
+    
+    @resolver.deployArtifact(@instance)
   end
 end

@@ -181,12 +181,17 @@ public class NaetherTest {
         naether.resolveDependencies();
         String jar = (new File( "target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar")).getAbsolutePath();
         
+        File destinationJar = new File("target/test-repo/test/test/0.4/test-0.4.jar");
+        if ( destinationJar.exists() ) {
+        	destinationJar.delete();
+        }
+        
         DeployArtifact deployArtifact = new DeployArtifact();
         deployArtifact.setFilePath( jar );
         deployArtifact.setNotation( "test:test:jar:0.4");
         deployArtifact.setRemoteRepo( new File( "target/test-repo" ).toURI().toString() );
         naether.deployArtifact( deployArtifact );
-        assertTrue( ( new File( "target/test-repo/test/test/0.4/test-0.4.jar") ).exists() );
+        assertTrue( destinationJar.exists() );
 	}
 
 }

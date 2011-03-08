@@ -39,5 +39,16 @@ describe Naether do
       @naether.add_dependency( "ch.qos.logback:logback-classic:jar:0.9.24" ) 
       @naether.resolve_dependencies.should eql ["ch.qos.logback:logback-classic:jar:0.9.24", "ch.qos.logback:logback-core:jar:0.9.24", "org.slf4j:slf4j-api:jar:1.6.0"]
     end
+    
+    it "should deploy artifact" do
+      if File.exists?( 'target/test-repo/test/test/22.3/test-22.3.jar' )
+        File.delete( 'target/test-repo/test/test/22.3/test-22.3.jar' )
+      end
+      jar = "target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar"
+      
+      @naether.deploy_artifact( "test:test:jar:22.3", jar, "file:target/test-repo" )
+      
+      File.exists?( 'target/test-repo/test/test/22.3/test-22.3.jar' ).should be_true
+    end
   end
 end
