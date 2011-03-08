@@ -59,8 +59,8 @@ class Naether
   end
   
   # Add remote repository
-  def add_remote_repository( url )
-    @resolver.addRemoteRepositoryByUrl( url )
+  def add_remote_repository( url, username = nil, password = nil )
+    @resolver.addRemoteRepositoryByUrl( url, username, password )
   end
   
   # Array of remote repositories
