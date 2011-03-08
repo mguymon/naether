@@ -62,6 +62,7 @@ public class Bootstrap {
 		deps.add("org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-7");
 		deps.add("org.apache.maven.wagon:wagon-http-shared:jar:1.0-beta-7");
 		deps.add("org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-7");
+		deps.add("org.apache.maven.wagon:wagon-file:jar:1.0-beta-7");
 		deps.add("org.codehaus.plexus:plexus-utils:jar:1.5.8");
 		deps.add("org.codehaus.plexus:plexus-container-default:jar:1.5.5");
 		deps.add("org.codehaus.plexus:plexus-classworlds:jar:2.2.2");

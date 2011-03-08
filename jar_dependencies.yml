@@ -1,35 +1,36 @@
 --- 
 :dependencies: 
-  - com.jcraft:jsch:jar:0.1.38
-  - com.ning:async-http-client:jar:1.6.1
-  - org.apache.xbean:xbean-reflect:jar:3.4
-  - org.jboss.netty:netty:jar:3.2.4.Final
-  - com.google.collections:google-collections:jar:1.0
-  - ch.qos.logback:logback-classic:jar:0.9.24
-  - ch.qos.logback:logback-core:jar:0.9.24
-  - org.slf4j:slf4j-api:jar:1.6.1
-  - org.slf4j:jcl-over-slf4j:jar:1.6.1
-  - org.slf4j:log4j-over-slf4j:jar:1.6.1
-  - org.sonatype.aether:aether-api:jar:1.11
-  - org.sonatype.aether:aether-util:jar:1.11
-  - org.sonatype.aether:aether-impl:jar:1.11
-  - org.sonatype.aether:aether-spi:jar:1.11
-  - org.sonatype.aether:aether-connector-file:jar:1.11
-  - org.sonatype.aether:aether-connector-asynchttpclient:jar:1.11
-  - org.sonatype.aether:aether-connector-wagon:jar:1.11
-  - org.apache.maven:maven-model-v3:jar:2.0
-  - org.apache.maven:maven-aether-provider:jar:3.0.2
-  - org.apache.maven:maven-model:jar:3.0.2
-  - org.apache.maven:maven-model-builder:jar:3.0.2
-  - org.apache.maven:maven-repository-metadata:jar:3.0.2
-  - org.apache.maven.wagon:wagon-provider-api:jar:1.0-beta-6
-  - org.apache.maven.wagon:wagon-ssh-common:jar:1.0-beta-7
-  - org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-7
-  - org.apache.maven.wagon:wagon-http-shared:jar:1.0-beta-7
-  - org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-7
-  - org.codehaus.plexus:plexus-utils:jar:1.5.8
-  - org.codehaus.plexus:plexus-container-default:jar:1.5.5
-  - org.codehaus.plexus:plexus-classworlds:jar:2.2.2
-  - org.codehaus.plexus:plexus-component-annotations:jar:1.5.5
-  - org.codehaus.plexus:plexus-interpolation:jar:1.14
-  - org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-6
+- com.jcraft:jsch:jar:0.1.38
+- com.ning:async-http-client:jar:1.6.1
+- org.apache.xbean:xbean-reflect:jar:3.4
+- org.jboss.netty:netty:jar:3.2.4.Final
+- com.google.collections:google-collections:jar:1.0
+- ch.qos.logback:logback-classic:jar:0.9.24
+- ch.qos.logback:logback-core:jar:0.9.24
+- org.slf4j:slf4j-api:jar:1.6.1
+- org.slf4j:jcl-over-slf4j:jar:1.6.1
+- org.slf4j:log4j-over-slf4j:jar:1.6.1
+- org.sonatype.aether:aether-api:jar:1.11
+- org.sonatype.aether:aether-util:jar:1.11
+- org.sonatype.aether:aether-impl:jar:1.11
+- org.sonatype.aether:aether-spi:jar:1.11
+- org.sonatype.aether:aether-connector-file:jar:1.11
+- org.sonatype.aether:aether-connector-asynchttpclient:jar:1.11
+- org.sonatype.aether:aether-connector-wagon:jar:1.11
+- org.apache.maven:maven-model-v3:jar:2.0
+- org.apache.maven:maven-aether-provider:jar:3.0.2
+- org.apache.maven:maven-model:jar:3.0.2
+- org.apache.maven:maven-model-builder:jar:3.0.2
+- org.apache.maven:maven-repository-metadata:jar:3.0.2
+- org.apache.maven.wagon:wagon-provider-api:jar:1.0-beta-6
+- org.apache.maven.wagon:wagon-ssh-common:jar:1.0-beta-7
+- org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-7
+- org.apache.maven.wagon:wagon-http-shared:jar:1.0-beta-7
+- org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-7
+- org.apache.maven.wagon:wagon-file:jar:1.0-beta-7
+- org.codehaus.plexus:plexus-utils:jar:1.5.8
+- org.codehaus.plexus:plexus-container-default:jar:1.5.5
+- org.codehaus.plexus:plexus-classworlds:jar:2.2.2
+- org.codehaus.plexus:plexus-component-annotations:jar:1.5.5
+- org.codehaus.plexus:plexus-interpolation:jar:1.14
+- org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-6

@@ -98,6 +98,12 @@
 		    <artifactId>wagon-http-lightweight</artifactId>
 		    <version>${wagonVersion}</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.maven.wagon</groupId>
+		    <artifactId>wagon-file</artifactId>
+		    <version>${wagonVersion}</version>
+		</dependency>
+
 	
 		<!-- exclude commons logging -->
 	    <dependency>

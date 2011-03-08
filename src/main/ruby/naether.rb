@@ -106,4 +106,8 @@ class Naether
     @resolver.resolveDependencies( download_artifacts );
     dependencies
   end
+  
+  def deploy_artifact(notation, file_path, pom_path = nil )
+    
+  end
 end

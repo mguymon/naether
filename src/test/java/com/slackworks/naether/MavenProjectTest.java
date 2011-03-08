@@ -83,6 +83,7 @@ public class MavenProjectTest {
 		notations.add( "org.apache.maven:maven-aether-provider:jar:3.0.2" );
 		notations.add( "org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-7" );
 		notations.add( "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-7" );
+		notations.add( "org.apache.maven.wagon:wagon-file:jar:1.0-beta-7" );
 		
 		List<String> missingDeps = new ArrayList<String>();
         for( String dep : mavenProject.getDependenciesNotation() ) {

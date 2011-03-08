@@ -40,10 +40,8 @@ import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.DependencyRequest;
 import org.sonatype.aether.resolution.DependencyResult;
 import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
@@ -51,6 +49,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 import org.sonatype.aether.connector.wagon.WagonProvider;
 import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
+import org.sonatype.aether.deployment.DeployRequest;
 
 
 /**
@@ -95,8 +94,7 @@ public class Naether {
 	 * 
 	 * groupId:artifactId:type:version
 	 * 
-	 * @param notation
-	 *            String
+	 * @param notation String
 	 */
 	public void addDependency(String notation) {
 		addDependency(notation, "compile");
@@ -107,10 +105,8 @@ public class Naether {
 	 * 
 	 * groupId:artifactId:type:version
 	 * 
-	 * @param notation
-	 *            String
-	 * @param scope
-	 *            String
+	 * @param notation String
+	 * @param scope String
 	 */
 	public void addDependency(String notation, String scope) {
 		Dependency dependency = new Dependency(new DefaultArtifact(notation), scope);
@@ -120,8 +116,7 @@ public class Naether {
 	/**
 	 * Add Dependency
 	 * 
-	 * @param dependency
-	 *            {@link Dependency}
+	 * @param dependency {@link Dependency}
 	 */
 	public void addDependency(Dependency dependency) {
 		dependencies.add(dependency);
@@ -132,22 +127,7 @@ public class Naether {
 	}
 
 	public void addRemoteRepository(String url) throws MalformedURLException {
-		URL parsedUrl = new URL(url);
-
-		StringBuffer id = new StringBuffer(parsedUrl.getHost());
-		String path = parsedUrl.getPath();
-		if ( path.length() > 0 ) {
-			path = path.replaceFirst("/", "").replaceAll("/", "-").replaceAll(":","-");
-			id.append("-");
-			id.append(path);
-		}
-
-		if (parsedUrl.getPort() > -1) {
-			id.append("-");
-			id.append(parsedUrl.getPort());
-		}
-
-		addRemoteRepository(new RemoteRepository(id.toString(), "default", url));
+		addRemoteRepository(RemoteRepoBuilder.createFromUrl(url));
 	}
 
 	/**
@@ -237,6 +217,29 @@ public class Naether {
 		
 		this.setDependencies(preorderedNodeList.getDependencies(true));
 		log.debug("Setting resolved dependencies: {}", this.getDependencies() );
+	}
+	
+	/**
+	 * Deploy an Artifact
+	 * 
+	 * @param deployArtifact {@link DeployArtifact}
+	 * @throws Exception
+	 */
+	public void deployArtifact( DeployArtifact deployArtifact ) throws Exception {
+		log.debug( "deploy artifact: {} ", deployArtifact.getNotation() );
+		RepositorySystem system = newRepositorySystem();
+
+        RepositorySystemSession session = newSession(system);
+
+        DeployRequest deployRequest = new DeployRequest();
+        deployRequest.addArtifact( deployArtifact.getJarArtifact() );
+        if ( deployArtifact.getPomArtifact() != null ) {
+	        deployRequest.addArtifact( deployArtifact.getPomArtifact() );
+        }
+        deployRequest.setRepository( deployArtifact.getRemoteRepo() );
+        
+        log.debug( "uploading artifact" );
+        system.deploy( session, deployRequest );
 	}
 
 	public String getResolvedClassPath() {
