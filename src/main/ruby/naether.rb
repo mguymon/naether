@@ -60,7 +60,7 @@ class Naether
   
   # Add remote repository
   def add_remote_repository( url )
-    @resolver.addRemoteRepository( url )
+    @resolver.addRemoteRepositoryByUrl( url )
   end
   
   # Array of remote repositories

@@ -68,7 +68,7 @@ public class NaetherTest {
 	public void addRemoteRepository() throws MalformedURLException {
 		assertEquals( "central", naether.getRemoteRepositories().get(0).getId() );
 		
-		naether.addRemoteRepository( "http://test.net/hamster:7011" );
+		naether.addRemoteRepositoryByUrl( "http://test.net/hamster:7011" );
 		assertEquals( "test.net-hamster-7011", naether.getRemoteRepositories().get(1).getId() );
 		
 		naether.addRemoteRepository( "test-id", "test-type", "http://test.net" );
@@ -152,8 +152,8 @@ public class NaetherTest {
 	public void resolveArtifactsNotInMainRepo() throws Exception {
 		Dependency dependency =
             new Dependency( new DefaultArtifact( "org.springframework:org.springframework.orm:3.0.5.RELEASE" ), "compile" );
-		naether.addRemoteRepository( "http://repository.springsource.com/maven/bundles/release" );
-		naether.addRemoteRepository( "http://repository.springsource.com/maven/bundles/external" );
+		naether.addRemoteRepositoryByUrl( "http://repository.springsource.com/maven/bundles/release" );
+		naether.addRemoteRepositoryByUrl( "http://repository.springsource.com/maven/bundles/external" );
 		naether.addDependency(dependency);
         naether.resolveDependencies(false);
         

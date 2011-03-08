@@ -40,6 +40,7 @@ import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.graph.Dependency;
+import org.sonatype.aether.repository.Authentication;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyRequest;
@@ -126,21 +127,20 @@ public class Naether {
 		setRemoteRepositories(new ArrayList<RemoteRepository>());
 	}
 
-	public void addRemoteRepository(String url) throws MalformedURLException {
+	public void addRemoteRepositoryByUrl(String url) throws MalformedURLException {
 		addRemoteRepository(RemoteRepoBuilder.createFromUrl(url));
 	}
-
-	/**
-	 * Add RemoteRepository
-	 * 
-	 * @param id  String
-	 * @param type  String
-	 * @param url String
-	 */
-	public void addRemoteRepository(String id, String type, String url) {
-		addRemoteRepository(new RemoteRepository(id, type, url));
+	
+	public void addRemoteRepositoryByUrl(String url, String username, String password) throws MalformedURLException {
+		RemoteRepository remoteRepo = RemoteRepoBuilder.createFromUrl(url);
+		remoteRepo.setAuthentication( new Authentication( username, password ) );
+		addRemoteRepository( remoteRepo );
 	}
 
+	public void addRemoteRepository(String id, String type, String url) {
+		getRemoteRepositories().add(new RemoteRepository( id, type, url ));
+	}
+	
 	/**
 	 * Add RemoteRepository
 	 * 
