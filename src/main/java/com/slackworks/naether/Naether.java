@@ -72,8 +72,8 @@ public class Naether {
 	private PreorderNodeListGenerator preorderedNodeList;
 
 	/**
-	 * Create new instance. Default repository locations is environment M2_REPO setting
-	 * or user home .m2/
+	 * Create new instance. Default local repository is environment M2_REPO setting
+	 * or user home .m2/. The local repository is the destination for downloaded metadata and artifacts.
 	 */
 	public Naether() {
 		dependencies = new ArrayList<Dependency>();
@@ -123,33 +123,79 @@ public class Naether {
 		dependencies.add(dependency);
 	}
 
+	/**
+	 * Remove all {@link RemoteRepository}
+	 */
 	public void clearRemoteRepositories() {
 		setRemoteRepositories(new ArrayList<RemoteRepository>());
 	}
 
+	/**
+	 * Add a {@link RemoteRepository} by String url
+	 * @param url String
+	 * @throws MalformedURLException
+	 */
 	public void addRemoteRepositoryByUrl(String url) throws MalformedURLException {
 		addRemoteRepository(RemoteRepoBuilder.createFromUrl(url));
 	}
 	
+	/**
+	 * Add a {@link RemoteRepository} by String url with String username and password authentication.
+	 * @param url String
+	 * @param username String
+	 * @param password String
+	 * @throws MalformedURLException
+	 */
 	public void addRemoteRepositoryByUrl(String url, String username, String password) throws MalformedURLException {
 		RemoteRepository remoteRepo = RemoteRepoBuilder.createFromUrl(url);
 		remoteRepo = remoteRepo.setAuthentication( new Authentication( username, password ) );
 		addRemoteRepository( remoteRepo );
 	}
 
+	/**
+	 * Add a {@link RemoteRepository}
+	 * 
+	 * @param id String
+	 * @param type String
+	 * @param url String
+	 */
 	public void addRemoteRepository(String id, String type, String url) {
 		getRemoteRepositories().add(new RemoteRepository( id, type, url ));
 	}
 	
 	/**
-	 * Add RemoteRepository
+	 * Add {@link RemoteRepository}
 	 * 
-	 * @param remoteRepository
+	 * @param remoteRepository {@link RemoteRepository}
 	 */
 	public void addRemoteRepository(RemoteRepository remoteRepository) {
 		getRemoteRepositories().add(remoteRepository);
 	}
 
+	/**
+	 * Set {@link List} of {@link RemoteRepository}
+	 * 
+	 * @param remoteRepositories {@link List}
+	 */
+	public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
+		this.remoteRepositories = remoteRepositories;
+	}
+
+	/**
+	 * Get {@link List} of {@link RemoteRepository}
+	 * 
+	 * @return {@link List}
+	 */
+	public List<RemoteRepository> getRemoteRepositories() {
+		return remoteRepositories;
+	}
+	
+	/**
+	 * Create new {@link RepositorySystem}
+	 * 
+	 * @return {@link RepositorySystem}
+	 * @throws Exception
+	 */
 	public RepositorySystem newRepositorySystem() throws Exception {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		locator.setServices(WagonProvider.class, new ManualWagonProvider());
@@ -159,6 +205,12 @@ public class Naether {
 
 	}
 
+	/**
+	 * Create new {@link RepositorySystemSession}
+	 * 
+	 * @param system {@link RepositorySystem}
+	 * @return {@link RepositorySystemSession}
+	 */
 	public RepositorySystemSession newSession(RepositorySystem system) {
 		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
 		session.setTransferListener( new LogTransferListener() );
@@ -170,7 +222,7 @@ public class Naether {
 	}
 
 	/**
-	 * Resolve Dependencies
+	 * Resolve Dependencies, downloading artifacts
 	 * 
 	 * @throws Exception
 	 */
@@ -178,6 +230,12 @@ public class Naether {
 		resolveDependencies( true );
 	}
 	
+	/**
+	 * Resolve Dependencies, boolean if artifacts are to be downloaded
+	 * 
+	 * @param downloadArtifacts boolean
+	 * @throws Exception
+	 */
 	public void resolveDependencies( boolean downloadArtifacts ) throws Exception {
 		log.info("Local Repo Path: {}", localRepoPath);
 
@@ -242,26 +300,56 @@ public class Naether {
         system.deploy( session, deployRequest );
 	}
 
+	/**
+	 * Classpath from resolved artifacts
+	 * 
+	 * @return String
+	 */
 	public String getResolvedClassPath() {
 		return preorderedNodeList.getClassPath();
 	}
 
+	/**
+	 * Set local repository path. This is the destination for downloaded metadata and artifacts.
+	 * 
+	 * @param repoPath String
+	 */
 	public void setLocalRepoPath(String repoPath) {
 		this.localRepoPath = repoPath;
 	}
 
+	/**
+	 * Get local repository path. This is the destination for downloaded metadata and artifacts.
+	 *  
+	 * @return String
+	 */
 	public String getLocalRepoPath() {
 		return localRepoPath;
 	}
 
+	/**
+	 * Set the {@link List} of {@link Dependency}
+	 * 
+	 * @param dependencies {@link List}
+	 */
 	public void setDependencies(List<Dependency> dependencies) {
 		this.dependencies = dependencies;
 	}
 
+	/**
+	 * {@link List} of {@link Dependency}
+	 * 
+	 * @return {@link List}
+	 */
 	public List<Dependency> getDependencies() {
 		return dependencies;
 	}
 
+	/**
+	 * {@link List} of {@link Dependency} converted to String notation
+	 * 
+	 * @return {@link List}
+	 */
 	public List<String> getDependenciesNotation() {
 		List<String> notations = new ArrayList<String>();
 		for (Dependency dependency : getDependencies()) {
@@ -269,14 +357,6 @@ public class Naether {
 		}
 
 		return notations;
-	}
-
-	public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
-		this.remoteRepositories = remoteRepositories;
-	}
-
-	public List<RemoteRepository> getRemoteRepositories() {
-		return remoteRepositories;
 	}
 
 }
