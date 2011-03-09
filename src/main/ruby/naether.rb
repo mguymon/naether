@@ -123,11 +123,11 @@ class Naether
     @instance.setNotation( notation )
     @instance.setFilePath( file_path )
     if opts[:pom_path]
-      @instance.setPomPath( pom_path )
+      @instance.setPomPath( opts[:pom_path] )
     end
     
-    if opts[:user_name] || opts[:pub_key]
-      @instance.setAuth(opts[:user_name], opts[:password], opts[:pub_key], opts[:pub_key_passphrase] )
+    if opts[:username] || opts[:pub_key]
+      @instance.setAuth(opts[:username], opts[:password], opts[:pub_key], opts[:pub_key_passphrase] )
     end
     
     @resolver.deployArtifact(@instance)
@@ -137,7 +137,7 @@ class Naether
   # notation of the pom, groupId:artifactId:type:version
   #
   # loads all resolved dependencies into pom
-  def write_pom( filePath, notation )
+  def write_pom( notation, file_path )
     if Naether.platform == 'java'
       @project_instance = com.slackworks.naether.MavenProject.new 
     else
@@ -151,7 +151,7 @@ class Naether
       @project_instance.addDependency( notation )
     end
     
-    @project_instance.writePom( filePath )
+    @project_instance.writePom( file_path )
     
   end
 end

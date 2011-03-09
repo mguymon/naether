@@ -130,7 +130,7 @@ public class LogTransferListener extends AbstractTransferListener {
     public void transferFailed( TransferEvent event ) {
         transferCompleted( event );
 
-        log.error( "Transfer Failed", event.getException() );
+        log.debug( "Transfer Failed", event.getException() );
     }
 
     private void transferCompleted( TransferEvent event ) {

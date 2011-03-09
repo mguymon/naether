@@ -69,7 +69,11 @@ public class MavenProject {
 	 * New Instance
 	 */
 	public MavenProject() {
-		setMavenModel( new Model() );
+		Model model = new Model();
+		model.setModelVersion( "4.0.0" );
+		model.setPackaging( "jar" );
+		setMavenModel( model );
+		
 	}
 
 	/**
@@ -100,11 +104,14 @@ public class MavenProject {
 		setMavenModel(reader.read(new BufferedReader(new FileReader(new File( pomPath )))));
 	}
 
-	/**
-	 * Get version of Maven project
-	 * 
-	 * @return String
-	 */
+	public String getModelVersion() {
+		return getMavenModel().getModelVersion();
+	}
+	
+	public void setModelVersion( String version ) {
+		getMavenModel().setModelVersion( version );
+	}
+	
 	public String getVersion() {
 		return getMavenModel().getVersion();
 	}
@@ -277,6 +284,7 @@ public class MavenProject {
 		}
 
 		if (property != null) {
+			log.debug( "Set property {} to {}", property, this.getMavenModel().getProperties().getProperty(property) );
 			return this.getMavenModel().getProperties().getProperty(property);
 		} else {
 			return field;
@@ -360,6 +368,7 @@ public class MavenProject {
 	}
 	
 	public void writePom( String filePath ) throws IOException {
+		log.debug( "Writing pom: {}", filePath );
 		Writer writer = new BufferedWriter(new FileWriter(filePath));
 		MavenXpp3Writer pomWriter = new MavenXpp3Writer();
 		pomWriter.write( writer, this.mavenModel );

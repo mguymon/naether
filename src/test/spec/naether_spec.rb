@@ -54,7 +54,7 @@ describe Naether do
     it "should write pom file" do
       @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.24" ]
       @naether.resolve_dependencies
-      @naether.write_pom( 'target/rb-pom.xml', 'test-rb:test-rb:jar:100.1')
+      @naether.write_pom( 'test-rb:test-rb:jar:100.1', 'target/rb-pom.xml')
       
       File.exists?( 'target/rb-pom.xml' ).should be_true
       
