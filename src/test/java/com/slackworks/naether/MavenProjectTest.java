@@ -69,8 +69,7 @@ public class MavenProjectTest {
 	}
 
 	@Test
-	public void getDependenciesNotation() throws FileNotFoundException,
-			IOException, XmlPullParserException {
+	public void getDependenciesNotation() throws FileNotFoundException, IOException, XmlPullParserException {
 		MavenProject mavenProject = new MavenProject("pom.xml");
 		List<String> notations = new ArrayList<String>();
 		notations.add("ch.qos.logback:logback-classic:jar:0.9.24");
@@ -90,7 +89,10 @@ public class MavenProjectTest {
 		notations.add("org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-7");
 		notations.add("org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-7");
 		notations.add("org.apache.maven.wagon:wagon-file:jar:1.0-beta-7");
-
+		notations.add("commons-logging:commons-logging:jar:1.1.1" );
+		notations.add("commons-logging:commons-logging-api:jar:1.1" );
+		notations.add("junit:junit:jar:4.8.2");
+				
 		List<String> missingDeps = new ArrayList<String>();
 		for (String dep : mavenProject.getDependenciesNotation()) {
 			if (notations.indexOf(dep) == -1) {
