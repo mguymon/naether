@@ -12,7 +12,7 @@ gem install naether
 
 === About
 
-Built do power the {Builder Resolver}[https://github.com/mguymon/buildr-resolver] for {Buildr}[https://github.com/apache/buildr],
+Built do power the {Buildr Resolver}[https://github.com/mguymon/buildr-resolver] for {Buildr}[https://github.com/apache/buildr],
 enabling dependency resolution to Buildr projects. The Java {Naether.java}[https://github.com/mguymon/naether/blob/master/src/main/java/com/slackworks/naether/Naether.java] 
 is a basic wrapper for {Aether}[https://github.com/sonatype/sonatype-aether], Maven 3's dependency resolution framework. 
 The Ruby {naether.rb}[https://github.com/mguymon/naether/blob/master/src/main/ruby/naether.rb] provides access to Java 
