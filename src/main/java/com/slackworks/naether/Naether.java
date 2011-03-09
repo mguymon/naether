@@ -21,7 +21,6 @@ package com.slackworks.naether;
 // Java SE
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -248,12 +247,7 @@ public class Naether {
 
 		RepositorySystemSession session = newSession(repoSystem);
 
-		// Dependency dependency =
-		// new Dependency( new DefaultArtifact(
-		// "org.apache.activemq:activemq-spring:jar:5.4.2" ), "compile" );
-
 		CollectRequest collectRequest = new CollectRequest();
-		// collectRequest.setRoot( dependency );
 		collectRequest.setDependencies(getDependencies());
 
 		for (RemoteRepository repo : getRemoteRepositories()) {
