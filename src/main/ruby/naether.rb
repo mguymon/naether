@@ -85,19 +85,35 @@ class Naether
   end
   
   # Add a dependency in the notation: groupId:artifactId:type:version
-  def add_dependency( notation )
-    @resolver.addDependency( notation )
+  def add_dependency( notation, scope = 'compile' )
+    @resolver.addDependency( notation, scope )
   end
   
   # Set array of dependencies in the notation: groupId:artifactId:type:version
   def dependencies=(dependencies)
     dependencies.each do |dependent|
-      add_dependency( dependent )  
+      # Hash of notation => scope
+      if dependent.is_a? Hash
+        key = dependent.keys.first
+        add_dependency( key, dependent[key] )
+        
+      # String notation with compile scope
+      else
+        add_dependency( dependent )  
+      end
     end
   end
   
   # Get dependencies
   def dependencies()
+    if Naether.platform == 'java'
+      return @resolver.getDependencies().to_a
+    else
+      return @resolver.getDependencies().toArray()
+    end 
+  end
+  
+  def dependenciesNotation()
     if Naether.platform == 'java'
       return @resolver.getDependenciesNotation().to_a
     else
@@ -108,7 +124,7 @@ class Naether
   # Resolve dependencies, finding related additional dependencies
   def resolve_dependencies( download_artifacts = true )
     @resolver.resolveDependencies( download_artifacts );
-    dependencies
+    dependenciesNotation
   end
   
   def deploy_artifact( notation, file_path, url, opts = {} )
@@ -145,7 +161,7 @@ class Naether
       @project_instance = projectClass.new
     end
     
-    @project_instance.setNotation( notation )
+    @project_instance.setProjectNotation( notation )
     
     dependencies().each do |notation|
       @project_instance.addDependency( notation )

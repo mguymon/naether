@@ -113,11 +113,12 @@ public class MavenProjectTest {
 		project.setVersion("test");
 		project.setType("jar");
 		project.addDependency("org.apache.maven.wagon:wagon-file:jar:1.0-beta-7");
-
-		project.writePom("target/test-pom.xml");
-		assertTrue((new File("target/test-pom.xml")).exists());
+		project.addDependency("junit:junit:jar:4.8.2", "test");
+	
+		project.writePom("target/test-classes/test-pom.xml");
+		assertTrue((new File("target/test-classes/test-pom.xml")).exists());
 		
-		MavenProject testProject = new MavenProject( "target/test-pom.xml" );
+		MavenProject testProject = new MavenProject( "target/test-classes/test-pom.xml" );
 		assertEquals( project.getArtifactId(), testProject.getArtifactId() );
 		assertEquals( project.getGroupId(), testProject.getGroupId() );
 		assertEquals( project.getVersion(), testProject.getVersion() );

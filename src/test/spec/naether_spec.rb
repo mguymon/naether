@@ -10,6 +10,11 @@ describe Naether do
   
   context "Instance" do
     before(:each) do
+      @test_dir = 'target/test-rb'
+      unless File.exists?( @test_dir )
+        Dir.mkdir @test_dir
+      end
+      
       @naether = Naether.create_from_paths("target/lib", 'target')
       @naether.should_not be_nil
       @naether.local_repo_path = 'target/test-repo'
@@ -27,12 +32,12 @@ describe Naether do
     
     it "should add a dependency" do
       @naether.add_dependency( "junit:junit:jar:4.8.2" )  
-      @naether.dependencies.should eql ["junit:junit:jar:4.8.2"]
+      @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2"]
     end
     
     it "should set a list of dependencies" do
-      @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.24" ]  
-      @naether.dependencies.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.24"]
+      @naether.dependencies = [ {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.24" ]  
+      @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.24"]
     end
     
     it "should resolve dependencies" do
@@ -52,14 +57,16 @@ describe Naether do
     end
     
     it "should write pom file" do
-      @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.24" ]
+      test_file = "#{@test_dir}/naether_spec_test.xml"
+      
+      @naether.dependencies = [ {"junit:junit:jar:4.8.2" => 'test'}, "ch.qos.logback:logback-classic:jar:0.9.24" ]
       @naether.resolve_dependencies
-      @naether.write_pom( 'test-rb:test-rb:jar:100.1', 'target/rb-pom.xml')
+      @naether.write_pom( 'test-rb:test-rb:jar:100.1', test_file)
       
-      File.exists?( 'target/rb-pom.xml' ).should be_true
+      File.exists?( test_file ).should be_true
       
-      xml = IO.read( 'target/rb-pom.xml' ) 
-      xml.should match /.+junit<\/groupId>\s+<artifactId>junit<\/artifactId>\s+<version>4.8.2.+/
+      xml = IO.read( test_file ) 
+      xml.should match /.+junit<\/groupId>\s+<artifactId>junit<\/artifactId>\s+<version>4.8.2<\/version>\s+<scope>test.+/
       xml.should match /.+ch.qos.logback<\/groupId>\s+<artifactId>logback-classic<\/artifactId>\s+<version>0.9.24.+/
       xml.should match /.+ch.qos.logback<\/groupId>\s+<artifactId>logback-core<\/artifactId>\s+<version>0.9.24.+/
       xml.should match /.+org.slf4j<\/groupId>\s+<artifactId>slf4j-api<\/artifactId>\s+<version>1.6.0.+/

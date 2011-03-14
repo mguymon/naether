@@ -90,7 +90,7 @@ public class Naether {
 	}
 
 	/**
-	 * Add dependency by String notation
+	 * Add dependency by String notation with default compile scope
 	 * 
 	 * groupId:artifactId:type:version
 	 * 
@@ -109,12 +109,13 @@ public class Naether {
 	 * @param scope String
 	 */
 	public void addDependency(String notation, String scope) {
+		log.debug( "Add dep {notation} {scope}" );
 		Dependency dependency = new Dependency(new DefaultArtifact(notation), scope);
 		addDependency(dependency);
 	}
 
 	/**
-	 * Add Dependency
+	 * Add {@link Dependency}
 	 * 
 	 * @param dependency {@link Dependency}
 	 */
@@ -242,7 +243,7 @@ public class Naether {
 		for (RemoteRepository repo : getRemoteRepositories()) {
 			log.info("  {}", repo.toString());
 		}
-
+		
 		RepositorySystem repoSystem = newRepositorySystem();
 
 		RepositorySystemSession session = newSession(repoSystem);
@@ -250,6 +251,8 @@ public class Naether {
 		CollectRequest collectRequest = new CollectRequest();
 		collectRequest.setDependencies(getDependencies());
 
+		collectRequest.addRepository( RemoteRepoBuilder.createFromUrl( "file:" + this.getLocalRepoPath() ) );
+		
 		for (RemoteRepository repo : getRemoteRepositories()) {
 			collectRequest.addRepository(repo);
 		}

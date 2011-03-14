@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import org.sonatype.aether.artifact.Artifact;
 
 /**
- * Helper for converting a Dependency object into String
+ * Helper for converting a String dependency notations
  * 
  * groupId:artifactId:type:version
  * 

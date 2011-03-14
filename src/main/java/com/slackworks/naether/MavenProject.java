@@ -45,6 +45,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 // SLF4J
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.aether.artifact.Artifact;
 
 /**
  * Maven Project Model
@@ -73,8 +74,7 @@ public class MavenProject {
 	/**
 	 * New Instance loading Maven pom
 	 * 
-	 * @param pomPath
-	 *            String path
+	 * @param pomPath String path
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws XmlPullParserException
@@ -86,8 +86,7 @@ public class MavenProject {
 	/**
 	 * Load Maven pom
 	 * 
-	 * @param pomPath
-	 *            String path
+	 * @param pomPath String path
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws XmlPullParserException
@@ -143,7 +142,7 @@ public class MavenProject {
 	 * 
 	 * @param notation String
 	 */
-	public void setNotation(String notation) {
+	public void setProjectNotation(String notation) {
 		Map<String, String> notationMap = Notation.parse(notation);
 		this.setGroupId(notationMap.get("groupId"));
 		this.setArtifactId(notationMap.get("artifactId"));
@@ -227,14 +226,31 @@ public class MavenProject {
 		mavenModel.addDependency(dependency);
 	}
 
-	public void addDependency(String notation) {
+	public void addDependency(String notation ) {
+		addDependency( notation, "compile" );
+	}
+	
+	public void addDependency(String notation, String scope ) {
 		Map<String, String> notationMap = Notation.parse(notation);
 		Dependency dependency = new Dependency();
 		dependency.setGroupId(notationMap.get("groupId"));
 		dependency.setArtifactId(notationMap.get("artifactId"));
 		dependency.setType(notationMap.get("type"));
 		dependency.setVersion(notationMap.get("version"));
-		mavenModel.addDependency(dependency);
+		dependency.setScope( scope );
+		addDependency(dependency);
+	}
+	
+	public void addDependency(org.sonatype.aether.graph.Dependency aetherDep) {
+		Artifact artifact = aetherDep.getArtifact();
+		
+		Dependency dependency = new Dependency();
+		dependency.setGroupId( artifact.getGroupId() );
+		dependency.setArtifactId( artifact.getArtifactId() );
+		dependency.setType( artifact.getExtension() );
+		dependency.setVersion( artifact.getVersion() );
+		dependency.setScope( aetherDep.getScope() );
+		addDependency( dependency );
 	}
 
 	/**
@@ -258,7 +274,7 @@ public class MavenProject {
 	/**
 	 * Substitute a Maven Property expression, i.e. ${aetherVersion}, to its
 	 * corresponding Maven pom definition, i.e. 1.11 from
-	 * {@code <aetherVersion>1.11</aetherVersion>}
+	 * {@code <properties><aetherVersion>1.11</aetherVersion></properties>}
 	 * 
 	 * @param field
 	 * @return
