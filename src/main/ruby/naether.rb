@@ -91,6 +91,7 @@ class Naether
   
   # Set array of dependencies in the notation: groupId:artifactId:type:version
   def dependencies=(dependencies)
+    @resolver.clearDependencies();
     dependencies.each do |dependent|
       # Hash of notation => scope
       if dependent.is_a? Hash

@@ -89,6 +89,10 @@ public class Naether {
 		}
 	}
 
+	public void clearDependencies() {
+		setDependencies( new ArrayList<Dependency>() );
+	}
+	
 	/**
 	 * Add dependency by String notation with default compile scope
 	 * 
