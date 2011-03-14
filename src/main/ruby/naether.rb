@@ -85,22 +85,34 @@ class Naether
   end
   
   # Add a dependency in the notation: groupId:artifactId:type:version
-  def add_dependency( notation, scope = 'compile' )
+  def add_notation_dependency( notation, scope='compile' )
     @resolver.addDependency( notation, scope )
+  end
+  
+  # Add a dependency 
+  def add_dependency( dependency )
+    #@resolver.addDependency( dependency )
+    if Naether.platform == 'java'
+      @resolver.addDependency( dependency )
+    else
+      @resolver._invoke('addDependency', 'Lorg.sonatype.aether.graph.Dependency;', dependency)
+    end
   end
   
   # Set array of dependencies in the notation: groupId:artifactId:type:version
   def dependencies=(dependencies)
-    @resolver.clearDependencies();
+    @resolver.clearDependencies()
     dependencies.each do |dependent|
       # Hash of notation => scope
       if dependent.is_a? Hash
         key = dependent.keys.first
-        add_dependency( key, dependent[key] )
+        add_notation_dependency( key, dependent[key] )
         
       # String notation with compile scope
+      elsif dependent.is_a? String
+        add_notation_dependency( dependent, 'compile' )
       else
-        add_dependency( dependent )  
+        add_dependency( dependent )
       end
     end
   end

@@ -89,6 +89,9 @@ public class Naether {
 		}
 	}
 
+	/**
+	 * Clear dependencies
+	 */
 	public void clearDependencies() {
 		setDependencies( new ArrayList<Dependency>() );
 	}
