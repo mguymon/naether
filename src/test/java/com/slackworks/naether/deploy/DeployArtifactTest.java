@@ -1,4 +1,4 @@
-package com.slackworks.naether;
+package com.slackworks.naether.deploy;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -23,6 +23,9 @@ import java.net.MalformedURLException;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.slackworks.naether.deploy.DeployArtifact;
+import com.slackworks.naether.repo.RemoteRepoBuilder;
 
 import static org.junit.Assert.*;
 

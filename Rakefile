@@ -79,12 +79,12 @@ Jeweler::Tasks.new do |gem|
   Naether::Java.load_jars_dir( ['target', 'target/lib'])
   
   if platform == 'java'
-    java_import com.slackworks.naether.MavenProject
+    java_import com.slackworks.naether.maven.Project
     
-    maven_project = MavenProject.new('pom.xml')
+    maven_project = Project.new('pom.xml')
     naether_jar = "naether-#{maven_project.get_version}.jar"
   else
-    mavenProjectClass = Rjb::import('com.slackworks.naether.MavenProject')
+    mavenProjectClass = Rjb::import('com.slackworks.naether.maven.Project')
     maven_project = mavenProjectClass.new
     maven_project.loadPOM('pom.xml')
     naether_jar = "naether-#{maven_project.getVersion()}.jar"
@@ -128,9 +128,10 @@ Rake::Task["build"].enhance do
   Rake::Task['naether:copy_gem_from_target'].invoke
 end
 
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new(:spec) do |t|
-  t.spec_files = FileList['src/test/spec/**/*_spec.rb']
+require 'rspec/core/rake_task'
+
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.pattern = 'src/test/spec/**/*_spec.rb'
 end
 
 task :test => :spec

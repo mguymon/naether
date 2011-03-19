@@ -31,7 +31,7 @@ describe Naether do
     end
     
     it "should add a dependency" do
-      @naether.add_dependency( "junit:junit:jar:4.8.2" )  
+      @naether.dependencies = "junit:junit:jar:4.8.2" 
       @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2"]
     end
     
@@ -41,7 +41,7 @@ describe Naether do
     end
     
     it "should resolve dependencies" do
-      @naether.add_dependency( "ch.qos.logback:logback-classic:jar:0.9.24" ) 
+      @naether.dependencies = "ch.qos.logback:logback-classic:jar:0.9.24" 
       @naether.resolve_dependencies.should eql ["ch.qos.logback:logback-classic:jar:0.9.24", "ch.qos.logback:logback-core:jar:0.9.24", "org.slf4j:slf4j-api:jar:1.6.0"]
     end
     

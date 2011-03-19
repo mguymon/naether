@@ -89,7 +89,7 @@ class Naether
     @resolver.addDependency( notation, scope )
   end
   
-  # Add a dependency 
+  # Add a dependency Java object
   def add_dependency( dependency )
     #@resolver.addDependency( dependency )
     if Naether.platform == 'java'
@@ -140,11 +140,12 @@ class Naether
     dependenciesNotation
   end
   
+  # Deploy artifact to remote repo url
   def deploy_artifact( notation, file_path, url, opts = {} )
     if Naether.platform == 'java'
-      @instance = com.slackworks.naether.DeployArtifact.new 
+      @instance = com.slackworks.naether.deploy.DeployArtifact.new 
     else
-      deployArtifactClass = Rjb::import('com.slackworks.naether.DeployArtifact') 
+      deployArtifactClass = Rjb::import('com.slackworks.naether.deploy.DeployArtifact') 
       @instance = deployArtifactClass.new
     end
     
@@ -162,15 +163,33 @@ class Naether
     @resolver.deployArtifact(@instance)
   end
   
+  # Install artifact to local repo
+  def install_artifact( notation, file_path, opts = {} )
+    if Naether.platform == 'java'
+      @instance = com.slackworks.naether.deploy.DeployArtifact.new 
+    else
+      deployArtifactClass = Rjb::import('com.slackworks.naether.deploy.DeployArtifact') 
+      @instance = deployArtifactClass.new
+    end
+    
+    @instance.setNotation( notation )
+    @instance.setFilePath( file_path )
+    if opts[:pom_path]
+      @instance.setPomPath( opts[:pom_path] )
+    end
+    
+    @resolver.installArtifact(@instance)
+  end
+  
   # filePath to write the pom 
   # notation of the pom, groupId:artifactId:type:version
   #
   # loads all resolved dependencies into pom
   def write_pom( notation, file_path )
     if Naether.platform == 'java'
-      @project_instance = com.slackworks.naether.MavenProject.new 
+      @project_instance = com.slackworks.naether.maven.Project.new 
     else
-      projectClass = Rjb::import('com.slackworks.naether.MavenProject') 
+      projectClass = Rjb::import('com.slackworks.naether.maven.Project') 
       @project_instance = projectClass.new
     end
     

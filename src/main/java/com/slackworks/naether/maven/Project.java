@@ -1,4 +1,4 @@
-package com.slackworks.naether;
+package com.slackworks.naether.maven;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -47,15 +47,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.artifact.Artifact;
 
+import com.slackworks.naether.Notation;
+
 /**
  * Maven Project Model
  * 
  * @author Michael Guymon
  * 
  */
-public class MavenProject {
+public class Project {
 
-	private static Logger log = LoggerFactory.getLogger(MavenProject.class);
+	private static Logger log = LoggerFactory.getLogger(Project.class);
 
 	private Model mavenModel;
 	private Pattern propertyPattern = Pattern.compile("^\\$\\{(.+)\\}$");
@@ -63,7 +65,7 @@ public class MavenProject {
 	/**
 	 * New Instance
 	 */
-	public MavenProject() {
+	public Project() {
 		Model model = new Model();
 		model.setModelVersion("4.0.0");
 		model.setPackaging("jar");
@@ -75,11 +77,12 @@ public class MavenProject {
 	 * New Instance loading Maven pom
 	 * 
 	 * @param pomPath String path
+	 * @throws ProjectException 
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws XmlPullParserException
 	 */
-	public MavenProject(String pomPath) throws FileNotFoundException, IOException, XmlPullParserException {
+	public Project(String pomPath) throws ProjectException {
 		loadPOM(pomPath);
 	}
 
@@ -87,14 +90,25 @@ public class MavenProject {
 	 * Load Maven pom
 	 * 
 	 * @param pomPath String path
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws XmlPullParserException
+	 * @throws ProjectException 
 	 */
-	public void loadPOM(String pomPath) throws FileNotFoundException, IOException, XmlPullParserException {
+	public void loadPOM(String pomPath) throws ProjectException {
 		log.debug("Loading pom {}", pomPath);
 		MavenXpp3Reader reader = new MavenXpp3Reader();
-		setMavenModel(reader.read(new BufferedReader(new FileReader(new File(pomPath)))));
+		try {
+			setMavenModel(reader.read(new BufferedReader(new FileReader(new File(pomPath)))));
+		} catch (FileNotFoundException e) {
+			log.error( "Failed to access pom", e);
+			throw new ProjectException( "Failed to access pom", e );
+			
+		} catch (IOException e) {
+			log.error( "Failed to read pom", e);
+			throw new ProjectException("Failed to read pom", e );
+			
+		} catch (XmlPullParserException e) {
+			log.error( "Failed to parse pom", e);
+			throw new ProjectException( "Failed to parse pom", e );
+		}
 	}
 
 	public String getModelVersion() {
@@ -294,10 +308,20 @@ public class MavenProject {
 		}
 	}
 
-	public void writePom(String filePath) throws IOException {
+	public void writePom(String filePath) throws ProjectException {
 		log.debug("Writing pom: {}", filePath);
-		Writer writer = new BufferedWriter(new FileWriter(filePath));
+		Writer writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(filePath));
+		} catch (IOException e) {
+			throw new ProjectException(e);
+		}
+		
 		MavenXpp3Writer pomWriter = new MavenXpp3Writer();
-		pomWriter.write(writer, this.mavenModel);
+		try {
+			pomWriter.write(writer, this.mavenModel);
+		} catch (IOException e) {
+			throw new ProjectException("Failed to write pom", e);
+		}
 	}
 }

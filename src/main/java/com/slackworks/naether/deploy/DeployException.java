@@ -1,4 +1,6 @@
-package com.slackworks.naether;
+package com.slackworks.naether.deploy;
+
+import com.slackworks.naether.NaetherException;
 
 public class DeployException extends NaetherException {
 

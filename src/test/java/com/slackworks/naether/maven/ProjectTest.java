@@ -1,4 +1,4 @@
-package com.slackworks.naether;
+package com.slackworks.naether.maven;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 // Junit
 import org.junit.Test;
 
-import com.slackworks.naether.MavenProject;
+import com.slackworks.naether.maven.Project;
 
 import static org.junit.Assert.*;
 
@@ -43,25 +43,21 @@ import static org.junit.Assert.*;
  * @author Michael Guymon
  * 
  */
-public class MavenProjectTest {
+public class ProjectTest {
 
 	@Test
 	public void createDefaultInstance() {
-		MavenProject mavenProject = new MavenProject();
+		Project mavenProject = new Project();
 		assertNotNull(mavenProject);
 	}
 
 	@Test
 	public void createInstanceWithPomPath() {
-		MavenProject mavenProject = null;
+		Project mavenProject = null;
 		try {
-			mavenProject = new MavenProject("pom.xml");
-		} catch (FileNotFoundException e) {
-			fail("pom not found: " + e.toString());
-		} catch (IOException e) {
+			mavenProject = new Project("pom.xml");
+		} catch (ProjectException e) {
 			fail("failed to read pom: " + e.toString());
-		} catch (XmlPullParserException e) {
-			fail("failed to parse pom xml: " + e.toString());
 		}
 
 		assertNotNull(mavenProject.getMavenModel());
@@ -69,8 +65,8 @@ public class MavenProjectTest {
 	}
 
 	@Test
-	public void getDependenciesNotation() throws FileNotFoundException, IOException, XmlPullParserException {
-		MavenProject mavenProject = new MavenProject("pom.xml");
+	public void getDependenciesNotation() throws ProjectException {
+		Project mavenProject = new Project("pom.xml");
 		List<String> notations = new ArrayList<String>();
 		notations.add("ch.qos.logback:logback-classic:jar:0.9.24");
 		notations.add("org.slf4j:slf4j-api:jar:1.6.1");
@@ -106,8 +102,8 @@ public class MavenProjectTest {
 	}
 
 	@Test
-	public void writePom() throws IOException, XmlPullParserException {
-		MavenProject project = new MavenProject();
+	public void writePom() throws ProjectException {
+		Project project = new Project();
 		project.setArtifactId("testArtifact");
 		project.setGroupId("testGroup");
 		project.setVersion("test");
@@ -118,7 +114,7 @@ public class MavenProjectTest {
 		project.writePom("target/test-classes/test-pom.xml");
 		assertTrue((new File("target/test-classes/test-pom.xml")).exists());
 		
-		MavenProject testProject = new MavenProject( "target/test-classes/test-pom.xml" );
+		Project testProject = new Project( "target/test-classes/test-pom.xml" );
 		assertEquals( project.getArtifactId(), testProject.getArtifactId() );
 		assertEquals( project.getGroupId(), testProject.getGroupId() );
 		assertEquals( project.getVersion(), testProject.getVersion() );

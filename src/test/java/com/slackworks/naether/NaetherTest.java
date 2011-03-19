@@ -36,9 +36,10 @@ import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.slackworks.naether.Bootstrap;
-import com.slackworks.naether.MavenProject;
 import com.slackworks.naether.Naether;
 import com.slackworks.naether.Notation;
+import com.slackworks.naether.deploy.DeployArtifact;
+import com.slackworks.naether.maven.Project;
 
 
 /**
@@ -65,7 +66,7 @@ public class NaetherTest {
 	}
 
 	@Test
-	public void addRemoteRepository() throws MalformedURLException {
+	public void addRemoteRepository() throws URLException {
 		assertEquals( "central", naether.getRemoteRepositories().get(0).getId() );
 		
 		naether.addRemoteRepositoryByUrl( "http://test.net/hamster:7011" );
@@ -76,11 +77,11 @@ public class NaetherTest {
 	}
 	
 	@Test
-	public void getDependenciesNotation() {
+	public void getDependenciesNotation() throws URLException, DependencyException {
 		Dependency dependency =
             new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
         naether.addDependency(dependency);
-        
+        naether.resolveDependencies( false );
         assertEquals( "junit:junit:jar:4.8.2", naether.getDependenciesNotation().get(0) );
 	}
 	
@@ -109,7 +110,7 @@ public class NaetherTest {
 	
 	@Test
 	public void resolveNaetherDependencies() throws Exception {
-		MavenProject mavenProject = new MavenProject("pom.xml");
+		Project mavenProject = new Project("pom.xml");
 		for( org.apache.maven.model.Dependency mavenDep : mavenProject.getDependencies() ) {
 			String notation = Notation.generate( mavenDep );
 			
@@ -191,6 +192,28 @@ public class NaetherTest {
         deployArtifact.setNotation( "test:test:jar:0.4");
         deployArtifact.setRemoteRepo( new File( "target/test-repo" ).toURI().toString() );
         naether.deployArtifact( deployArtifact );
+        assertTrue( destinationJar.exists() );
+	}
+	
+	@Test
+	public void testInstallArtifact() throws Exception {
+		
+		// Use Naether to get a jar to deploy
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
+        naether.addDependency(dependency);
+        naether.resolveDependencies();
+        String jar = (new File( "target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar")).getAbsolutePath();
+        
+        File destinationJar = new File("target/test-repo/test/test-install/0.4/test-install-0.4.jar");
+        if ( destinationJar.exists() ) {
+        	destinationJar.delete();
+        }
+        
+        DeployArtifact deployArtifact = new DeployArtifact();
+        deployArtifact.setFilePath( jar );
+        deployArtifact.setNotation( "test:test-install:jar:0.4");
+        naether.installArtifact( deployArtifact );
         assertTrue( destinationJar.exists() );
 	}
 

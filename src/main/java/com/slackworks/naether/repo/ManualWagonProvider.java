@@ -1,4 +1,4 @@
-package com.slackworks.naether;
+package com.slackworks.naether.repo;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one

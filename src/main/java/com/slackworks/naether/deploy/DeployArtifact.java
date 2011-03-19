@@ -1,4 +1,4 @@
-package com.slackworks.naether;
+package com.slackworks.naether.deploy;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,6 +28,8 @@ import org.sonatype.aether.repository.Authentication;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.SubArtifact;
+
+import com.slackworks.naether.repo.RemoteRepoBuilder;
 
 /**
  * Information for deploying an {@link Artifact}
