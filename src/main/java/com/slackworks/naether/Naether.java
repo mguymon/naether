@@ -38,11 +38,15 @@ import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
+import org.sonatype.aether.collection.DependencyCollectionException;
 import org.sonatype.aether.graph.Dependency;
+import org.sonatype.aether.installation.InstallRequest;
+import org.sonatype.aether.installation.InstallationException;
 import org.sonatype.aether.repository.Authentication;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyRequest;
+import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.resolution.DependencyResult;
 import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
@@ -50,6 +54,7 @@ import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 import org.sonatype.aether.connector.wagon.WagonProvider;
 import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
 import org.sonatype.aether.deployment.DeployRequest;
+import org.sonatype.aether.deployment.DeploymentException;
 
 
 /**
@@ -140,10 +145,15 @@ public class Naether {
 	/**
 	 * Add a {@link RemoteRepository} by String url
 	 * @param url String
+	 * @throws URLException 
 	 * @throws MalformedURLException
 	 */
-	public void addRemoteRepositoryByUrl(String url) throws MalformedURLException {
-		addRemoteRepository(RemoteRepoBuilder.createFromUrl(url));
+	public void addRemoteRepositoryByUrl(String url) throws URLException {
+		try {
+			addRemoteRepository(RemoteRepoBuilder.createFromUrl(url));
+		} catch (MalformedURLException e) {
+			throw new URLException(e);
+		}
 	}
 	
 	/**
@@ -151,10 +161,16 @@ public class Naether {
 	 * @param url String
 	 * @param username String
 	 * @param password String
+	 * @throws URLException 
 	 * @throws MalformedURLException
 	 */
-	public void addRemoteRepositoryByUrl(String url, String username, String password) throws MalformedURLException {
-		RemoteRepository remoteRepo = RemoteRepoBuilder.createFromUrl(url);
+	public void addRemoteRepositoryByUrl(String url, String username, String password) throws URLException {
+		RemoteRepository remoteRepo;
+		try {
+			remoteRepo = RemoteRepoBuilder.createFromUrl(url);
+		} catch (MalformedURLException e) {
+			throw new URLException(e);
+		}
 		remoteRepo = remoteRepo.setAuthentication( new Authentication( username, password ) );
 		addRemoteRepository( remoteRepo );
 	}
@@ -201,15 +217,13 @@ public class Naether {
 	 * Create new {@link RepositorySystem}
 	 * 
 	 * @return {@link RepositorySystem}
-	 * @throws Exception
 	 */
-	public RepositorySystem newRepositorySystem() throws Exception {
+	public RepositorySystem newRepositorySystem() {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		locator.setServices(WagonProvider.class, new ManualWagonProvider());
 		locator.addService(RepositoryConnectorFactory.class, WagonRepositoryConnectorFactory.class);
 
 		return locator.getService(RepositorySystem.class);
-
 	}
 
 	/**
@@ -230,10 +244,12 @@ public class Naether {
 
 	/**
 	 * Resolve Dependencies, downloading artifacts
+	 * @throws DependencyException 
+	 * @throws URLException 
 	 * 
 	 * @throws Exception
 	 */
-	public void resolveDependencies() throws Exception {
+	public void resolveDependencies() throws URLException, DependencyException {
 		resolveDependencies( true );
 	}
 	
@@ -241,9 +257,12 @@ public class Naether {
 	 * Resolve Dependencies, boolean if artifacts are to be downloaded
 	 * 
 	 * @param downloadArtifacts boolean
+	 * @throws URLException 
+	 * @throws DependencyException 
+	 * @throws MalformedURLException 
 	 * @throws Exception
 	 */
-	public void resolveDependencies( boolean downloadArtifacts ) throws Exception {
+	public void resolveDependencies( boolean downloadArtifacts ) throws URLException, DependencyException {
 		log.info("Local Repo Path: {}", localRepoPath);
 
 		log.info("Remote Repositories:");
@@ -258,19 +277,34 @@ public class Naether {
 		CollectRequest collectRequest = new CollectRequest();
 		collectRequest.setDependencies(getDependencies());
 
-		collectRequest.addRepository( RemoteRepoBuilder.createFromUrl( "file:" + this.getLocalRepoPath() ) );
+		try {
+			collectRequest.addRepository( RemoteRepoBuilder.createFromUrl( "file:" + this.getLocalRepoPath() ) );
+		} catch (MalformedURLException e) {
+			throw new URLException(e);
+		}
 		
 		for (RemoteRepository repo : getRemoteRepositories()) {
 			collectRequest.addRepository(repo);
 		}
 		
-		CollectResult collectResult = repoSystem.collectDependencies( session, collectRequest );
+		CollectResult collectResult;
+		try {
+			collectResult = repoSystem.collectDependencies( session, collectRequest );
+		} catch (DependencyCollectionException e) {
+			throw new DependencyException(e);
+		}
+		
 		preorderedNodeList = new PreorderNodeListGenerator();
 		if ( downloadArtifacts ) {
 			DependencyRequest dependencyRequest = new DependencyRequest( collectRequest, null );
 	
 			log.info("Resolving dependencies to files");
-			DependencyResult dependencyResult = repoSystem.resolveDependencies(session, dependencyRequest);
+			DependencyResult dependencyResult;
+			try {
+				dependencyResult = repoSystem.resolveDependencies(session, dependencyRequest);
+			} catch (DependencyResolutionException e) {
+				throw new DependencyException(e);
+			}
 			dependencyResult.getRoot().accept( preorderedNodeList );
 			
 		} else {
@@ -285,9 +319,9 @@ public class Naether {
 	 * Deploy an Artifact
 	 * 
 	 * @param deployArtifact {@link DeployArtifact}
-	 * @throws Exception
+	 * @throws DeploymentException 
 	 */
-	public void deployArtifact( DeployArtifact deployArtifact ) throws Exception {
+	public void deployArtifact( DeployArtifact deployArtifact ) throws DeployException {
 		log.debug( "deploy artifact: {} ", deployArtifact.getNotation() );
 		RepositorySystem system = newRepositorySystem();
 
@@ -300,8 +334,40 @@ public class Naether {
         }
         deployRequest.setRepository( deployArtifact.getRemoteRepo() );
         
-        log.debug( "uploading artifact" );
-        system.deploy( session, deployRequest );
+        log.debug( "deploying artifact {}", deployArtifact.getNotation() );
+        try {
+			system.deploy( session, deployRequest );
+		} catch (DeploymentException e) {
+			log.error( "Failed to deploy artifact", e);
+			throw new DeployException(e);
+		}
+	}
+	
+	/**
+	 * Install Artifact to local repo
+	 * 
+	 * @param deployArtifact {@link DeployArtifact}
+	 * @throws InstallException
+	 */
+	public void installArtifact( DeployArtifact deployArtifact ) throws InstallException {
+		log.debug( "deploy artifact: {} ", deployArtifact.getNotation() );
+		RepositorySystem system = newRepositorySystem();
+
+        RepositorySystemSession session = newSession(system);
+
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.addArtifact( deployArtifact.getJarArtifact() );
+        if ( deployArtifact.getPomArtifact() != null ) {
+	        installRequest.addArtifact( deployArtifact.getPomArtifact() );
+        }
+        
+        log.debug( "installing artifact {}", deployArtifact.getNotation() );
+        try {
+			system.install( session, installRequest );
+		} catch (InstallationException e) {
+			log.error( "Failed to install artifact", e);
+			throw new InstallException(e);
+		}
 	}
 
 	/**
