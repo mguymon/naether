@@ -62,7 +62,7 @@ public class LogRepositoryListener
 
     public void artifactInstalling( RepositoryEvent event )
     {
-        log.info( "Installing " + event.getArtifact() + " to " + event.getFile() );
+        log.debug( "Installing " + event.getArtifact() + " to " + event.getFile() );
     }
 
     public void artifactResolved( RepositoryEvent event )
@@ -72,7 +72,7 @@ public class LogRepositoryListener
 
     public void artifactDownloading( RepositoryEvent event )
     {
-        log.info( "Downloading artifact " + event.getArtifact() + " from " + event.getRepository() );
+        log.debug( "Downloading artifact " + event.getArtifact() + " from " + event.getRepository() );
     }
 
     public void artifactDownloaded( RepositoryEvent event )
@@ -92,7 +92,7 @@ public class LogRepositoryListener
 
     public void metadataDeploying( RepositoryEvent event )
     {
-        log.info( "Deploying " + event.getMetadata() + " to " + event.getRepository() );
+        log.debug( "Deploying " + event.getMetadata() + " to " + event.getRepository() );
     }
 
     public void metadataInstalled( RepositoryEvent event )
@@ -102,7 +102,7 @@ public class LogRepositoryListener
 
     public void metadataInstalling( RepositoryEvent event )
     {
-        log.info( "Installing " + event.getMetadata() + " to " + event.getFile() );
+        log.debug( "Installing " + event.getMetadata() + " to " + event.getFile() );
     }
 
     public void metadataInvalid( RepositoryEvent event )
