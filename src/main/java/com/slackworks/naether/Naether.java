@@ -353,8 +353,7 @@ public class Naether {
 	 *            {@link DeployArtifact}
 	 * @throws DeploymentException
 	 */
-	public void deployArtifact(DeployArtifact deployArtifact)
-			throws DeployException {
+	public void deployArtifact(DeployArtifact deployArtifact) throws DeployException {
 		log.debug("deploy artifact: {} ", deployArtifact.getNotation());
 		RepositorySystem system = newRepositorySystem();
 
