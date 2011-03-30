@@ -52,6 +52,7 @@ namespace :naether do
     Dir.chdir( "../../" )
   end
 
+  desc "write jar_dependencies.yml"
   task :write_dependencies do
     Naether::Bootstrap.write_dependencies("target")
   end

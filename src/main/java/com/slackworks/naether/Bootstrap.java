@@ -38,7 +38,6 @@ public class Bootstrap {
 		deps.add("com.jcraft:jsch:jar:0.1.38");
 		deps.add("com.ning:async-http-client:jar:1.6.1");
 		deps.add("org.apache.xbean:xbean-reflect:jar:3.4");
-		deps.add("org.jboss.netty:netty:jar:3.2.4.Final");
 		deps.add("com.google.collections:google-collections:jar:1.0");
 		deps.add("ch.qos.logback:logback-classic:jar:0.9.24");
 		deps.add("ch.qos.logback:logback-core:jar:0.9.24");
