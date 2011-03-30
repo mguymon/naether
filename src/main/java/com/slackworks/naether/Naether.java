@@ -128,23 +128,19 @@ public class Naether {
 	 * 
 	 * groupId:artifactId:type:version
 	 * 
-	 * @param notation
-	 *            String
-	 * @param scope
-	 *            String
+	 * @param notation String
+	 * @param scope  String
 	 */
 	public void addDependency(String notation, String scope) {
 		log.debug("Add dep {notation} {scope}");
-		Dependency dependency = new Dependency(new DefaultArtifact(notation),
-				scope);
+		Dependency dependency = new Dependency(new DefaultArtifact(notation), scope);
 		addDependency(dependency);
 	}
 
 	/**
 	 * Add {@link Dependency}
 	 * 
-	 * @param dependency
-	 *            {@link Dependency}
+	 * @param dependency {@link Dependency}
 	 */
 	public void addDependency(Dependency dependency) {
 		dependencies.add(dependency);
@@ -160,8 +156,7 @@ public class Naether {
 	/**
 	 * Add a {@link RemoteRepository} by String url
 	 * 
-	 * @param url
-	 *            String
+	 * @param url String
 	 * @throws URLException
 	 * @throws MalformedURLException
 	 */
@@ -177,37 +172,29 @@ public class Naether {
 	 * Add a {@link RemoteRepository} by String url with String username and
 	 * password authentication.
 	 * 
-	 * @param url
-	 *            String
-	 * @param username
-	 *            String
-	 * @param password
-	 *            String
+	 * @param url String
+	 * @param username String
+	 * @param password String
 	 * @throws URLException
 	 * @throws MalformedURLException
 	 */
-	public void addRemoteRepositoryByUrl(String url, String username,
-			String password) throws URLException {
+	public void addRemoteRepositoryByUrl(String url, String username, String password) throws URLException {
 		RemoteRepository remoteRepo;
 		try {
 			remoteRepo = RemoteRepoBuilder.createFromUrl(url);
 		} catch (MalformedURLException e) {
 			throw new URLException(e);
 		}
-		remoteRepo = remoteRepo.setAuthentication(new Authentication(username,
-				password));
+		remoteRepo = remoteRepo.setAuthentication(new Authentication(username, password));
 		addRemoteRepository(remoteRepo);
 	}
 
 	/**
 	 * Add a {@link RemoteRepository}
 	 * 
-	 * @param id
-	 *            String
-	 * @param type
-	 *            String
-	 * @param url
-	 *            String
+	 * @param id String
+	 * @param type String
+	 * @param url String
 	 */
 	public void addRemoteRepository(String id, String type, String url) {
 		getRemoteRepositories().add(new RemoteRepository(id, type, url));
@@ -216,8 +203,7 @@ public class Naether {
 	/**
 	 * Add {@link RemoteRepository}
 	 * 
-	 * @param remoteRepository
-	 *            {@link RemoteRepository}
+	 * @param remoteRepository {@link RemoteRepository}
 	 */
 	public void addRemoteRepository(RemoteRepository remoteRepository) {
 		getRemoteRepositories().add(remoteRepository);
@@ -226,8 +212,7 @@ public class Naether {
 	/**
 	 * Set {@link List} of {@link RemoteRepository}
 	 * 
-	 * @param remoteRepositories
-	 *            {@link List}
+	 * @param remoteRepositories {@link List}
 	 */
 	public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
 		this.remoteRepositories = remoteRepositories;
@@ -250,8 +235,7 @@ public class Naether {
 	public RepositorySystem newRepositorySystem() {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		locator.setServices(WagonProvider.class, new ManualWagonProvider());
-		locator.addService(RepositoryConnectorFactory.class,
-				WagonRepositoryConnectorFactory.class);
+		locator.addService(RepositoryConnectorFactory.class, WagonRepositoryConnectorFactory.class);
 
 		return locator.getService(RepositorySystem.class);
 	}
@@ -259,8 +243,7 @@ public class Naether {
 	/**
 	 * Create new {@link RepositorySystemSession}
 	 * 
-	 * @param system
-	 *            {@link RepositorySystem}
+	 * @param system {@link RepositorySystem}
 	 * @return {@link RepositorySystemSession}
 	 */
 	public RepositorySystemSession newSession(RepositorySystem system) {
@@ -274,7 +257,7 @@ public class Naether {
 	}
 
 	/**
-	 * Resolve Dependencies, downloading artifacts
+	 * Resolve dependencies and download artifacts
 	 * 
 	 * @throws DependencyException
 	 * @throws URLException
@@ -288,8 +271,7 @@ public class Naether {
 	/**
 	 * Resolve Dependencies, boolean if artifacts are to be downloaded
 	 * 
-	 * @param downloadArtifacts
-	 *            boolean
+	 * @param downloadArtifacts boolean
 	 * @throws URLException
 	 * @throws DependencyException
 	 */
@@ -349,8 +331,7 @@ public class Naether {
 	/**
 	 * Deploy an Artifact
 	 * 
-	 * @param deployArtifact
-	 *            {@link DeployArtifact}
+	 * @param deployArtifact {@link DeployArtifact}
 	 * @throws DeploymentException
 	 */
 	public void deployArtifact(DeployArtifact deployArtifact) throws DeployException {
