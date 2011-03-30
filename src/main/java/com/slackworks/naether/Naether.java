@@ -160,11 +160,12 @@ public class Naether {
 	 * @throws URLException
 	 * @throws MalformedURLException
 	 */
-	public void addRemoteRepositoryByUrl(String url) throws URLException {
+	public void addRemoteRepositoryByUrl(String url) throws NaetherException {
 		try {
 			addRemoteRepository(RemoteRepoBuilder.createFromUrl(url));
 		} catch (MalformedURLException e) {
-			throw new URLException(e);
+			log.error( "Malformed url: {}", url, e);
+			throw new NaetherException(e);
 		}
 	}
 

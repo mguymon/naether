@@ -61,7 +61,7 @@ public class ProjectTest {
 		}
 
 		assertNotNull(mavenProject.getMavenModel());
-		assertEquals("0.3.1", mavenProject.getVersion());
+		assertEquals("0.3.4", mavenProject.getVersion());
 	}
 
 	@Test
