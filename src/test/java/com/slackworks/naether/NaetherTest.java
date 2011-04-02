@@ -66,7 +66,7 @@ public class NaetherTest {
 	}
 
 	@Test
-	public void addRemoteRepository() throws URLException {
+	public void addRemoteRepository() throws NaetherException {
 		assertEquals( "central", naether.getRemoteRepositories().get(0).getId() );
 		
 		naether.addRemoteRepositoryByUrl( "http://test.net/hamster:7011" );

@@ -181,6 +181,25 @@ class Naether
     @resolver.installArtifact(@instance)
   end
   
+  # filePath to read the pom
+  #
+  def pom_dependencies( file_path )
+    if Naether.platform == 'java'
+      @project_instance = com.slackworks.naether.maven.Project.new 
+    else
+      projectClass = Rjb::import('com.slackworks.naether.maven.Project') 
+      @project_instance = projectClass.new
+    end
+    
+    @project_instance.loadPOM( file_path )
+    
+    if Naether.platform == 'java'
+      return @project_instance.getDependenciesNotation().to_a
+    else
+      return @project_instance.getDependenciesNotation().toArray().map{ |dep| dep.toString() }
+    end 
+  end
+  
   # filePath to write the pom 
   # notation of the pom, groupId:artifactId:type:version
   #

@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
 
 import org.sonatype.aether.artifact.Artifact;
 
+import com.slackworks.naether.maven.Project;
+
 /**
  * Helper for converting a String dependency notations
  * 
@@ -48,6 +50,17 @@ public class Notation {
 		return notation.toString();
 	}
 
+	public static String generate( Project pom ) {
+		return new StringBuilder( pom.getGroupId() )
+			.append( ":" )
+			.append( pom.getArtifactId() )
+			.append( ":" )
+			.append( pom.getType() )
+			.append( ":" )
+			.append( pom.getVersion() )
+			.toString();
+	}
+	
 	public static String generate(org.sonatype.aether.graph.Dependency dependency) {
 		Artifact artifact = dependency.getArtifact();
 		StringBuffer notation = new StringBuffer()

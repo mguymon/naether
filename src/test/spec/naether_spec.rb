@@ -56,6 +56,28 @@ describe Naether do
       File.exists?( 'target/test-repo/test/test/22.3/test-22.3.jar' ).should be_true
     end
     
+    it "should get dependencies from pom file" do
+      deps = @naether.pom_dependencies( 'pom.xml' )
+      deps.should eql [ "ch.qos.logback:logback-classic:jar:0.9.24",
+                        "org.slf4j:slf4j-api:jar:1.6.1",
+                        "org.slf4j:jcl-over-slf4j:jar:1.6.1",
+                        "org.slf4j:log4j-over-slf4j:jar:1.6.1",
+                        "org.codehaus.plexus:plexus-utils:jar:1.5.8",
+                        "org.apache.maven:maven-model-v3:jar:2.0",
+                        "org.codehaus.plexus:plexus-container-default:jar:1.5.5",
+                        "org.sonatype.aether:aether-api:jar:1.11",
+                        "org.sonatype.aether:aether-util:jar:1.11",
+                        "org.sonatype.aether:aether-impl:jar:1.11",
+                        "org.sonatype.aether:aether-connector-file:jar:1.11",
+                        "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.11",
+                        "org.sonatype.aether:aether-connector-wagon:jar:1.11",
+                        "org.apache.maven:maven-aether-provider:jar:3.0.2",
+                        "org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-7",
+                        "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-7",
+                        "org.apache.maven.wagon:wagon-file:jar:1.0-beta-7",
+                        "junit:junit:jar:4.8.2" ]
+    end
+    
     it "should write pom file" do
       test_file = "#{@test_dir}/naether_spec_test.xml"
       

@@ -152,6 +152,15 @@ public class Project {
 	}
 
 	/**
+	 * Get the String notation for the Maven Project
+	 * 
+	 * @return String
+	 */
+	public String getProjectNotation() {
+		return Notation.generate( this );
+	}
+	
+	/**
 	 * Set Maven Project from String notation
 	 * 
 	 * @param notation String
