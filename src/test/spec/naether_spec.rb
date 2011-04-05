@@ -56,6 +56,10 @@ describe Naether do
       File.exists?( 'target/test-repo/test/test/22.3/test-22.3.jar' ).should be_true
     end
     
+    it "should get version from pom file" do
+      @naether.pom_version( 'pom.xml' ).should eql "0.3.4"
+    end
+    
     it "should get dependencies from pom file" do
       deps = @naether.pom_dependencies( 'pom.xml' )
       deps.should eql [ "ch.qos.logback:logback-classic:jar:0.9.24",
@@ -76,6 +80,11 @@ describe Naether do
                         "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-7",
                         "org.apache.maven.wagon:wagon-file:jar:1.0-beta-7",
                         "junit:junit:jar:4.8.2" ]
+    end
+    
+    it "should load a pom to use for future pom calls" do
+      @naether.load_pom( 'pom.xml' )
+      @naether.pom_version.should eql "0.3.4"
     end
     
     it "should write pom file" do

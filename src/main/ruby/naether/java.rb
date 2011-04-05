@@ -45,6 +45,29 @@ class Naether
       end
     end
     
+    def self.create_maven_project
+      if Naether.platform == 'java'
+        return com.slackworks.naether.maven.Project.new 
+      else
+        projectClass = Rjb::import('com.slackworks.naether.maven.Project') 
+        return projectClass.new
+      end
+    end
+    
+    def self.convert_to_ruby_array( java_array, to_string = false )
+      if Naether.platform == 'java'
+        return java_array.to_a
+      else
+        ruby_array = java_array.toArray()
+        
+        if to_string
+          ruby_array = ruby_array.map { |x| x.toString()}
+        end
+        
+        return ruby_array
+      end 
+    end
+    
     #
     # Handle loading jars for JRuby
     #

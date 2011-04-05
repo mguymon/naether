@@ -18,5 +18,10 @@ describe Naether::Java do
       end
       
     end
+    
+    it "should create an instance of com.slackworks.naether.maven.Project" do
+      Naether::Java.create_maven_project.getClass().getName().should eql "com.slackworks.naether.maven.Project" 
+    end
+    
   end
 end

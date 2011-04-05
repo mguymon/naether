@@ -69,11 +69,7 @@ class Naether
   
   # Array of remote repositories
   def remote_repositories
-    if Naether.platform == 'java'
-      return @resolver.getRemoteRepositories()
-    else
-      return @resolver.getRemoteRepositories().toArray()
-    end 
+    Naether::Java.convert_to_ruby_array(@resolver.getRemoteRepositories())
   end
   
   def local_repo_path
@@ -119,19 +115,11 @@ class Naether
   
   # Get dependencies
   def dependencies()
-    if Naether.platform == 'java'
-      return @resolver.getDependencies().to_a
-    else
-      return @resolver.getDependencies().toArray()
-    end 
+    Naether::Java.convert_to_ruby_array( @resolver.getDependencies() )
   end
   
   def dependenciesNotation()
-    if Naether.platform == 'java'
-      return @resolver.getDependenciesNotation().to_a
-    else
-      return @resolver.getDependenciesNotation().toArray().map{ |dep| dep.toString() }
-    end 
+    Naether::Java.convert_to_ruby_array(@resolver.getDependenciesNotation(), true)
   end
   
   # Resolve dependencies, finding related additional dependencies
@@ -181,23 +169,27 @@ class Naether
     @resolver.installArtifact(@instance)
   end
   
+  def load_pom( file_path )
+    @project_instance = Naether::Java.create_maven_project
+    @project_instance.loadPOM( file_path )
+  end
+  
   # filePath to read the pom
   #
-  def pom_dependencies( file_path )
-    if Naether.platform == 'java'
-      @project_instance = com.slackworks.naether.maven.Project.new 
-    else
-      projectClass = Rjb::import('com.slackworks.naether.maven.Project') 
-      @project_instance = projectClass.new
+  def pom_dependencies( file_path=nil )
+    if file_path
+      load_pom( file_path )
     end
     
-    @project_instance.loadPOM( file_path )
+    Naether::Java.convert_to_ruby_array( @project_instance.getDependenciesNotation(), true )
+  end
+  
+  def pom_version( file_path=nil )
+    if file_path
+      load_pom( file_path )
+    end
     
-    if Naether.platform == 'java'
-      return @project_instance.getDependenciesNotation().to_a
-    else
-      return @project_instance.getDependenciesNotation().toArray().map{ |dep| dep.toString() }
-    end 
+    return @project_instance.getVersion()
   end
   
   # filePath to write the pom 
@@ -205,13 +197,7 @@ class Naether
   #
   # loads all resolved dependencies into pom
   def write_pom( notation, file_path )
-    if Naether.platform == 'java'
-      @project_instance = com.slackworks.naether.maven.Project.new 
-    else
-      projectClass = Rjb::import('com.slackworks.naether.maven.Project') 
-      @project_instance = projectClass.new
-    end
-    
+    @project_instance = Naether::Java.create_maven_project
     @project_instance.setProjectNotation( notation )
     
     dependencies().each do |notation|
