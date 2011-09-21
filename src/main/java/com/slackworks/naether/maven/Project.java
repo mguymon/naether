@@ -28,6 +28,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -190,6 +191,17 @@ public class Project {
 	 * @return List<Dependency>
 	 */
 	public List<Dependency> getDependencies(boolean substituteProperties) {
+		return getDependencies( null, substituteProperties );
+	}
+	
+	/**
+	 * Get List of {@link Depedencies} for the Maven Project, with boolean to
+	 * substitute Project Properties.
+	 * 
+	 * @param substituteProperties boolean
+	 * @return List<Dependency>
+	 */
+	public List<Dependency> getDependencies(List<String> scopes, boolean substituteProperties) {
 		List<Dependency> dependencies = new ArrayList<Dependency>();
 
 		// Substitute Properties
@@ -212,6 +224,24 @@ public class Project {
 		} else {
 			for (Dependency dependency : getMavenModel().getDependencies()) {
 				dependencies.add(dependency);
+			}
+		}
+		
+		if ( scopes != null ) {
+			for ( Iterator<Dependency> iterator = dependencies.iterator(); iterator.hasNext(); ) {
+				Dependency dependency = iterator.next();
+				
+				String scope = dependency.getScope();
+				
+				// Default scope for dependencies is compile
+				if ( scope == null ) {
+					scope = "compile";
+				}
+				
+				if ( !scopes.contains( scope ) ) {
+					log.debug( "Removing {} with scope {}", dependency, dependency.getScope() );
+					iterator.remove();
+				}
 			}
 		}
 

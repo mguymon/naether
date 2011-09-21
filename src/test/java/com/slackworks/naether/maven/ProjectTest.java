@@ -29,6 +29,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.Dependency;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 // Junit
@@ -61,30 +62,54 @@ public class ProjectTest {
 		}
 
 		assertNotNull(mavenProject.getMavenModel());
-		assertEquals("0.3.4", mavenProject.getVersion());
+		assertEquals("0.4.0", mavenProject.getVersion());
 	}
 
+	@Test
+	public void getDependenciesByScope() throws ProjectException {
+		Project mavenProject = new Project("pom.xml");
+		
+		List<String> scopes = new ArrayList<String>();
+		scopes.add("test");
+		
+		List<Dependency> dependencies = mavenProject.getDependencies( scopes, true );
+		assertTrue( "should only return junit", dependencies.size() == 1 );
+		
+		assertEquals( "junit", dependencies.get(0).getArtifactId() );
+		assertEquals( "junit", dependencies.get(0).getGroupId() );
+		
+		scopes = new ArrayList<String>();
+		scopes.add("compile");
+		
+		dependencies = mavenProject.getDependencies( scopes, true );
+		assertTrue( "should return many dependencies", dependencies.size() > 1 );
+		
+		for ( Dependency dependency : dependencies ) {
+			assertFalse( "junit dep should not be in dependencies", "junit".equals( dependency.getArtifactId() ) );
+		}
+	}
+	
 	@Test
 	public void getDependenciesNotation() throws ProjectException {
 		Project mavenProject = new Project("pom.xml");
 		List<String> notations = new ArrayList<String>();
-		notations.add("ch.qos.logback:logback-classic:jar:0.9.24");
-		notations.add("org.slf4j:slf4j-api:jar:1.6.1");
-		notations.add("org.slf4j:jcl-over-slf4j:jar:1.6.1");
-		notations.add("org.slf4j:log4j-over-slf4j:jar:1.6.1");
-		notations.add("org.codehaus.plexus:plexus-utils:jar:1.5.8");
+		notations.add("ch.qos.logback:logback-classic:jar:0.9.29");
+		notations.add("org.slf4j:slf4j-api:jar:1.6.2");
+		notations.add("org.slf4j:jcl-over-slf4j:jar:1.6.2");
+		notations.add("org.slf4j:log4j-over-slf4j:jar:1.6.2");
+		notations.add("org.codehaus.plexus:plexus-utils:jar:3.0");
 		notations.add("org.apache.maven:maven-model-v3:jar:2.0");
 		notations.add("org.codehaus.plexus:plexus-container-default:jar:1.5.5");
-		notations.add("org.sonatype.aether:aether-api:jar:1.11");
-		notations.add("org.sonatype.aether:aether-util:jar:1.11");
-		notations.add("org.sonatype.aether:aether-impl:jar:1.11");
-		notations.add("org.sonatype.aether:aether-connector-file:jar:1.11");
-		notations.add("org.sonatype.aether:aether-connector-asynchttpclient:jar:1.11");
-		notations.add("org.sonatype.aether:aether-connector-wagon:jar:1.11");
-		notations.add("org.apache.maven:maven-aether-provider:jar:3.0.2");
-		notations.add("org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-7");
-		notations.add("org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-7");
-		notations.add("org.apache.maven.wagon:wagon-file:jar:1.0-beta-7");
+		notations.add("org.sonatype.aether:aether-api:jar:1.13");
+		notations.add("org.sonatype.aether:aether-util:jar:1.13");
+		notations.add("org.sonatype.aether:aether-impl:jar:1.13");
+		notations.add("org.sonatype.aether:aether-connector-file:jar:1.13");
+		notations.add("org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13");
+		notations.add("org.sonatype.aether:aether-connector-wagon:jar:1.13");
+		notations.add("org.apache.maven:maven-aether-provider:jar:3.0.3");
+		notations.add("org.apache.maven.wagon:wagon-ssh:jar:1.0");
+		notations.add("org.apache.maven.wagon:wagon-http-lightweight:jar:1.0");
+		notations.add("org.apache.maven.wagon:wagon-file:jar:1.0");
 		notations.add("commons-logging:commons-logging:jar:1.1.1" );
 		notations.add("commons-logging:commons-logging-api:jar:1.1" );
 		notations.add("junit:junit:jar:4.8.2");
@@ -108,7 +133,7 @@ public class ProjectTest {
 		project.setGroupId("testGroup");
 		project.setVersion("test");
 		project.setType("jar");
-		project.addDependency("org.apache.maven.wagon:wagon-file:jar:1.0-beta-7");
+		project.addDependency("org.apache.maven.wagon:wagon-file:jar:1.0");
 		project.addDependency("junit:junit:jar:4.8.2", "test");
 	
 		project.writePom("target/test-classes/test-pom.xml");
