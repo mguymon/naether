@@ -312,7 +312,7 @@ public class Naether {
 		if (downloadArtifacts) {
 			DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, null);
 
-			log.info("Resolving dependencies to files");
+			log.debug("Resolving dependencies to files");
 			DependencyResult dependencyResult;
 			try {
 				dependencyResult = repoSystem.resolveDependencies(session, dependencyRequest);

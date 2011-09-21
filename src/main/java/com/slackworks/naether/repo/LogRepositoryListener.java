@@ -46,13 +46,13 @@ public class LogRepositoryListener
 
     public void artifactDescriptorInvalid( RepositoryEvent event )
     {
-        log.info( "Invalid artifact descriptor for " + event.getArtifact() + ": "
+        log.warn( "Invalid artifact descriptor for " + event.getArtifact() + ": "
             + event.getException().getMessage() );
     }
 
     public void artifactDescriptorMissing( RepositoryEvent event )
     {
-        log.info( "Missing artifact descriptor for " + event.getArtifact() );
+        log.warn( "Missing artifact descriptor for " + event.getArtifact() );
     }
 
     public void artifactInstalled( RepositoryEvent event )
@@ -107,7 +107,7 @@ public class LogRepositoryListener
 
     public void metadataInvalid( RepositoryEvent event )
     {
-        log.info( "Invalid metadata " + event.getMetadata() );
+        log.warn( "Invalid metadata " + event.getMetadata() );
     }
 
     public void metadataResolved( RepositoryEvent event )
