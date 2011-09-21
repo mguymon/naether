@@ -4,7 +4,7 @@ describe Naether do
   
   context "Class" do
     it "should have bootstrap dependencies" do
-      Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.11"
+      Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.13"
     end
   end
   
@@ -36,13 +36,13 @@ describe Naether do
     end
     
     it "should set a list of dependencies" do
-      @naether.dependencies = [ {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.24" ]  
-      @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.24"]
+      @naether.dependencies = [ {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
+      @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
     end
     
     it "should resolve dependencies" do
-      @naether.dependencies = "ch.qos.logback:logback-classic:jar:0.9.24" 
-      @naether.resolve_dependencies.should eql ["ch.qos.logback:logback-classic:jar:0.9.24", "ch.qos.logback:logback-core:jar:0.9.24", "org.slf4j:slf4j-api:jar:1.6.0"]
+      @naether.dependencies = "ch.qos.logback:logback-classic:jar:0.9.29" 
+      @naether.resolve_dependencies.should eql ["ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"]
     end
     
     it "should deploy artifact" do
@@ -57,40 +57,40 @@ describe Naether do
     end
     
     it "should get version from pom file" do
-      @naether.pom_version( 'pom.xml' ).should eql "0.3.4"
+      @naether.pom_version( 'pom.xml' ).should eql "0.4.0"
     end
     
     it "should get dependencies from pom file" do
       deps = @naether.pom_dependencies( 'pom.xml' )
-      deps.should eql [ "ch.qos.logback:logback-classic:jar:0.9.24",
-                        "org.slf4j:slf4j-api:jar:1.6.1",
-                        "org.slf4j:jcl-over-slf4j:jar:1.6.1",
-                        "org.slf4j:log4j-over-slf4j:jar:1.6.1",
-                        "org.codehaus.plexus:plexus-utils:jar:1.5.8",
+      deps.should eql [ "ch.qos.logback:logback-classic:jar:0.9.29",
+                        "org.slf4j:slf4j-api:jar:1.6.2",
+                        "org.slf4j:jcl-over-slf4j:jar:1.6.2",
+                        "org.slf4j:log4j-over-slf4j:jar:1.6.2",
+                        "org.codehaus.plexus:plexus-utils:jar:3.0",
                         "org.apache.maven:maven-model-v3:jar:2.0",
                         "org.codehaus.plexus:plexus-container-default:jar:1.5.5",
-                        "org.sonatype.aether:aether-api:jar:1.11",
-                        "org.sonatype.aether:aether-util:jar:1.11",
-                        "org.sonatype.aether:aether-impl:jar:1.11",
-                        "org.sonatype.aether:aether-connector-file:jar:1.11",
-                        "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.11",
-                        "org.sonatype.aether:aether-connector-wagon:jar:1.11",
-                        "org.apache.maven:maven-aether-provider:jar:3.0.2",
-                        "org.apache.maven.wagon:wagon-ssh:jar:1.0-beta-7",
-                        "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0-beta-7",
-                        "org.apache.maven.wagon:wagon-file:jar:1.0-beta-7",
+                        "org.sonatype.aether:aether-api:jar:1.13",
+                        "org.sonatype.aether:aether-util:jar:1.13",
+                        "org.sonatype.aether:aether-impl:jar:1.13",
+                        "org.sonatype.aether:aether-connector-file:jar:1.13",
+                        "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13",
+                        "org.sonatype.aether:aether-connector-wagon:jar:1.13",
+                        "org.apache.maven:maven-aether-provider:jar:3.0.3",
+                        "org.apache.maven.wagon:wagon-ssh:jar:1.0",
+                        "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0",
+                        "org.apache.maven.wagon:wagon-file:jar:1.0",
                         "junit:junit:jar:4.8.2" ]
     end
     
     it "should load a pom to use for future pom calls" do
       @naether.load_pom( 'pom.xml' )
-      @naether.pom_version.should eql "0.3.4"
+      @naether.pom_version.should eql "0.4.0"
     end
     
     it "should write pom file" do
       test_file = "#{@test_dir}/naether_spec_test.xml"
       
-      @naether.dependencies = [ {"junit:junit:jar:4.8.2" => 'test'}, "ch.qos.logback:logback-classic:jar:0.9.24" ]
+      @naether.dependencies = [ {"junit:junit:jar:4.8.2" => 'test'}, "ch.qos.logback:logback-classic:jar:0.9.29" ]
       @naether.resolve_dependencies
       @naether.write_pom( 'test-rb:test-rb:jar:100.1', test_file)
       
@@ -98,9 +98,9 @@ describe Naether do
       
       xml = IO.read( test_file ) 
       xml.should match /.+junit<\/groupId>\s+<artifactId>junit<\/artifactId>\s+<version>4.8.2<\/version>\s+<scope>test.+/
-      xml.should match /.+ch.qos.logback<\/groupId>\s+<artifactId>logback-classic<\/artifactId>\s+<version>0.9.24.+/
-      xml.should match /.+ch.qos.logback<\/groupId>\s+<artifactId>logback-core<\/artifactId>\s+<version>0.9.24.+/
-      xml.should match /.+org.slf4j<\/groupId>\s+<artifactId>slf4j-api<\/artifactId>\s+<version>1.6.0.+/
+      xml.should match /.+ch.qos.logback<\/groupId>\s+<artifactId>logback-classic<\/artifactId>\s+<version>0.9.29.+/
+      xml.should match /.+ch.qos.logback<\/groupId>\s+<artifactId>logback-core<\/artifactId>\s+<version>0.9.29.+/
+      xml.should match /.+org.slf4j<\/groupId>\s+<artifactId>slf4j-api<\/artifactId>\s+<version>1.6.1.+/
       
     end
   end
