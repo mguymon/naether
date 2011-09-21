@@ -129,7 +129,8 @@ public class NaetherTest {
 		List<String> completeDeps = Bootstrap.dependencies;
 		
 		// Jars excluded from bootstrap dependencies
-		completeDeps.add( "org.jboss.netty:netty:jar:3.2.4.Final");
+		completeDeps.add( "org.sonatype.sisu:sisu-guice:jar:3.0.3");
+		completeDeps.add( "org.jboss.netty:netty:jar:3.2.5.Final");
 		completeDeps.add( "junit:junit:jar:4.8.2");
 		completeDeps.add( "log4j:log4j:jar:1.2.12");
 		completeDeps.add( "commons-logging:commons-logging-api:jar:1.1");
