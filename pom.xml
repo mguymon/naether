@@ -4,7 +4,7 @@
 
     <groupId>com.slackworks</groupId>
     <artifactId>naether</artifactId>
-    <version>0.3.4</version>
+    <version>0.4.0</version>
     <packaging>jar</packaging>
     <name>naether</name>
     <url>https://github.com/mguymon/naether</url>
@@ -23,16 +23,16 @@
 
     <properties>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<aetherVersion>1.11</aetherVersion>
-	    <mavenVersion>3.0.2</mavenVersion>
-	    <wagonVersion>1.0-beta-7</wagonVersion>
-		<org.slf4j.version>1.6.1</org.slf4j.version>
+		<aetherVersion>1.13</aetherVersion>
+	    <mavenVersion>3.0.3</mavenVersion>
+	    <wagonVersion>1.0</wagonVersion>
+		<org.slf4j.version>1.6.2</org.slf4j.version>
 	</properties>
     <dependencies>
 	  <dependency>
 	      <groupId>ch.qos.logback</groupId>
 	      <artifactId>logback-classic</artifactId>
-	      <version>0.9.24</version>
+	      <version>0.9.29</version>
 	  </dependency>
 	  <dependency>
 	      <groupId>org.slf4j</groupId>
@@ -52,7 +52,7 @@
 	  <dependency>
 		   <groupId>org.codehaus.plexus</groupId>
 		   <artifactId>plexus-utils</artifactId>
-		   <version>1.5.8</version>
+		   <version>3.0</version>
 		</dependency>
 	  	<dependency>
 	  		<groupId>org.apache.maven</groupId>
