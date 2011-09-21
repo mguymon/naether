@@ -180,7 +180,7 @@ public class Project {
 	 * @return List<Dependency>
 	 */
 	public List<Dependency> getDependencies() {
-		return getDependencies(true);
+		return getDependencies(null, true);
 	}
 
 	/**
@@ -255,7 +255,7 @@ public class Project {
 	 * @return List<String>
 	 */
 	public List<String> getDependenciesNotation() {
-		return getDependenciesNotation(true);
+		return getDependenciesNotation(null, true);
 	}
 
 	/**
@@ -266,9 +266,20 @@ public class Project {
 	 * @return List<String>
 	 */
 	public List<String> getDependenciesNotation(boolean substituteProperties) {
+		return getDependenciesNotation( null, substituteProperties );
+	}
+	
+	/**
+	 * Get List<String> of dependencies in format of
+	 * groupId:artifactId:packageType:version
+	 * 
+	 * @param substituteProperties boolean
+	 * @return List<String>
+	 */
+	public List<String> getDependenciesNotation(List<String> scopes, boolean substituteProperties) {
 		List<String> notations = new ArrayList<String>();
 
-		for (Dependency dependency : getDependencies(substituteProperties)) {
+		for (Dependency dependency : getDependencies(scopes, substituteProperties)) {
 			notations.add(Notation.generate(dependency));
 		}
 

@@ -176,12 +176,12 @@ class Naether
   
   # filePath to read the pom
   #
-  def pom_dependencies( file_path=nil )
+  def pom_dependencies( file_path=nil, scopes = nil )
     if file_path
       load_pom( file_path )
     end
     
-    Naether::Java.convert_to_ruby_array( @project_instance.getDependenciesNotation(), true )
+    Naether::Java.convert_to_ruby_array( @project_instance.getDependenciesNotation(scopes, true), true )
   end
   
   def pom_version( file_path=nil )

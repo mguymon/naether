@@ -80,6 +80,9 @@ describe Naether do
                         "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0",
                         "org.apache.maven.wagon:wagon-file:jar:1.0",
                         "junit:junit:jar:4.8.2" ]
+                        
+      deps = @naether.pom_dependencies( 'pom.xml', ['test'] )
+      deps.should eql [ "junit:junit:jar:4.8.2" ]
     end
     
     it "should load a pom to use for future pom calls" do
