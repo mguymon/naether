@@ -61,7 +61,7 @@ public class Project {
 	private static Logger log = LoggerFactory.getLogger(Project.class);
 
 	private Model mavenModel;
-	private Pattern propertyPattern = Pattern.compile("^\\$\\{(.+)\\}$");
+	private static final Pattern propertyPattern = Pattern.compile("^\\$\\{(.+)\\}$");
 
 	/**
 	 * New Instance
@@ -71,7 +71,6 @@ public class Project {
 		model.setModelVersion("4.0.0");
 		model.setPackaging("jar");
 		setMavenModel(model);
-
 	}
 
 	/**
@@ -84,7 +83,7 @@ public class Project {
 	 * @throws XmlPullParserException
 	 */
 	public Project(String pomPath) throws ProjectException {
-		loadPOM(pomPath);
+		setMavenModel( loadPOM(pomPath) );
 	}
 
 	/**
@@ -93,11 +92,11 @@ public class Project {
 	 * @param pomPath String path
 	 * @throws ProjectException 
 	 */
-	public void loadPOM(String pomPath) throws ProjectException {
+	public static Model loadPOM(String pomPath) throws ProjectException {
 		log.debug("Loading pom {}", pomPath);
 		MavenXpp3Reader reader = new MavenXpp3Reader();
 		try {
-			setMavenModel(reader.read(new BufferedReader(new FileReader(new File(pomPath)))));
+			return reader.read(new BufferedReader(new FileReader(new File(pomPath))));
 		} catch (FileNotFoundException e) {
 			log.error( "Failed to access pom", e);
 			throw new ProjectException( "Failed to access pom", e );
@@ -202,6 +201,7 @@ public class Project {
 	 * @return List<Dependency>
 	 */
 	public List<Dependency> getDependencies(List<String> scopes, boolean substituteProperties) {
+		log.debug( "Valid scopes: {}", scopes );
 		List<Dependency> dependencies = new ArrayList<Dependency>();
 
 		// Substitute Properties
@@ -210,17 +210,16 @@ public class Project {
 			for (Dependency dependency : getMavenModel().getDependencies()) {
 
 				String artifactId = substituteProperty(dependency.getArtifactId());
-				String groupId = substituteProperty(dependency.getGroupId());
-				String version = substituteProperty(dependency.getVersion());
+				String groupId    = substituteProperty(dependency.getGroupId());
+				String version    = substituteProperty(dependency.getVersion());
 
 				dependency.setArtifactId(artifactId);
 				dependency.setGroupId(groupId);
 				dependency.setVersion(version);
 				dependencies.add(dependency);
-
 			}
 
-		// Keep vals
+		// Keep vals as is
 		} else {
 			for (Dependency dependency : getMavenModel().getDependencies()) {
 				dependencies.add(dependency);
