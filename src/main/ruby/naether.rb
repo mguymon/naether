@@ -86,7 +86,15 @@ class Naether
   end
   
   def add_pom_dependencies( pom_path, scopes=['compile'] )
-    @resolver.addDependencies( pom_path, scopes )
+    if Naether.platform == 'java'
+      @resolver.addDependencies( pom_path, scopes )
+    else
+      list = Rjb::import("java.util.ArrayList").new
+      scopes.each do |scope|
+        list.add( scope )
+      end
+      @resolver._invoke( 'addDependencies', 'Ljava.lang.String;Ljava.util.List;', pom_path, list )
+    end
   end
   
   # Add a dependency Java object
@@ -199,7 +207,17 @@ class Naether
       load_pom( file_path )
     end
 
-    deps = Naether::Java.maven_project_dependencies_notation( @project_instance, scopes )
+    if Naether.platform == 'java'
+      deps = @project_instance.getDependenciesNotation( scopes, true )
+    else
+      if scopes
+        list = Rjb::import("java.util.ArrayList").new
+        scopes.each do |scope|
+          list.add( scope )
+        end
+      end
+      deps = @project_instance._invoke('getDependenciesNotation', 'Ljava.util.List;Z', list, true)
+    end
     
     Naether::Java.convert_to_ruby_array( deps, true )
   end

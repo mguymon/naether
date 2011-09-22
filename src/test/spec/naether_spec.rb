@@ -3,6 +3,7 @@ require 'src/main/ruby/naether'
 describe Naether do
   
   context "Class" do
+    
     it "should have bootstrap dependencies" do
       Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.13"
     end
@@ -87,7 +88,7 @@ describe Naether do
     end
     
     it "should get version from pom file" do
-      @naether.pom_version( 'pom.xml' ).should eql "0.4.2"
+      @naether.pom_version( 'pom.xml' ).should eql "0.4.3"
     end
     
     it "should get dependencies from pom file" do
@@ -117,7 +118,7 @@ describe Naether do
     
     it "should load a pom to use for future pom calls" do
       @naether.load_pom( 'pom.xml' )
-      @naether.pom_version.should eql "0.4.2"
+      @naether.pom_version.should eql "0.4.3"
     end
     
     it "should write pom file" do

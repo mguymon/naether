@@ -88,7 +88,7 @@ public class NaetherTest {
 	
 	@Test
 	public void addDependenciesFromPom() throws ProjectException {
-		naether.addDependencies( "pom.xml", null );
+		naether.addDependencies( "pom.xml" );
 		List<String> dependencies = new ArrayList<String>();
 		dependencies.add( "ch.qos.logback:logback-classic:jar:0.9.29" );
 		dependencies.add( "org.slf4j:slf4j-api:jar:1.6.2" );
@@ -148,7 +148,7 @@ public class NaetherTest {
 	@Test
 	public void resolveNaetherDependencies() throws Exception {
 		Project mavenProject = new Project("pom.xml");
-		for( org.apache.maven.model.Dependency mavenDep : mavenProject.getDependencies() ) {
+		for( org.apache.maven.model.Dependency mavenDep : mavenProject.getDependencies(null, true) ) {
 			String notation = Notation.generate( mavenDep );
 			
 			Dependency dependency =

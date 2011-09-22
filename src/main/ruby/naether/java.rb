@@ -60,14 +60,6 @@ class Naether
       end
     end
     
-    def self.maven_project_dependencies_notation( instance, scopes = nil )
-      if Naether.platform == 'java'
-        instance.getDependenciesNotation(scopes, true)
-      else
-        instance._invoke('getDependenciesNotation', 'Ljava.util.List;boolean;', scopes, true)
-      end
-    end
-    
     def self.convert_to_ruby_array( java_array, to_string = false )
       if Naether.platform == 'java'
         return java_array.to_a

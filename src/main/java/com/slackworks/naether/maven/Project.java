@@ -172,25 +172,13 @@ public class Project {
 		this.setType(notationMap.get("type"));
 		this.setVersion(notationMap.get("version"));
 	}
-
-	/**
-	 * Get List of {@link Dependency} for Maven Project
-	 * 
-	 * @return List<Dependency>
-	 */
+	
 	public List<Dependency> getDependencies() {
 		return getDependencies(null, true);
 	}
-
-	/**
-	 * Get List of {@link Depedencies} for the Maven Project, with boolean to
-	 * substitute Project Properties.
-	 * 
-	 * @param substituteProperties boolean
-	 * @return List<Dependency>
-	 */
+	
 	public List<Dependency> getDependencies(boolean substituteProperties) {
-		return getDependencies( null, substituteProperties );
+		return getDependencies(null, substituteProperties);
 	}
 	
 	/**
@@ -200,7 +188,7 @@ public class Project {
 	 * @param substituteProperties boolean
 	 * @return List<Dependency>
 	 */
-	public List<Dependency> getDependencies(List<String> scopes, boolean substituteProperties) {
+	public List<Dependency> getDependencies(List scopes, boolean substituteProperties) {
 		log.debug( "Valid scopes: {}", scopes );
 		List<Dependency> dependencies = new ArrayList<Dependency>();
 

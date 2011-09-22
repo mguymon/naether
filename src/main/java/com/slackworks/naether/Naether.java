@@ -22,6 +22,7 @@ package com.slackworks.naether;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -165,6 +166,10 @@ public class Naether {
 		dependency.setExclusions( exclusions );
 		
 		dependencies.add( dependency );
+	}
+	
+	public void addDependencies( String pomPath ) throws ProjectException {
+		addDependencies( new Project( pomPath), (List<String>)null );
 	}
 	
 	public void addDependencies( String pomPath, List<String> scopes ) throws ProjectException {
