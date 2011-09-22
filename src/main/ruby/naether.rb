@@ -110,6 +110,11 @@ class Naether
   # Array of mixed dependencies
   def dependencies=(dependencies)
     @resolver.clearDependencies()
+    
+    unless dependencies.is_a? Array
+      dependencies = [dependencies]
+    end
+    
     dependencies.each do |dependent|
       # Hash of notation => scope
       if dependent.is_a? Hash
@@ -117,7 +122,14 @@ class Naether
         
         # Add pom dependencies with scopes
         if key =~ /\.xml$/i
-          add_pom_dependencies( key, dependeny[key] )
+          scopes = nil
+          if dependent[key].is_a? Array
+            scopes = dependent[key]
+          else
+            scopes = [dependent[key]]
+          end
+          
+          add_pom_dependencies( key, dependent[key] )
           
         # Add a dependency notation with scopes
         else

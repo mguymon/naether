@@ -66,8 +66,8 @@ describe Naether do
       end
       
       it "should handle scopes" do
-        @naether.dependencies = [ {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
-        @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+        @naether.dependencies = [ {"pom.xml" => ["test"]}, {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
+        @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
       end
     end
     
