@@ -77,7 +77,7 @@ public class LogRepositoryListener
 
     public void artifactDownloaded( RepositoryEvent event )
     {
-        log.info( "Downloaded artifact " + event.getArtifact() + " from " + event.getRepository() );
+        log.debug( "Downloaded artifact " + event.getArtifact() + " from " + event.getRepository() );
     }
 
     public void artifactResolving( RepositoryEvent event )

@@ -52,24 +52,26 @@ public class LogTransferListener extends AbstractTransferListener {
 
     @Override
     public void transferProgressed( TransferEvent event ) {
-        TransferResource resource = event.getResource();
-        downloads.put( resource, Long.valueOf( event.getTransferredBytes() ) );
-
-        StringBuilder buffer = new StringBuilder( 64 );
-
-        for ( Map.Entry<TransferResource, Long> entry : downloads.entrySet() )
-        {
-            long total = entry.getKey().getContentLength();
-            long complete = entry.getValue().longValue();
-
-            buffer.append( getStatus( complete, total ) ).append( "  " );
-        }
-
-        int pad = lastLength - buffer.length();
-        lastLength = buffer.length();
-        pad( buffer, pad );
-
-        log.info( buffer.toString() );
+    	if ( log.isDebugEnabled() ) {
+	        TransferResource resource = event.getResource();
+	        downloads.put( resource, Long.valueOf( event.getTransferredBytes() ) );
+	
+	        StringBuilder buffer = new StringBuilder( 64 );
+	
+	        for ( Map.Entry<TransferResource, Long> entry : downloads.entrySet() )
+	        {
+	            long total = entry.getKey().getContentLength();
+	            long complete = entry.getValue().longValue();
+	
+	            buffer.append( getStatus( complete, total ) ).append( "  " );
+	        }
+	
+	        int pad = lastLength - buffer.length();
+	        lastLength = buffer.length();
+	        pad( buffer, pad );
+	
+	        log.debug( buffer.toString() );
+    	}
     }
 
     private String getStatus( long complete, long total ) {
@@ -121,7 +123,7 @@ public class LogTransferListener extends AbstractTransferListener {
                 throughput = " at " + format.format( kbPerSec ) + " KB/sec";
             }
 
-            log.info( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
+            log.debug( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
                 + throughput + ")" );
         }
     }
@@ -130,7 +132,8 @@ public class LogTransferListener extends AbstractTransferListener {
     public void transferFailed( TransferEvent event ) {
         transferCompleted( event );
 
-        log.debug( "Transfer Failed", event.getException() );
+        log.debug( "Transfer Failed from repo {} for {}", event.getResource().getRepositoryUrl(), event.getResource().getResourceName() );
+        log.debug( "Transfer Failed Exception", event.getException() );
     }
 
     private void transferCompleted( TransferEvent event ) {
@@ -138,7 +141,7 @@ public class LogTransferListener extends AbstractTransferListener {
 
         StringBuilder buffer = new StringBuilder( 64 );
         pad( buffer, lastLength );
-        log.info( buffer.toString() );
+        log.debug( buffer.toString() );
     }
 
     public void transferCorrupted( TransferEvent event ) {
