@@ -40,6 +40,7 @@ import com.slackworks.naether.Naether;
 import com.slackworks.naether.Notation;
 import com.slackworks.naether.deploy.DeployArtifact;
 import com.slackworks.naether.maven.Project;
+import com.slackworks.naether.maven.ProjectException;
 
 
 /**
@@ -83,6 +84,42 @@ public class NaetherTest {
         naether.addDependency(dependency);
         naether.resolveDependencies( false );
         assertEquals( "junit:junit:jar:4.8.2", naether.getDependenciesNotation().get(0) );
+	}
+	
+	@Test
+	public void addDependenciesFromPom() throws ProjectException {
+		naether.addDependencies( "pom.xml", null );
+		List<String> dependencies = new ArrayList<String>();
+		dependencies.add( "ch.qos.logback:logback-classic:jar:0.9.29" );
+		dependencies.add( "org.slf4j:slf4j-api:jar:1.6.2" );
+		dependencies.add( "org.slf4j:jcl-over-slf4j:jar:1.6.2" ); 
+		dependencies.add( "org.slf4j:log4j-over-slf4j:jar:1.6.2" );
+		dependencies.add( "org.codehaus.plexus:plexus-utils:jar:3.0" ); 
+		dependencies.add( "org.apache.maven:maven-model-v3:jar:2.0" );
+		dependencies.add( "org.codehaus.plexus:plexus-container-default:jar:1.5.5" );
+		dependencies.add( "org.sonatype.aether:aether-api:jar:1.13" );
+		dependencies.add( "org.sonatype.aether:aether-util:jar:1.13" );
+		dependencies.add( "org.sonatype.aether:aether-impl:jar:1.13" );
+		dependencies.add( "org.sonatype.aether:aether-connector-file:jar:1.13" );
+		dependencies.add( "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13" );
+		dependencies.add( "org.sonatype.aether:aether-connector-wagon:jar:1.13" );
+		dependencies.add( "org.apache.maven:maven-aether-provider:jar:3.0.3" );
+		dependencies.add( "org.apache.maven.wagon:wagon-ssh:jar:1.0" );
+		dependencies.add( "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0" );
+		dependencies.add( "org.apache.maven.wagon:wagon-file:jar:1.0" );
+		dependencies.add( "junit:junit:jar:4.8.2" );
+		assertEquals( dependencies, naether.getDependenciesNotation() );
+	}
+	
+	@Test
+	public void addDependenciesFromPomWithTestScope() throws ProjectException {
+		List<String> scopes = new ArrayList<String>();
+		scopes.add("test");
+		
+		naether.addDependencies( "pom.xml", scopes );
+		List<String> dependencies = new ArrayList<String>();
+		dependencies.add( "junit:junit:jar:4.8.2" );
+		assertEquals( dependencies, naether.getDependenciesNotation() );
 	}
 	
 	@Test

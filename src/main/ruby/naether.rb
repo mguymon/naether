@@ -85,6 +85,10 @@ class Naether
     @resolver.addDependency( notation, scope )
   end
   
+  def add_pom_dependencies( pom_path, scopes=['compile'] )
+    @resolver.addDependencies( pom_path, scopes )
+  end
+  
   # Add a dependency Java object
   def add_dependency( dependency )
     #@resolver.addDependency( dependency )
@@ -95,18 +99,35 @@ class Naether
     end
   end
   
-  # Set array of dependencies in the notation: groupId:artifactId:type:version
+  # Array of mixed dependencies
   def dependencies=(dependencies)
     @resolver.clearDependencies()
     dependencies.each do |dependent|
       # Hash of notation => scope
       if dependent.is_a? Hash
         key = dependent.keys.first
-        add_notation_dependency( key, dependent[key] )
         
-      # String notation with compile scope
+        # Add pom dependencies with scopes
+        if key =~ /\.xml$/i
+          add_pom_dependencies( key, dependeny[key] )
+          
+        # Add a dependency notation with scopes
+        else
+          add_notation_dependency( key, dependent[key] )
+        end
+        
       elsif dependent.is_a? String
-        add_notation_dependency( dependent, 'compile' )
+        
+        # Add pom dependencies with default scopes
+        if dependent =~ /\.xml$/i
+          add_pom_dependencies( dependent )
+          
+        # Add a dependency notation with compile scope
+        else
+          add_notation_dependency( dependent, 'compile' )
+        end
+      
+      # Add an Aether dependency
       else
         add_dependency( dependent )
       end
@@ -170,18 +191,17 @@ class Naether
   end
   
   def load_pom( file_path )
-    @project_instance = Naether::Java.create_maven_project
-    @project_instance.loadPOM( file_path )
+    @project_instance = Naether::Java.create_maven_project( file_path )
   end
   
-  # filePath to read the pom
-  #
-  def pom_dependencies( file_path=nil, scopes = nil )
+  def pom_dependencies( file_path=nil, scopes = nil)
     if file_path
       load_pom( file_path )
     end
+
+    deps = Naether::Java.maven_project_dependencies_notation( @project_instance, scopes )
     
-    Naether::Java.convert_to_ruby_array( @project_instance.getDependenciesNotation(scopes, true), true )
+    Naether::Java.convert_to_ruby_array( deps, true )
   end
   
   def pom_version( file_path=nil )

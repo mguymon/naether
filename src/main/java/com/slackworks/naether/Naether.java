@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 // Apache Maven
+import org.apache.maven.model.Model;
 import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 
@@ -40,6 +41,7 @@ import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.collection.DependencyCollectionException;
 import org.sonatype.aether.graph.Dependency;
+import org.sonatype.aether.graph.Exclusion;
 import org.sonatype.aether.installation.InstallRequest;
 import org.sonatype.aether.installation.InstallationException;
 import org.sonatype.aether.repository.Authentication;
@@ -59,6 +61,8 @@ import org.sonatype.aether.deployment.DeploymentException;
 import com.slackworks.naether.deploy.DeployArtifact;
 import com.slackworks.naether.deploy.DeployException;
 import com.slackworks.naether.deploy.InstallException;
+import com.slackworks.naether.maven.Project;
+import com.slackworks.naether.maven.ProjectException;
 import com.slackworks.naether.repo.LogRepositoryListener;
 import com.slackworks.naether.repo.LogTransferListener;
 import com.slackworks.naether.repo.ManualWagonProvider;
@@ -144,6 +148,39 @@ public class Naether {
 	 */
 	public void addDependency(Dependency dependency) {
 		dependencies.add(dependency);
+	}
+	
+	/**
+	 * Add {@link org.apache.maven.model.Dependency}
+	 */
+	public void addDependency(org.apache.maven.model.Dependency projectDependency) {
+		log.debug( "Adding dependency: {}", projectDependency );
+		Dependency dependency = new Dependency(new DefaultArtifact(Notation.generate( projectDependency ) ), projectDependency.getScope());
+		dependency.setOptional( projectDependency.isOptional() );
+		
+		List<Exclusion> exclusions = new ArrayList<Exclusion>();
+		for ( org.apache.maven.model.Exclusion projectExclusion : projectDependency.getExclusions() ) {
+			exclusions.add( new Exclusion(projectExclusion.getGroupId(), projectExclusion.getArtifactId(), null, null) );
+		}
+		dependency.setExclusions( exclusions );
+		
+		dependencies.add( dependency );
+	}
+	
+	public void addDependencies( String pomPath, List<String> scopes ) throws ProjectException {
+		addDependencies( new Project( pomPath), scopes );
+	}
+	
+	/**
+	 * Add dependencies from a Maven Pom
+	 * 
+	 * @param project {@link Model}
+	 * @param scopes List<String> of dependency scopes
+	 */
+	public void addDependencies( Project project, List<String> scopes ) {
+		for ( org.apache.maven.model.Dependency dependency : project.getDependencies(scopes, true) ) {
+			addDependency( dependency );
+		}
 	}
 
 	/**

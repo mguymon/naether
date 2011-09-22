@@ -30,14 +30,44 @@ describe Naether do
       @naether.remote_repositories[1].getId().should eql( "test.net-7011" )
     end
     
-    it "should add a dependency" do
+    it "should add a dependency from notation" do
       @naether.dependencies = "junit:junit:jar:4.8.2" 
       @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2"]
     end
     
-    it "should set a list of dependencies" do
-      @naether.dependencies = [ {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
-      @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+    context "setting mixed list of dependencies" do
+      it "should handle a list of dependencies" do
+         @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29" ]  
+         @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+      end
+      
+      it "should handle poms in a list of dependencies" do
+         @naether.dependencies = [  "pom.xml", "does.not:exist:jar:0.1" ]  
+         @naether.dependenciesNotation.should eql [
+            "ch.qos.logback:logback-classic:jar:0.9.29",
+            "org.slf4j:slf4j-api:jar:1.6.2",
+            "org.slf4j:jcl-over-slf4j:jar:1.6.2",
+            "org.slf4j:log4j-over-slf4j:jar:1.6.2",
+            "org.codehaus.plexus:plexus-utils:jar:3.0",
+            "org.apache.maven:maven-model-v3:jar:2.0",
+            "org.codehaus.plexus:plexus-container-default:jar:1.5.5",
+            "org.sonatype.aether:aether-api:jar:1.13",
+            "org.sonatype.aether:aether-util:jar:1.13",
+            "org.sonatype.aether:aether-impl:jar:1.13",
+            "org.sonatype.aether:aether-connector-file:jar:1.13",
+            "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13",
+            "org.sonatype.aether:aether-connector-wagon:jar:1.13",
+            "org.apache.maven:maven-aether-provider:jar:3.0.3",
+            "org.apache.maven.wagon:wagon-ssh:jar:1.0",
+            "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0",
+            "org.apache.maven.wagon:wagon-file:jar:1.0",
+            "does.not:exist:jar:0.1" ]
+      end
+      
+      it "should handle scopes" do
+        @naether.dependencies = [ {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
+        @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+      end
     end
     
     it "should resolve dependencies" do
@@ -57,7 +87,7 @@ describe Naether do
     end
     
     it "should get version from pom file" do
-      @naether.pom_version( 'pom.xml' ).should eql "0.4.1"
+      @naether.pom_version( 'pom.xml' ).should eql "0.4.2"
     end
     
     it "should get dependencies from pom file" do
@@ -87,7 +117,7 @@ describe Naether do
     
     it "should load a pom to use for future pom calls" do
       @naether.load_pom( 'pom.xml' )
-      @naether.pom_version.should eql "0.4.1"
+      @naether.pom_version.should eql "0.4.2"
     end
     
     it "should write pom file" do

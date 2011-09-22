@@ -45,12 +45,26 @@ class Naether
       end
     end
     
-    def self.create_maven_project
+    def self.create_maven_project(path = nil)
+      projectClass = nil
       if Naether.platform == 'java'
-        return com.slackworks.naether.maven.Project.new 
+        projectClass = com.slackworks.naether.maven.Project 
       else
         projectClass = Rjb::import('com.slackworks.naether.maven.Project') 
-        return projectClass.new
+      end
+      
+      unless path.nil?
+        projectClass.new( path )
+      else
+        projectClass.new
+      end
+    end
+    
+    def self.maven_project_dependencies_notation( instance, scopes = nil )
+      if Naether.platform == 'java'
+        instance.getDependenciesNotation(scopes, true)
+      else
+        instance._invoke('getDependenciesNotation', 'Ljava.util.List;boolean;', scopes, true)
       end
     end
     
