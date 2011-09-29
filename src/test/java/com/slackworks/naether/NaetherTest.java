@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // JUnit
+import org.apache.maven.model.Exclusion;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -109,6 +110,37 @@ public class NaetherTest {
 		dependencies.add( "org.apache.maven.wagon:wagon-file:jar:1.0" );
 		dependencies.add( "junit:junit:jar:4.8.2" );
 		assertEquals( dependencies, naether.getDependenciesNotation() );
+	}
+	
+	@Test
+	public void addDependenciesFromPomWithExclusions() throws ProjectException, URLException, DependencyException {
+		Project project = new Project();
+		org.apache.maven.model.Dependency dependency = new org.apache.maven.model.Dependency();
+		dependency.setArtifactId( "jasper" );
+		dependency.setGroupId( "org.apache.tomcat" );
+		dependency.setVersion( "6.0.33" );
+		
+		Exclusion exclusion = new Exclusion();
+		exclusion.setArtifactId( "catalina" );
+		exclusion.setGroupId( "org.apache.tomcat" );
+		dependency.addExclusion( exclusion );
+		
+		project.addDependency( dependency );
+		
+		naether.addDependencies( project );
+		naether.resolveDependencies( false );
+		
+		List<String> resolvedDependencies = naether.getDependenciesNotation();
+		
+		List<String> results = new ArrayList<String>();
+		results.add( "org.apache.tomcat:jasper:jar:6.0.33" );
+		results.add( "org.apache.tomcat:servlet-api:jar:6.0.33" );
+		results.add( "org.apache.tomcat:juli:jar:6.0.33" );
+		results.add( "org.apache.tomcat:jsp-api:jar:6.0.33" );		
+		results.add( "org.apache.tomcat:el-api:jar:6.0.33" );
+		results.add( "org.eclipse.jdt.core.compiler:ecj:jar:3.3.1" );
+		results.add( "org.apache.tomcat:jasper-el:jar:6.0.33" );
+		assertEquals( results, resolvedDependencies );
 	}
 	
 	@Test
