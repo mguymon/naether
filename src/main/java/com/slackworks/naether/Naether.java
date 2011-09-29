@@ -22,7 +22,6 @@ package com.slackworks.naether;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +58,7 @@ import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
 import org.sonatype.aether.deployment.DeployRequest;
 import org.sonatype.aether.deployment.DeploymentException;
 
+// Naether
 import com.slackworks.naether.deploy.DeployArtifact;
 import com.slackworks.naether.deploy.DeployException;
 import com.slackworks.naether.deploy.InstallException;
@@ -72,8 +72,7 @@ import com.slackworks.naether.repo.RemoteRepoBuilder;
 /**
  * Dependency Resolver using Maven's Aether
  * 
- * Based on {@link https
- * ://docs.sonatype.org/display/AETHER/Home#Home-AetherinsideMaven}
+ * Based on {@link https://docs.sonatype.org/display/AETHER/Home#Home-AetherinsideMaven}
  * 
  * @author Michael Guymon
  * 
@@ -161,9 +160,10 @@ public class Naether {
 		
 		List<Exclusion> exclusions = new ArrayList<Exclusion>();
 		for ( org.apache.maven.model.Exclusion projectExclusion : projectDependency.getExclusions() ) {
-			exclusions.add( new Exclusion(projectExclusion.getGroupId(), projectExclusion.getArtifactId(), null, null) );
+			exclusions.add( new Exclusion(projectExclusion.getGroupId(), projectExclusion.getArtifactId(), "*", "*") );			
 		}
-		dependency.setExclusions( exclusions );
+		log.debug( "Exclusion: {}", exclusions );
+		dependency = dependency.setExclusions( exclusions );
 		
 		dependencies.add( dependency );
 	}
@@ -180,6 +180,15 @@ public class Naether {
 	 * Add dependencies from a Maven Pom
 	 * 
 	 * @param project {@link Model}
+	 */
+	public void addDependencies( Project project ) {
+		addDependencies( project, (List<String>)null );		
+	}
+	
+	/**
+	 * Add dependencies from a Maven Pom
+	 * 
+	 * @param project {@link Project}
 	 * @param scopes List<String> of dependency scopes
 	 */
 	public void addDependencies( Project project, List<String> scopes ) {
@@ -319,11 +328,14 @@ public class Naether {
 	 * @throws DependencyException
 	 */
 	public void resolveDependencies(boolean downloadArtifacts) throws URLException, DependencyException {
+		log.info( "Resolving Dependencies" );
 		log.info("Local Repo Path: {}", localRepoPath);
 
-		log.info("Remote Repositories:");
-		for (RemoteRepository repo : getRemoteRepositories()) {
-			log.info("  {}", repo.toString());
+		if ( log.isDebugEnabled() ) {
+			log.debug("Remote Repositories:");
+			for (RemoteRepository repo : getRemoteRepositories()) {
+				log.debug("  {}", repo.toString());
+			}
 		}
 
 		RepositorySystem repoSystem = newRepositorySystem();
