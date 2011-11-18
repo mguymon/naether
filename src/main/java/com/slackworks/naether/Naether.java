@@ -90,6 +90,8 @@ public class Naether {
 	 * Create new instance. Default local repository is environment M2_REPO
 	 * setting or user home .m2/. The local repository is the destination for
 	 * downloaded metadata and artifacts.
+	 * 
+	 * The default remote repository is http://repo1.maven.org/maven2/
 	 */
 	public Naether() {
 		dependencies = new ArrayList<Dependency>();
@@ -101,8 +103,7 @@ public class Naether {
 		String m2Repo = env.get("M2_REPO");
 		if (m2Repo == null) {
 			String userHome = System.getProperty("user.home");
-			setLocalRepoPath(userHome + File.separator + ".m2" + File.separator
-					+ "repository");
+			setLocalRepoPath(userHome + File.separator + ".m2" + File.separator + "repository");
 		} else {
 			setLocalRepoPath((new File(m2Repo)).getAbsolutePath());
 		}
@@ -120,8 +121,7 @@ public class Naether {
 	 * 
 	 * groupId:artifactId:type:version
 	 * 
-	 * @param notation
-	 *            String
+	 * @param notation String
 	 */
 	public void addDependency(String notation) {
 		addDependency(notation, "compile");
@@ -133,7 +133,7 @@ public class Naether {
 	 * groupId:artifactId:type:version
 	 * 
 	 * @param notation String
-	 * @param scope  String
+	 * @param scope String
 	 */
 	public void addDependency(String notation, String scope) {
 		log.debug("Add dep {notation} {scope}");
@@ -168,16 +168,29 @@ public class Naether {
 		dependencies.add( dependency );
 	}
 	
+	/**
+	 * Add dependences from a Maven POM
+	 * 
+	 * @param pomPath String path to POM
+	 * @throws ProjectException
+	 */
 	public void addDependencies( String pomPath ) throws ProjectException {
 		addDependencies( new Project( pomPath), (List<String>)null );
 	}
 	
+	/**
+	 * Add dependencies from a Maven POM, limited to a {@link List<String>} of scopes.
+	 * 
+	 * @param pomPath String path to POM
+	 * @param scopes Link<String> of scopes
+	 * @throws ProjectException
+	 */
 	public void addDependencies( String pomPath, List<String> scopes ) throws ProjectException {
 		addDependencies( new Project( pomPath), scopes );
 	}
 	
 	/**
-	 * Add dependencies from a Maven Pom
+	 * Add dependencies from a Maven POM
 	 * 
 	 * @param project {@link Model}
 	 */
@@ -186,7 +199,7 @@ public class Naether {
 	}
 	
 	/**
-	 * Add dependencies from a Maven Pom
+	 * Add dependencies from a Maven POM, limited to a {@link List<String>} of scopes.
 	 * 
 	 * @param project {@link Project}
 	 * @param scopes List<String> of dependency scopes
@@ -222,7 +235,7 @@ public class Naether {
 
 	/**
 	 * Add a {@link RemoteRepository} by String url with String username and
-	 * password authentication.
+	 * password for authentication.
 	 * 
 	 * @param url String
 	 * @param username String

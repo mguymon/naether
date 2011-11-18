@@ -28,9 +28,9 @@ import org.sonatype.aether.artifact.Artifact;
 import com.slackworks.naether.maven.Project;
 
 /**
- * Helper for converting a String dependency notations
+ * Helper for converting the dependency notations:
  * 
- * groupId:artifactId:type:version
+ *   groupId:artifactId:type:version
  * 
  * @author Michael Guymon
  * 
