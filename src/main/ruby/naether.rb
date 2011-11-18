@@ -72,10 +72,12 @@ class Naether
     Naether::Java.convert_to_ruby_array(@resolver.getRemoteRepositories())
   end
   
+  # Path to local maven repo
   def local_repo_path
     @resolver.getLocalRepoPath()
   end
   
+  # Set path to local maven repo
   def local_repo_path=( path )
     @resolver.setLocalRepoPath( path )
   end
@@ -85,6 +87,7 @@ class Naether
     @resolver.addDependency( notation, scope )
   end
   
+  # Add dependencies from a Maven POM
   def add_pom_dependencies( pom_path, scopes=['compile'] )
     if Naether.platform == 'java'
       @resolver.addDependencies( pom_path, scopes )
@@ -97,7 +100,7 @@ class Naether
     end
   end
   
-  # Add a dependency Java object
+  # Add a dependency of org.sonatype.aether.graph.Dependency Java object
   def add_dependency( dependency )
     #@resolver.addDependency( dependency )
     if Naether.platform == 'java'
@@ -154,11 +157,12 @@ class Naether
     end
   end
   
-  # Get dependencies
+  # Get array of dependencies
   def dependencies()
     Naether::Java.convert_to_ruby_array( @resolver.getDependencies() )
   end
   
+  # Get array of dependencies as notation
   def dependenciesNotation()
     Naether::Java.convert_to_ruby_array(@resolver.getDependenciesNotation(), true)
   end
@@ -234,6 +238,7 @@ class Naether
     Naether::Java.convert_to_ruby_array( deps, true )
   end
   
+  # Get the POM version
   def pom_version( file_path=nil )
     if file_path
       load_pom( file_path )
