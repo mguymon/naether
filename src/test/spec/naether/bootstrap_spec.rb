@@ -34,7 +34,6 @@ describe Naether::Bootstrap do
         'target/test/bootstrap', :local_repo => 'target/test/bootstrap-repo' )
       
       deps = Naether::Bootstrap.check_local_repo_for_deps('target/test/bootstrap-repo')
-      puts deps.inspect
       deps[:exists].should eql( Naether::Bootstrap.dependencies )            
     end
     

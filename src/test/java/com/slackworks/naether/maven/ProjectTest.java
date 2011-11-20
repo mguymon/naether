@@ -19,25 +19,18 @@ package com.slackworks.naether.maven;
  */
 
 // Java SE
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-// Junit
 import org.junit.Test;
-
-import com.slackworks.naether.maven.Project;
-
-import static org.junit.Assert.*;
 
 /**
  * 
@@ -62,7 +55,7 @@ public class ProjectTest {
 		}
 
 		assertNotNull(mavenProject.getMavenModel());
-		assertEquals("0.4.4", mavenProject.getVersion());
+		assertEquals("0.5.0", mavenProject.getVersion());
 	}
 
 	@Test
