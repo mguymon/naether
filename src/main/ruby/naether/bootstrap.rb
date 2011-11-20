@@ -1,6 +1,8 @@
 require "#{File.dirname(__FILE__)}/java"
 require 'yaml'
-
+require 'open-uri'
+require 'fileutils'
+        
 class Naether
   # :title:Naether::Bootstrap
   #
@@ -49,6 +51,122 @@ class Naether
         
         dep = YAML.load_file( dep_file )  
         @@dependencies = dep[:dependencies]
+      end
+      
+      def download_dependencies( dest, opts = {} )
+         
+        if !File.exists? dest
+          FileUtils.mkdir_p( dest )
+        end
+        
+        deps = {}
+          
+        if opts[:deps]
+          deps[:missing] = opts[:deps] 
+        else
+          deps = check_local_repo_for_deps( opts[:local_repo] )
+        end
+        
+        deps[:downloaded] = []
+          
+        puts "Downloading jars for Naether"  
+          
+        deps[:missing].each do |dep|
+          notation = dep.split(":")
+          group = notation[0].gsub("\.", File::SEPARATOR)
+          artifact = notation[1]
+          type = notation[2]
+          version = notation[3]
+          
+          jar = "#{artifact}-#{version}.#{type}"
+          
+          maven_path = "#{dest}#{File::SEPARATOR}#{jar}"
+          
+          if !File.exists? maven_path
+            maven_mirror = "http://repo1.maven.org/maven2/#{group}/#{artifact}/#{version}/#{jar}"
+            
+            open(maven_path, 'wb') do |io|
+              io.print open(maven_mirror).read
+            end
+            
+            deps[:downloaded] << { dep => maven_path }
+          else
+            deps[:exists] << maven_path
+          end
+        end
+        
+        deps
+      end
+      
+      def check_local_repo_for_deps(local_repo = nil)
+        
+        local_repo = local_repo || ENV['M2_HOME'] || '~/.m2/repository'
+        local_repo = File.expand_path(local_repo)
+        
+        puts "Checking #{local_repo} for jars to bootstrap Naether"
+        
+        deps = {:exists => [], :missing => [] }
+        
+        # /home/zinger/.m2/repository/com/jcraft/jsch/0.1.44-1/jsch-0.1.44-1.jar
+        dependencies.each do |dep|
+          notation = dep.split(":")
+          group = notation[0].gsub("\.", File::SEPARATOR)
+          artifact = notation[1].gsub("\.", File::SEPARATOR)
+          type = notation[2]
+          version = notation[3]
+          
+          jar = "#{artifact}-#{version}.#{type}"
+          
+          maven_path = "#{local_repo}#{File::SEPARATOR}#{group}#{File::SEPARATOR}#{artifact}#{File::SEPARATOR}#{version}#{File::SEPARATOR}#{jar}"
+          
+          if File.exists? maven_path
+            deps[:exists] << dep
+          else
+            deps[:missing] << dep
+          end
+          
+        end  
+          
+        deps
+      end
+      
+      def install_dependencies_to_local_repo( jars_or_dir, opts = {}  )
+        
+        deps = check_local_repo_for_deps(opts[:local_repo])
+          
+        @naether = nil
+        jars = []  
+        unless jars_or_dir.is_a? Array
+          @naether = Naether.create_from_paths( jars_or_dir, opts[:naether_jar_dir] )
+          jars = Dir.glob( "#{jars_or_dir}#{File::SEPARATOR}*.jar" )
+        else
+          @naether = Naether.create_from_jars( jars_or_dir )
+          jars = jars_or_dir
+        end
+        
+        if opts[:local_repo]
+          @naether.local_repo_path = opts[:local_repo]
+        end
+        
+        dependencies.each do |dep|
+          notation = dep.split(":")
+          group = notation[0].gsub("\.", File::SEPARATOR)
+          artifact = notation[1].gsub("\.", File::SEPARATOR)
+          type = notation[2]
+          version = notation[3]
+          
+          name = "#{artifact}-#{version}.#{type}"
+          
+          jar = jars.select { |x| x =~ /#{name}/ }
+          if jar.size > 0
+            jar = jar[0]
+            @naether.install_artifact( dep, jar )
+          else
+            puts "Could not find jar for #{dep}"
+          end
+          
+        end
+        
       end
     end
   end
