@@ -132,7 +132,7 @@ class Naether
             scopes = [dependent[key]]
           end
           
-          add_pom_dependencies( key, dependent[key] )
+          add_pom_dependencies( key, scopes )
           
         # Add a dependency notation with scopes
         else
@@ -165,6 +165,17 @@ class Naether
   # Get array of dependencies as notation
   def dependenciesNotation()
     Naether::Java.convert_to_ruby_array(@resolver.getDependenciesNotation(), true)
+  end
+  
+  def dependencies_classpath()
+    @resolver.getResolvedClassPath()
+  end
+  
+  def load_dependencies_to_classpath
+    jars = dependencies_classpath.split(":")
+    Naether::Java.load_jars(jars)
+    
+    jars
   end
   
   # Resolve dependencies, finding related additional dependencies
