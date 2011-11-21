@@ -34,7 +34,7 @@ describe Naether::Bootstrap do
         'target/test/bootstrap', :local_repo => 'target/test/bootstrap-repo' )
       
       deps = Naether::Bootstrap.check_local_repo_for_deps('target/test/bootstrap-repo')
-      deps[:exists].should eql( Naether::Bootstrap.dependencies )            
+      deps[:exists].map {|x| x.keys[0] }.should eql( Naether::Bootstrap.dependencies )            
     end
     
     context "check_local_repo_for_deps" do
@@ -52,12 +52,7 @@ describe Naether::Bootstrap do
       it "local repo contains jars" do
         deps = Naether::Bootstrap.check_local_repo_for_deps
         
-        result = {
-          :missing => [],
-          :exists => Naether::Bootstrap.dependencies
-        }
-        
-        deps.should eql( result )
+        deps[:exists].map {|x| x.keys[0] }.should eql( Naether::Bootstrap.dependencies )
       end
     end
   end

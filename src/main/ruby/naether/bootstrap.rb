@@ -69,29 +69,31 @@ class Naether
         
         deps[:downloaded] = []
           
-        puts "Downloading jars for Naether"  
-          
-        deps[:missing].each do |dep|
-          notation = dep.split(":")
-          group = notation[0].gsub("\.", File::SEPARATOR)
-          artifact = notation[1]
-          type = notation[2]
-          version = notation[3]
-          
-          jar = "#{artifact}-#{version}.#{type}"
-          
-          maven_path = "#{dest}#{File::SEPARATOR}#{jar}"
-          
-          if !File.exists? maven_path
-            maven_mirror = "http://repo1.maven.org/maven2/#{group}/#{artifact}/#{version}/#{jar}"
+        if deps[:missing].size > 0
+          puts "Downloading jars for Naether"  
             
-            open(maven_path, 'wb') do |io|
-              io.print open(maven_mirror).read
+          deps[:missing].each do |dep|
+            notation = dep.split(":")
+            group = notation[0].gsub("\.", File::SEPARATOR)
+            artifact = notation[1]
+            type = notation[2]
+            version = notation[3]
+            
+            jar = "#{artifact}-#{version}.#{type}"
+            
+            maven_path = "#{dest}#{File::SEPARATOR}#{jar}"
+            
+            if !File.exists? maven_path
+              maven_mirror = "http://repo1.maven.org/maven2/#{group}/#{artifact}/#{version}/#{jar}"
+              
+              open(maven_path, 'wb') do |io|
+                io.print open(maven_mirror).read
+              end
+              
+              deps[:downloaded] << { dep => maven_path }
+            else
+              deps[:exists] << { dep => maven_path }
             end
-            
-            deps[:downloaded] << { dep => maven_path }
-          else
-            deps[:exists] << maven_path
           end
         end
         
@@ -120,7 +122,7 @@ class Naether
           maven_path = "#{local_repo}#{File::SEPARATOR}#{group}#{File::SEPARATOR}#{artifact}#{File::SEPARATOR}#{version}#{File::SEPARATOR}#{jar}"
           
           if File.exists? maven_path
-            deps[:exists] << dep
+            deps[:exists] << { dep => maven_path }
           else
             deps[:missing] << dep
           end
@@ -131,8 +133,6 @@ class Naether
       end
       
       def install_dependencies_to_local_repo( jars_or_dir, opts = {}  )
-        
-        deps = check_local_repo_for_deps(opts[:local_repo])
           
         @naether = nil
         jars = []  
