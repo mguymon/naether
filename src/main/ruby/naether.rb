@@ -12,6 +12,7 @@ class Naether
   
   # Naether jar path will default to packaged in the gem
   JAR_LIB = "#{File.dirname(__FILE__)}/.."
+  JAR_PATH = "#{JAR_LIB}/naether-#{IO.read("VERSION")}.jar"
   
   class << self
     

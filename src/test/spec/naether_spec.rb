@@ -2,10 +2,20 @@ require 'src/main/ruby/naether'
 
 describe Naether do
   
+  it "jar of correct version should be built" do
+    version = IO.read("VERSION")
+    File.exists?( "target/naether-#{version}.jar" ).should be_true
+  end
+  
   context "Class" do
     
     it "should have bootstrap dependencies" do
       Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.13"
+    end
+    
+    it "JAR_PATH constant should match jar" do
+      version = IO.read("VERSION")
+      Naether::JAR_PATH.should match /naether-#{version}.jar/
     end
   end
   
@@ -88,7 +98,8 @@ describe Naether do
     end
     
     it "should get version from pom file" do
-      @naether.pom_version( 'pom.xml' ).should eql "0.5.0"
+      version = IO.read("VERSION")
+      @naether.pom_version( 'pom.xml' ).should eql version
     end
     
     it "should get dependencies from pom file" do
@@ -117,8 +128,10 @@ describe Naether do
     end
     
     it "should load a pom to use for future pom calls" do
+      version = IO.read("VERSION")
+      
       @naether.load_pom( 'pom.xml' )
-      @naether.pom_version.should eql "0.5.0"
+      @naether.pom_version.should eql version
     end
     
     it "should write pom file" do

@@ -26,9 +26,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Dependency;
 import org.junit.Test;
 
@@ -46,16 +48,16 @@ public class ProjectTest {
 	}
 
 	@Test
-	public void createInstanceWithPomPath() {
+	public void createInstanceWithPomPath() throws IOException {
 		Project mavenProject = null;
 		try {
 			mavenProject = new Project("pom.xml");
 		} catch (ProjectException e) {
 			fail("failed to read pom: " + e.toString());
 		}
-
+		
 		assertNotNull(mavenProject.getMavenModel());
-		assertEquals("0.5.0", mavenProject.getVersion());
+		assertEquals( FileUtils.readFileToString( new File("VERSION") ), mavenProject.getVersion());
 	}
 
 	@Test
