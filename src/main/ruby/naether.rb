@@ -12,7 +12,7 @@ class Naether
   
   # Naether jar path will default to packaged in the gem
   JAR_LIB = "#{File.dirname(__FILE__)}/.."
-  JAR_PATH = "#{JAR_LIB}/naether-#{IO.read("VERSION")}.jar"
+  JAR_PATH = "#{JAR_LIB}/naether-0.5.1.jar" #XXX: hardcoded, should be based on VERSION file
   
   class << self
     
@@ -227,7 +227,7 @@ class Naether
   end
   
   def load_pom( file_path )
-    @project_instance = Naether::Java.create_maven_project( file_path )
+    @project_instance = Naether::Java.create("com.slackworks.naether.maven.Project", file_path )
   end
   
   def pom_dependencies( file_path=nil, scopes = nil)
@@ -264,7 +264,7 @@ class Naether
   #
   # loads all resolved dependencies into pom
   def write_pom( notation, file_path )
-    @project_instance = Naether::Java.create_maven_project
+    @project_instance = Naether::Java.create("com.slackworks.naether.maven.Project")
     @project_instance.setProjectNotation( notation )
     
     dependencies().each do |notation|

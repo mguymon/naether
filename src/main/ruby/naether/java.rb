@@ -45,19 +45,14 @@ class Naether
       end
     end
     
-    def self.create_maven_project(path = nil)
-      projectClass = nil
+    def self.create( java_class, *args )
       if Naether.platform == 'java'
-        projectClass = com.slackworks.naether.maven.Project 
+        java_class = eval(java_class)
       else
-        projectClass = Rjb::import('com.slackworks.naether.maven.Project') 
+        java_class = Rjb::import(java_class) 
       end
       
-      unless path.nil?
-        projectClass.new( path )
-      else
-        projectClass.new
-      end
+      java_class.new( *args )
     end
     
     def self.convert_to_ruby_array( java_array, to_string = false )
