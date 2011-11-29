@@ -428,9 +428,15 @@ public class Naether {
 	}
 
 	/**
-	 * Install Artifact to local repo
+	 * Install Artifact to local repo. 
 	 * 
-	 * @param deployArtifact {@link DeployArtifact}
+	 * If installing a POM, filePath can be null. If install a Jar without a POM, pomPath
+	 * can be null.
+	 * 
+	 * @param String notation String
+	 * @param String pomPath String
+	 * @param String filePath String
+	 * 
 	 * @throws InstallException
 	 */
 	
