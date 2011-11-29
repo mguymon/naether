@@ -282,7 +282,7 @@ public class NaetherTest {
         }
         
         naether.install( "test:test-install:jar:0.4", null, jar );
-        assertTrue( "installed jar exists", destinationJar.exists() );
+        assertTrue( "installed jar should exist", destinationJar.exists() );
 	}
 	
 	@Test
@@ -301,7 +301,7 @@ public class NaetherTest {
         }
         
         naether.install( "test:test-install:0.4", pom, null );
-        assertTrue( "installed pom exists", destinationPom.exists() );
+        assertTrue( "installed pom should exist", destinationPom.exists() );
 	}
 	
 	@Test
@@ -328,8 +328,8 @@ public class NaetherTest {
         }
         
         naether.install( "test:test-install:0.4", pom, jar );
-        assertTrue( "installed pom exists", destinationPom.exists() );
-        assertTrue( "installed jar exists", destinationJar.exists() );
+        assertTrue( "installed pom should exist", destinationPom.exists() );
+        assertTrue( "installed jar should exist", destinationJar.exists() );
 	}
 
 }

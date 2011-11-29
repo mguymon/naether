@@ -455,8 +455,12 @@ public class Naether {
 				installRequest.addArtifact( pomArtifact );
 			}
 			
+		// If Pom only, without a jar, ensure the notation type is set to pom
 		} else  if ( pomPath != null ) {
-			DefaultArtifact pomArtifact = new DefaultArtifact( notation );
+			Map<String,String> notationMap = Notation.parse( notation );
+			notationMap.put( "type", "pom" );
+			
+			DefaultArtifact pomArtifact = new DefaultArtifact( Notation.generate(notationMap) );
 			pomArtifact = (DefaultArtifact)pomArtifact.setFile( new File(pomPath ) );
 			installRequest.addArtifact( pomArtifact );	
 		}

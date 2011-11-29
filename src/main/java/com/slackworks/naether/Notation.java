@@ -37,11 +37,11 @@ import com.slackworks.naether.maven.Project;
  */
 public class Notation {
 	
-	// groupId:artifactId:extension:version
-	private static Pattern notationPattern = Pattern.compile("^(.+):(.+):(.+):(.+)$");
+	// groupId:artifactId:extension:version or groupId:artifactId:version 
+	private static Pattern notationPattern = Pattern.compile("^(.+?):(.+?):(.+?)(:(.+))?$");
 	
 	public static String generate(org.apache.maven.model.Dependency dependency) {
-		StringBuffer notation = new StringBuffer()
+		StringBuilder notation = new StringBuilder()
 				.append(dependency.getGroupId()).append(":")
 				.append(dependency.getArtifactId()).append(":")
 				.append(dependency.getType()).append(":")
@@ -63,7 +63,7 @@ public class Notation {
 	
 	public static String generate(org.sonatype.aether.graph.Dependency dependency) {
 		Artifact artifact = dependency.getArtifact();
-		StringBuffer notation = new StringBuffer()
+		StringBuilder notation = new StringBuilder()
 				.append(artifact.getGroupId()).append(":")
 				.append(artifact.getArtifactId()).append(":")
 				.append(artifact.getExtension()).append(":")
@@ -72,14 +72,35 @@ public class Notation {
 		return notation.toString();
 	}
 	
+	public static String generate( Map<String,String> notationMap ) {
+		StringBuilder notation = new StringBuilder();
+		notation.append( notationMap.get( "groupId" ) ).append(":").append( notationMap.get( "artifactId") ).append(":");
+		
+		if ( notationMap.get( "type" ) != null ) {
+			notation.append( notationMap.get("type") ).append( ":" );
+		}
+		
+		notation.append( notationMap.get( "version" ) );
+		
+		return notation.toString();
+	}
+	
 	public static Map<String,String> parse( String notation ) {
 		Matcher matcher = notationPattern.matcher(notation);
 		if ( matcher.find() ) {
+			
 			Map<String,String> notationMap = new HashMap<String,String>();
+			
 			notationMap.put( "groupId", matcher.group(1) );
 			notationMap.put( "artifactId", matcher.group(2) );
-			notationMap.put( "type", matcher.group(3) );
-			notationMap.put( "version", matcher.group(4) );
+			
+			if ( matcher.group(4) == null ) {
+				notationMap.put( "version", matcher.group(3) );
+			} else {
+				notationMap.put( "type", matcher.group(3) );
+				notationMap.put( "version", matcher.group(5) );
+			}
+			
 			return notationMap;
 		} else {
 			return null;
