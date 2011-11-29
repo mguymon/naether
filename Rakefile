@@ -140,6 +140,10 @@ task :default => :test
 
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
+  puts " #########################################################"
+  puts " Make sure you run mvn package to downloaded for the tests"
+  puts " #########################################################"
+  puts ""
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
