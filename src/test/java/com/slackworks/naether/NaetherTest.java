@@ -245,7 +245,7 @@ public class NaetherTest {
 	}
 	
 	@Test
-	public void testDeployArtifact() throws Exception {
+	public void deployArtifact() throws Exception {
 		// Use Naether to get a jar to deploy
 		Dependency dependency =
             new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
@@ -267,7 +267,7 @@ public class NaetherTest {
 	}
 	
 	@Test
-	public void testInstallArtifact() throws Exception {
+	public void installAJar() throws Exception {
 		
 		// Use Naether to get a jar to deploy
 		Dependency dependency =
@@ -281,11 +281,55 @@ public class NaetherTest {
         	destinationJar.delete();
         }
         
-        DeployArtifact deployArtifact = new DeployArtifact();
-        deployArtifact.setFilePath( jar );
-        deployArtifact.setNotation( "test:test-install:jar:0.4");
-        naether.installArtifact( deployArtifact );
-        assertTrue( destinationJar.exists() );
+        naether.install( "test:test-install:jar:0.4", null, jar );
+        assertTrue( "installed jar exists", destinationJar.exists() );
+	}
+	
+	@Test
+	public void installAPom() throws Exception {
+		
+		// Use Naether to get a jar to deploy
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
+        naether.addDependency(dependency);
+        naether.resolveDependencies();
+        String pom = (new File( "target/test-repo/junit/junit/4.8.2/junit-4.8.2.pom")).getAbsolutePath();
+        
+        File destinationPom = new File("target/test-repo/test/test-install/0.4/test-install-0.4.pom");
+        if ( destinationPom.exists() ) {
+        	destinationPom.delete();
+        }
+        
+        naether.install( "test:test-install:0.4", pom, null );
+        assertTrue( "installed pom exists", destinationPom.exists() );
+	}
+	
+	@Test
+	public void installAPomAndJar() throws Exception {
+		
+		// Use Naether to get a jar to deploy
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
+        naether.addDependency(dependency);
+        naether.resolveDependencies();
+        
+        String jar = (new File( "target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar")).getAbsolutePath();
+        
+        File destinationJar = new File("target/test-repo/test/test-install/0.4/test-install-0.4.jar");
+        if ( destinationJar.exists() ) {
+        	destinationJar.delete();
+        }
+        
+        String pom = (new File( "target/test-repo/junit/junit/4.8.2/junit-4.8.2.pom")).getAbsolutePath();
+        
+        File destinationPom = new File("target/test-repo/test/test-install/0.4/test-install-0.4.pom");
+        if ( destinationPom.exists() ) {
+        	destinationPom.delete();
+        }
+        
+        naether.install( "test:test-install:0.4", pom, jar );
+        assertTrue( "installed pom exists", destinationPom.exists() );
+        assertTrue( "installed jar exists", destinationJar.exists() );
 	}
 
 }

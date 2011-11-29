@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 // Sonatype Aether Dependency Management
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.collection.DependencyCollectionException;
@@ -44,6 +45,7 @@ import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.graph.Exclusion;
 import org.sonatype.aether.installation.InstallRequest;
 import org.sonatype.aether.installation.InstallationException;
+import org.sonatype.aether.metadata.Metadata;
 import org.sonatype.aether.repository.Authentication;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -52,6 +54,7 @@ import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.resolution.DependencyResult;
 import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 import org.sonatype.aether.connector.wagon.WagonProvider;
 import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
@@ -430,19 +433,34 @@ public class Naether {
 	 * @param deployArtifact {@link DeployArtifact}
 	 * @throws InstallException
 	 */
-	public void installArtifact(DeployArtifact deployArtifact) throws InstallException {
-		log.debug("deploy artifact: {} ", deployArtifact.getNotation());
+	
+	public void install(String notation, String pomPath, String filePath ) throws InstallException {
+		log.debug("installing artifact: {} ", notation);
+		
 		RepositorySystem system = newRepositorySystem();
 
 		RepositorySystemSession session = newSession(system);
 
 		InstallRequest installRequest = new InstallRequest();
-		installRequest.addArtifact(deployArtifact.getJarArtifact());
-		if (deployArtifact.getPomArtifact() != null) {
-			installRequest.addArtifact(deployArtifact.getPomArtifact());
+		
+		if ( filePath != null ) {
+			DefaultArtifact jarArtifact = new DefaultArtifact( notation );
+			jarArtifact = (DefaultArtifact)jarArtifact.setFile( new File( filePath ) );
+			
+			installRequest.addArtifact( jarArtifact );
+				
+			if ( pomPath != null ) {
+				SubArtifact pomArtifact = new SubArtifact( jarArtifact, "", "pom" );
+				pomArtifact = (SubArtifact)pomArtifact.setFile( new File( pomPath ) );
+				installRequest.addArtifact( pomArtifact );
+			}
+			
+		} else  if ( pomPath != null ) {
+			DefaultArtifact pomArtifact = new DefaultArtifact( notation );
+			pomArtifact = (DefaultArtifact)pomArtifact.setFile( new File(pomPath ) );
+			installRequest.addArtifact( pomArtifact );	
 		}
-
-		log.debug("installing artifact {}", deployArtifact.getNotation());
+				
 		try {
 			system.install(session, installRequest);
 		} catch (InstallationException e) {
