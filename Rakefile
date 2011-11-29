@@ -134,20 +134,26 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = 'src/test/spec/**/*_spec.rb'
 end
 
+task :spec => :test_warning
+
 task :test => :spec
 
 task :default => :test
 
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
-  puts " #########################################################"
-  puts " Make sure you run mvn package to downloaded for the tests"
-  puts " #########################################################"
-  puts ""
+  
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "naether #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('src/main/ruby/**/*.rb')
+end
+
+task :test_warning do
+  puts " ###########################################################"
+  puts " Make sure you run mvn package to download jars for the tests"
+  puts " ###########################################################"
+  puts ""
 end
