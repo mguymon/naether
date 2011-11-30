@@ -121,7 +121,7 @@ class Naether
       end
       
       def load_jars(jars)
-        loaded_jars = []
+        loadable_jars = []
         unless jars.is_a?( Array )
           jars = [jars]
         end
@@ -129,16 +129,16 @@ class Naether
         jars.each do |jar|
           expanded_jar = File.expand_path(jar)
           if !@loaded_jars.include? expanded_jar
-            loaded_jars << expanded_jar
+            loadable_jars << expanded_jar
             @loaded_jars << expanded_jar
           end
         end
         
-        unless loaded_jars.empty?
-          Rjb::add_jar( loaded_jars )
+        unless loadable_jars.empty?
+          Rjb::add_jar( loadable_jars )
         end
         
-        loaded_jars
+        loadable_jars
       end
     end
   end
