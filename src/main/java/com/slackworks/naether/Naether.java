@@ -131,7 +131,7 @@ public class Naether {
 	}
 
 	/**
-	 * * Add dependency by String notation and Maven scope
+	 * Add dependency by String notation and Maven scope
 	 * 
 	 * groupId:artifactId:type:version
 	 * 
