@@ -160,7 +160,7 @@ class Naether
           jar = jars.select { |x| x =~ /#{name}/ }
           if jar.size > 0
             jar = jar[0]
-            @naether.install_artifact( dep, jar )
+            @naether.install( dep, nil, jar )
           else
             puts "Could not find jar for #{dep}"
           end

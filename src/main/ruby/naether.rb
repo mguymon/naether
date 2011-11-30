@@ -208,22 +208,9 @@ class Naether
     @resolver.deployArtifact(@instance)
   end
   
-  # Install artifact to local repo
-  def install_artifact( notation, file_path, opts = {} )
-    if Naether.platform == 'java'
-      @instance = com.slackworks.naether.deploy.DeployArtifact.new 
-    else
-      deployArtifactClass = Rjb::import('com.slackworks.naether.deploy.DeployArtifact') 
-      @instance = deployArtifactClass.new
-    end
-    
-    @instance.setNotation( notation )
-    @instance.setFilePath( file_path )
-    if opts[:pom_path]
-      @instance.setPomPath( opts[:pom_path] )
-    end
-    
-    @resolver.installArtifact(@instance)
+  # Install artifact or pom to local repo, must specify pom_path and/or jar_path
+  def install( notation, pom_path =nil, jar_path = nil )
+    @resolver.install(notation, pom_path, jar_path)
   end
   
   def load_pom( file_path )

@@ -30,18 +30,24 @@ import com.slackworks.naether.maven.Project;
 /**
  * Helper for converting the dependency notations:
  * 
- *   groupId:artifactId:type:version
+ *   groupId:artifactId:type:version or groupId:artifactId:version
  * 
  * @author Michael Guymon
  * 
  */
 public class Notation {
+	 
+	private static Pattern notationPattern = Pattern.compile("^(.+?):(.+?):(.+?)(:(.+))?$");
 	
-	// groupId:artifactId:extension:version
-	private static Pattern notationPattern = Pattern.compile("^(.+):(.+):(.+):(.+)$");
-	
+	/**
+	 * Convert a {@link org.apache.maven.model.Dependency} to String notation of
+	 * groupId:artifactId:type:version
+	 * 
+	 * @param dependency
+	 * @return String notation
+	 */
 	public static String generate(org.apache.maven.model.Dependency dependency) {
-		StringBuffer notation = new StringBuffer()
+		StringBuilder notation = new StringBuilder()
 				.append(dependency.getGroupId()).append(":")
 				.append(dependency.getArtifactId()).append(":")
 				.append(dependency.getType()).append(":")
@@ -50,6 +56,13 @@ public class Notation {
 		return notation.toString();
 	}
 
+	/**
+	 * Convert a {@link Project} to String notation of
+	 * groupId:artifactId:type:version
+	 * 
+	 * @param pom
+	 * @return String notation
+	 */
 	public static String generate( Project pom ) {
 		return new StringBuilder( pom.getGroupId() )
 			.append( ":" )
@@ -61,9 +74,16 @@ public class Notation {
 			.toString();
 	}
 	
+	/**
+	 * Convert a {@link org.sonatype.aether.graph.Dependency} to String notation of
+	 * groupId:artifactId:type:version
+	 * 
+	 * @param dependency
+	 * @return String notation
+	 */
 	public static String generate(org.sonatype.aether.graph.Dependency dependency) {
 		Artifact artifact = dependency.getArtifact();
-		StringBuffer notation = new StringBuffer()
+		StringBuilder notation = new StringBuilder()
 				.append(artifact.getGroupId()).append(":")
 				.append(artifact.getArtifactId()).append(":")
 				.append(artifact.getExtension()).append(":")
@@ -72,14 +92,55 @@ public class Notation {
 		return notation.toString();
 	}
 	
+	/**
+	 * Convert a {@link Map<String,String>} to String notation of
+	 * groupId:artifactId:version or if type is present, groupId:artifactId:type:version
+	 * 
+	 * @param notationMap Map<String,String>
+	 * @return String notation
+	 * @see {@link #parse(String)}
+	 */
+	public static String generate( Map<String,String> notationMap ) {
+		StringBuilder notation = new StringBuilder();
+		notation.append( notationMap.get( "groupId" ) ).append(":").append( notationMap.get( "artifactId") ).append(":");
+		
+		if ( notationMap.get( "type" ) != null ) {
+			notation.append( notationMap.get("type") ).append( ":" );
+		}
+		
+		notation.append( notationMap.get( "version" ) );
+		
+		return notation.toString();
+	}
+	
+	/**
+	 * Parsing the notation and returns a Map with keys
+	 *   <ul>
+	 *   <li>groupId</li>
+	 *   <li>artifactId</li>
+	 *   <li>version</li>
+	 *   <li>type - may be null if not in the notation param</li>
+	 *   </ul>
+	 *      
+	 * @param notation String
+	 * @return Map<String,String>
+	 */
 	public static Map<String,String> parse( String notation ) {
 		Matcher matcher = notationPattern.matcher(notation);
 		if ( matcher.find() ) {
+			
 			Map<String,String> notationMap = new HashMap<String,String>();
+			
 			notationMap.put( "groupId", matcher.group(1) );
 			notationMap.put( "artifactId", matcher.group(2) );
-			notationMap.put( "type", matcher.group(3) );
-			notationMap.put( "version", matcher.group(4) );
+			
+			if ( matcher.group(4) == null ) {
+				notationMap.put( "version", matcher.group(3) );
+			} else {
+				notationMap.put( "type", matcher.group(3) );
+				notationMap.put( "version", matcher.group(5) );
+			}
+			
 			return notationMap;
 		} else {
 			return null;
