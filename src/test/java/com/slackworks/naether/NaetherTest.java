@@ -88,27 +88,42 @@ public class NaetherTest {
 	}
 	
 	@Test
-	public void addDependenciesFromPom() throws ProjectException {
-		naether.addDependencies( "pom.xml" );
+	public void addDependenciesFromPom() throws ProjectException, URLException, DependencyException {
+		naether.addDependencies( "src/test/resources/pom.xml" );
+		
 		List<String> dependencies = new ArrayList<String>();
-		dependencies.add( "ch.qos.logback:logback-classic:jar:0.9.29" );
-		dependencies.add( "org.slf4j:slf4j-api:jar:1.6.2" );
-		dependencies.add( "org.slf4j:jcl-over-slf4j:jar:1.6.2" ); 
-		dependencies.add( "org.slf4j:log4j-over-slf4j:jar:1.6.2" );
-		dependencies.add( "org.codehaus.plexus:plexus-utils:jar:3.0" ); 
-		dependencies.add( "org.apache.maven:maven-model-v3:jar:2.0" );
-		dependencies.add( "org.codehaus.plexus:plexus-container-default:jar:1.5.5" );
-		dependencies.add( "org.sonatype.aether:aether-api:jar:1.13" );
-		dependencies.add( "org.sonatype.aether:aether-util:jar:1.13" );
-		dependencies.add( "org.sonatype.aether:aether-impl:jar:1.13" );
-		dependencies.add( "org.sonatype.aether:aether-connector-file:jar:1.13" );
-		dependencies.add( "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13" );
-		dependencies.add( "org.sonatype.aether:aether-connector-wagon:jar:1.13" );
-		dependencies.add( "org.apache.maven:maven-aether-provider:jar:3.0.3" );
-		dependencies.add( "org.apache.maven.wagon:wagon-ssh:jar:1.0" );
-		dependencies.add( "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0" );
-		dependencies.add( "org.apache.maven.wagon:wagon-file:jar:1.0" );
+		dependencies.add( "org.apache.mina:mina-core:jar:2.0.4" );
+		dependencies.add( "org.slf4j:slf4j-api:jar:1.6.1" );
+		dependencies.add( "google:collect:jar:1.0" );
 		dependencies.add( "junit:junit:jar:4.8.2" );
+		
+		naether.resolveDependencies(false);
+		
+		assertEquals( dependencies, naether.getDependenciesNotation() );
+	}
+	
+	@Test
+	public void addDependenciesFromPomWithScopes() throws ProjectException, URLException, DependencyException {
+		List<String> scopes = new ArrayList<String>();
+		List<String> dependencies = new ArrayList<String>();
+		
+		scopes.add("test");
+		naether.addDependencies( "src/test/resources/pom.xml", scopes );
+		dependencies.add( "junit:junit:jar:4.8.2" );
+		naether.resolveDependencies(false);
+		assertEquals( dependencies, naether.getDependenciesNotation() );
+		
+		scopes.add("system");
+		naether.addDependencies( "src/test/resources/pom.xml", scopes );
+		dependencies.add( "google:collect:jar:1.0" );
+		naether.resolveDependencies(false);
+		assertEquals( dependencies, naether.getDependenciesNotation() );
+		
+		scopes.add("compile");
+		naether.addDependencies( "src/test/resources/pom.xml", scopes );
+		dependencies.add( "org.apache.mina:mina-core:jar:2.0.4" );
+		dependencies.add( "org.slf4j:slf4j-api:jar:1.6.1" );
+		naether.resolveDependencies(false);
 		assertEquals( dependencies, naether.getDependenciesNotation() );
 	}
 	
