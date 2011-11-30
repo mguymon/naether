@@ -182,13 +182,13 @@ public class Project {
 	}
 	
 	/**
-	 * Get List of {@link Depedencies} for the Maven Project, with boolean to
+	 * Get List of {@link Dependency} for the Maven Project, with boolean to
 	 * substitute Project Properties.
 	 * 
 	 * @param substituteProperties boolean
 	 * @return List<Dependency>
 	 */
-	public List<Dependency> getDependencies(List scopes, boolean substituteProperties) {
+	public List<Dependency> getDependencies(List<String> scopes, boolean substituteProperties) {
 		log.debug( "Valid scopes: {}", scopes );
 		List<Dependency> dependencies = new ArrayList<Dependency>();
 
@@ -207,7 +207,7 @@ public class Project {
 				dependencies.add(dependency);
 			}
 
-		// Keep vals as is
+		// Keep value as is
 		} else {
 			for (Dependency dependency : getMavenModel().getDependencies()) {
 				dependencies.add(dependency);
