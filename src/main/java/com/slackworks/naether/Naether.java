@@ -132,7 +132,7 @@ public class Naether {
 	}
 
 	/**
-	 * * Add dependency by String notation and Maven scope
+	 * Add dependency by String notation and Maven scope
 	 * 
 	 * groupId:artifactId:type:version
 	 * 
@@ -488,7 +488,11 @@ public class Naether {
 	 * @return String
 	 */
 	public String getResolvedClassPath() {
-		return preorderedNodeList.getClassPath();
+		if ( preorderedNodeList != null ) {
+			return preorderedNodeList.getClassPath();
+		} else {
+			return null;
+		}
 	}
 
 	/**
