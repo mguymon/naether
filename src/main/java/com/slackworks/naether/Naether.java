@@ -56,6 +56,7 @@ import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
+import org.sonatype.aether.util.graph.selector.AndDependencySelector;
 import org.sonatype.aether.connector.wagon.WagonProvider;
 import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
 import org.sonatype.aether.deployment.DeployRequest;
@@ -317,9 +318,11 @@ public class Naether {
 	 */
 	public RepositorySystemSession newSession(RepositorySystem system) {
 		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
-		session.setDependencySelector( new ValidSystemScopeDependencySelector() );
-		session.setTransferListener(new LogTransferListener());
-		session.setRepositoryListener(new LogRepositoryListener());
+		session = (MavenRepositorySystemSession)session.setDependencySelector( new AndDependencySelector( session.getDependencySelector(), new ValidSystemScopeDependencySelector() ) );
+		session = (MavenRepositorySystemSession)session.setTransferListener(new LogTransferListener());
+		session = (MavenRepositorySystemSession)session.setRepositoryListener(new LogRepositoryListener());
+		
+		session = (MavenRepositorySystemSession)session.setIgnoreMissingArtifactDescriptor( false );
 		
 		LocalRepository localRepo = new LocalRepository(getLocalRepoPath());
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(localRepo));

@@ -152,8 +152,8 @@ Rake::RDocTask.new do |rdoc|
 end
 
 task :test_warning do
-  puts " ###########################################################"
-  puts " Make sure you run mvn package to download jars for the tests"
-  puts " ###########################################################"
+  puts " ##############################################################"
+  puts "  Make sure you run mvn package to download jars for the tests"
+  puts " ##############################################################"
   puts ""
 end

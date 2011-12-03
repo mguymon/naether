@@ -22,6 +22,7 @@ package com.slackworks.naether;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 // JUnit
@@ -89,15 +90,12 @@ public class NaetherTest {
 	
 	@Test
 	public void addDependenciesFromPom() throws ProjectException, URLException, DependencyException {
-		naether.addDependencies( "src/test/resources/pom.xml" );
+		naether.addDependencies( "src/test/resources/valid_pom.xml" );
 		
-		List<String> dependencies = new ArrayList<String>();
-		dependencies.add( "org.apache.mina:mina-core:jar:2.0.4" );
-		dependencies.add( "org.slf4j:slf4j-api:jar:1.6.1" );
-		dependencies.add( "google:collect:jar:1.0" );
-		dependencies.add( "junit:junit:jar:4.8.2" );
-		
-		naether.resolveDependencies(false);
+		List<String> dependencies = new ArrayList<String>(Arrays.asList( 
+	        "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", 
+	        "org.slf4j:slf4j-api:jar:1.6.1", "junit:junit:jar:4.8.2" ));
+        naether.resolveDependencies(false);
 		
 		assertEquals( dependencies, naether.getDependenciesNotation() );
 	}
@@ -105,26 +103,31 @@ public class NaetherTest {
 	@Test
 	public void addDependenciesFromPomWithScopes() throws ProjectException, URLException, DependencyException {
 		List<String> scopes = new ArrayList<String>();
-		List<String> dependencies = new ArrayList<String>();
+		List<String> expectedDependencies = new ArrayList<String>();
 		
 		scopes.add("test");
-		naether.addDependencies( "src/test/resources/pom.xml", scopes );
-		dependencies.add( "junit:junit:jar:4.8.2" );
+		naether.addDependencies( "src/test/resources/valid_pom.xml", scopes );
 		naether.resolveDependencies(false);
-		assertEquals( dependencies, naether.getDependenciesNotation() );
 		
+		expectedDependencies.add( "junit:junit:jar:4.8.2" );
+		assertEquals( expectedDependencies, naether.getDependenciesNotation() );
+		
+		/* XXX: invalid system scopes are removed from dependencies
 		scopes.add("system");
-		naether.addDependencies( "src/test/resources/pom.xml", scopes );
-		dependencies.add( "google:collect:jar:1.0" );
+		naether.addDependencies( "src/test/resources/valid_pom.xml", scopes );
 		naether.resolveDependencies(false);
-		assertEquals( dependencies, naether.getDependenciesNotation() );
+		
+		expectedDependencies.add( "google:collect:jar:1.0" );
+		assertEquals( expectedDependencies, naether.getDependenciesNotation() );
+		*/
 		
 		scopes.add("compile");
-		naether.addDependencies( "src/test/resources/pom.xml", scopes );
-		dependencies.add( "org.apache.mina:mina-core:jar:2.0.4" );
-		dependencies.add( "org.slf4j:slf4j-api:jar:1.6.1" );
+		naether.addDependencies( "src/test/resources/valid_pom.xml", scopes );
 		naether.resolveDependencies(false);
-		assertEquals( dependencies, naether.getDependenciesNotation() );
+		
+		expectedDependencies.addAll( Arrays.asList( "ch.qos.logback:logback-classic:jar:0.9.29", 
+        	"ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1") );
+		assertEquals( expectedDependencies, naether.getDependenciesNotation() );
 	}
 	
 	@Test

@@ -42,13 +42,10 @@ public class SystemPathDependencyTest {
 	private Naether naether;
 	
 	@Before
-	public void createNaether() {
+	public void createNaether() throws URLException, DependencyException, InstallException {
 		naether = new Naether();
-		naether.setLocalRepoPath( "target/test-repo" );		
-	}
-	
-	@Test
-	public void systemPathDependency() throws URLException, DependencyException, InstallException {
+		naether.setLocalRepoPath( "target/test-repo" );
+		
 		// Use Naether to get a jar to deploy
 		Dependency dependency =
             new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
@@ -61,46 +58,46 @@ public class SystemPathDependencyTest {
         naether.install("valid:pom:3", "src/test/resources/valid_pom.xml", jar);
         
         naether.clearDependencies();
-        
-        dependency =
+	}
+	
+	@Test
+	public void isAValidPom() throws URLException, DependencyException {
+		Dependency dependency =
                 new Dependency( new DefaultArtifact( "valid:pom:3" ), "compile" );
         naether.addDependency(dependency);
         naether.resolveDependencies( false );
-            
+        
         List<String> dependencies = naether.getDependenciesNotation();
         List<String> expectedDependencies = new ArrayList<String>( Arrays.asList( 
-        	"valid:pom:jar:3", "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1" ));
+        	"valid:pom:jar:3", "ch.qos.logback:logback-classic:jar:0.9.29", 
+        	"ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1" ));
         assertEquals( expectedDependencies, dependencies );
-        
-        naether.clearDependencies();
-        
-        dependency =
+	}
+	
+	@Test
+	public void systemPathDependency() throws URLException, DependencyException, InstallException {
+		Dependency dependency =
                 new Dependency( new DefaultArtifact( "pom:with-system-path:2" ), "compile" );
         naether.addDependency(dependency);
         naether.resolveDependencies( false );
             
-        dependencies = naether.getDependenciesNotation();
-        
-        
-        //   XXX: assertion fails, returns only [pom:with-system-path:2]
-        //expectedDependencies = new ArrayList<String>( Arrays.asList( 
-        //    	"pom:with-system-path:2", "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1" ));
-            
-        // XXX: should not match
-        expectedDependencies = new ArrayList<String>( Arrays.asList( "pom:with-system-path:jar:2" ) );
-        assertEquals( expectedDependencies, dependencies );
-        
-        /*
-        naether.clearDependencies();
-        
-        dependency =
+        List<String> dependencies = naether.getDependenciesNotation();
+        List<String> expectedDependencies = new ArrayList<String>( Arrays.asList(
+        	"pom:with-system-path:jar:2", "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1" ));
+        assertEquals( expectedDependencies, dependencies );   
+	}
+	
+	@Test
+	public void hasBrokenDep() throws URLException, DependencyException {
+        Dependency dependency =
                 new Dependency( new DefaultArtifact( "pom:with-broken-dep:1" ), "compile" );
         naether.addDependency(dependency);
         naether.resolveDependencies( false );
             
-        dependencies = naether.getDependenciesNotation();        
-        expectedDependencies = new ArrayList<String>();       
+        List<String> dependencies = naether.getDependenciesNotation();        
+        List<String> expectedDependencies = new ArrayList<String>( Arrays.asList(
+        	"pom:with-broken-dep:jar:1", "pom:with-system-path:jar:2", "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"));       
         assertEquals( expectedDependencies, dependencies );
-        */
+        
 	}
 }
