@@ -62,6 +62,7 @@ import org.sonatype.aether.deployment.DeployRequest;
 import org.sonatype.aether.deployment.DeploymentException;
 
 // Naether
+import com.slackworks.naether.aether.ValidSystemScopeDependencySelector;
 import com.slackworks.naether.deploy.DeployArtifact;
 import com.slackworks.naether.deploy.DeployException;
 import com.slackworks.naether.deploy.InstallException;
@@ -316,8 +317,10 @@ public class Naether {
 	 */
 	public RepositorySystemSession newSession(RepositorySystem system) {
 		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
+		session.setDependencySelector( new ValidSystemScopeDependencySelector() );
 		session.setTransferListener(new LogTransferListener());
 		session.setRepositoryListener(new LogRepositoryListener());
+		
 		LocalRepository localRepo = new LocalRepository(getLocalRepoPath());
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(localRepo));
 
@@ -357,10 +360,10 @@ public class Naether {
 		RepositorySystem repoSystem = newRepositorySystem();
 
 		RepositorySystemSession session = newSession(repoSystem);
-
+		
 		CollectRequest collectRequest = new CollectRequest();
 		collectRequest.setDependencies(getDependencies());
-
+		
 		try {
 			collectRequest.addRepository(RemoteRepoBuilder.createFromUrl("file:" + this.getLocalRepoPath()));
 		} catch (MalformedURLException e) {
