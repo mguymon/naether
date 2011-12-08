@@ -107,7 +107,7 @@ public class LogRepositoryListener
 
     public void metadataInvalid( RepositoryEvent event )
     {
-        log.warn( "Invalid metadata " + event.getMetadata() );
+        log.debug( "Invalid metadata " + event.getMetadata() );
     }
 
     public void metadataResolved( RepositoryEvent event )
