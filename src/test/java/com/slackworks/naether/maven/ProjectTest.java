@@ -122,6 +122,18 @@ public class ProjectTest {
 	}
 
 	@Test
+	public void substituteProperty() throws ProjectException {
+		Project project = new Project( "src/test/resources/pom_with_system_path.xml" );
+		List<Dependency> dependencies = project.getDependencies();
+		
+		for ( Dependency dependency : dependencies ) {
+			if ( "gdata-spreadsheet".equals( dependency.getArtifactId() ) ) {
+				assertEquals( (new File( "src/test/resources")).getAbsolutePath(), dependency.getSystemPath() );
+			}
+		}
+	}
+	
+	@Test
 	public void writePom() throws ProjectException {
 		Project project = new Project();
 		project.setArtifactId("testArtifact");
