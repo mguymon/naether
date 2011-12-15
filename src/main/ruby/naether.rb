@@ -159,13 +159,18 @@ class Naether
   end
   
   # Get array of dependencies
-  def dependencies()
+  def dependencies
     Naether::Java.convert_to_ruby_array( @resolver.getDependencies() )
   end
   
   # Get array of dependencies as notation
-  def dependenciesNotation()
+  def dependencies_notation
     Naether::Java.convert_to_ruby_array(@resolver.getDependenciesNotation(), true)
+  end
+  alias_method :dependenciesNotation, :dependencies_notation # some javaism snuck in
+  
+  def dependencies_path
+    Naether::Java.convert_to_ruby_hash( @resolver.getDependenciesPath(), true )
   end
   
   def dependencies_classpath()

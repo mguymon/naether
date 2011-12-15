@@ -43,18 +43,24 @@ describe Naether do
     
     it "should add a dependency from notation" do
       @naether.dependencies = "junit:junit:jar:4.8.2" 
-      @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2"]
+      @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2"]
+    end
+    
+    it "should get paths for dependencies" do
+      @naether.dependencies = "junit:junit:jar:4.8.2" 
+      @naether.resolve_dependencies
+      @naether.dependencies_path.should eql({"junit:junit:jar:4.8.2" => File.expand_path("target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar")})
     end
     
     context "setting mixed list of dependencies" do
       it "should handle a list of dependencies" do
          @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29" ]  
-         @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+         @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
       end
       
       it "should handle poms in a list of dependencies" do
          @naether.dependencies = [  "pom.xml", "does.not:exist:jar:0.1" ]  
-         @naether.dependenciesNotation.should eql [
+         @naether.dependencies_notation.should eql [
             "ch.qos.logback:logback-classic:jar:0.9.29",
             "org.slf4j:slf4j-api:jar:1.6.2",
             "org.slf4j:jcl-over-slf4j:jar:1.6.2",
@@ -77,7 +83,7 @@ describe Naether do
       
       it "should handle scopes" do
         @naether.dependencies = [ {"pom.xml" => ["test"]}, {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
-        @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+        @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2", "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
       end
     end
     

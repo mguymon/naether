@@ -69,6 +69,29 @@ class Naether
       end 
     end
     
+    def self.convert_to_ruby_hash( java_hash, to_string = false )
+      if Naether.platform == 'java'
+        return java_hash
+      else
+        hash = {}
+        keys = java_hash.keySet()
+        iterator = keys.iterator()
+        if to_string
+          while iterator.hasNext()
+            key = iterator.next().toString()
+            hash[key] = java_hash.get( key ).toString()
+          end
+        else
+          while iterator.hasNext()
+            key = iterator.next()
+            hash[key] = java_hash.get( key )              
+          end
+        end
+        
+        return hash
+      end
+    end
+    
     #
     # Handle loading jars for JRuby
     #
