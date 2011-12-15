@@ -307,7 +307,7 @@ public class Naether {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		locator.setServices(WagonProvider.class, new ManualWagonProvider());
 		locator.addService(RepositoryConnectorFactory.class, WagonRepositoryConnectorFactory.class);
-
+		
 		return locator.getService(RepositorySystem.class);
 	}
 
@@ -317,7 +317,7 @@ public class Naether {
 	 * @param system {@link RepositorySystem}
 	 * @return {@link RepositorySystemSession}
 	 */
-	public RepositorySystemSession newSession(RepositorySystem system) {
+	public MavenRepositorySystemSession newSession(RepositorySystem system) {
 		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
 		session = (MavenRepositorySystemSession)session.setDependencySelector( new AndDependencySelector( session.getDependencySelector(), new ValidSystemScopeDependencySelector() ) );
 		session = (MavenRepositorySystemSession)session.setTransferListener(new LogTransferListener());
@@ -327,7 +327,7 @@ public class Naether {
 		
 		LocalRepository localRepo = new LocalRepository(getLocalRepoPath());
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(localRepo));
-
+		
 		return session;
 	}
 
@@ -340,7 +340,7 @@ public class Naether {
 	 * @throws Exception
 	 */
 	public void resolveDependencies() throws URLException, DependencyException {
-		resolveDependencies(true);
+		resolveDependencies(true, null);
 	}
 
 	/**
@@ -351,6 +351,10 @@ public class Naether {
 	 * @throws DependencyException
 	 */
 	public void resolveDependencies(boolean downloadArtifacts) throws URLException, DependencyException {
+		resolveDependencies( downloadArtifacts, null );
+	}
+	
+	public void resolveDependencies(boolean downloadArtifacts, Map<String,String> properties) throws URLException, DependencyException {
 		log.info( "Resolving Dependencies" );
 		log.info("Local Repo Path: {}", localRepoPath);
 
@@ -362,8 +366,17 @@ public class Naether {
 		}
 
 		RepositorySystem repoSystem = newRepositorySystem();
-
+		
 		RepositorySystemSession session = newSession(repoSystem);
+		if ( properties != null ) {
+			Map<String,String> userProperties = session.getUserProperties();
+			if ( userProperties != null ) {
+				userProperties = new HashMap<String,String>();
+			}
+			userProperties.putAll( properties );
+			
+			session = ((MavenRepositorySystemSession)session).setUserProperties( userProperties );
+		}
 		
 		CollectRequest collectRequest = new CollectRequest();
 		collectRequest.setDependencies(getDependencies());
