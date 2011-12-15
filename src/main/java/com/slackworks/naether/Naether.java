@@ -22,6 +22,7 @@ package com.slackworks.naether;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -539,9 +540,9 @@ public class Naether {
 	}
 
 	/**
-	 * {@link List} of {@link Dependency} converted to String notation
+	 * {@link List<String>} of {@link Dependency} converted to String notation
 	 * 
-	 * @return {@link List}
+	 * @return {@link List<String>}
 	 */
 	public List<String> getDependenciesNotation() {
 		List<String> notations = new ArrayList<String>();
@@ -550,6 +551,22 @@ public class Naether {
 		}
 
 		return notations;
+	}
+	
+	/**
+	 * {@link Map} of String notation and the corresponding String file path 
+	 * 
+	 * @return {@link Map<String,String>}
+	 */
+	public Map<String,String> getDependenciesPath() {
+		Map<String,String> dependencies = new HashMap<String,String>();
+		for (Dependency dependency : getDependencies()) {
+			if ( dependency.getArtifact().getFile() != null ) {
+				dependencies.put( Notation.generate( dependency ), dependency.getArtifact().getFile().getAbsolutePath() );
+			}
+		}
+		
+		return dependencies;
 	}
 
 }

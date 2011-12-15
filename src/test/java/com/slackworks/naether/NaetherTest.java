@@ -23,7 +23,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // JUnit
 import org.apache.maven.model.Exclusion;
@@ -86,6 +88,18 @@ public class NaetherTest {
         naether.addDependency(dependency);
         naether.resolveDependencies( false );
         assertEquals( "junit:junit:jar:4.8.2", naether.getDependenciesNotation().get(0) );
+	}
+	
+	@Test
+	public void getDependenciesPath() throws URLException, DependencyException {
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
+        naether.addDependency(dependency);
+        naether.resolveDependencies( true );
+        
+        Map<String, String> match =  naether.getDependenciesPath();
+        assertTrue( "Has notation key", match.containsKey("junit:junit:jar:4.8.2") );
+        assertTrue( "Has path", match.get("junit:junit:jar:4.8.2").contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
 	}
 	
 	@Test
