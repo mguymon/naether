@@ -71,7 +71,7 @@ class Naether
     
     def self.convert_to_ruby_hash( java_hash, to_string = false )
       if Naether.platform == 'java'
-        return java_hash
+        return java_hash.to_hash
       else
         hash = {}
         keys = java_hash.keySet()

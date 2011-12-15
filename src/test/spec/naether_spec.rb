@@ -105,7 +105,7 @@ describe Naether do
     
     it "should get version from pom file" do
       version = IO.read("VERSION")
-      @naether.pom_version( 'pom.xml' ).should eql version
+      @naether.pom_version( 'pom.xml' ).strip.should eql version.strip
     end
     
     it "should get dependencies from pom file" do
@@ -137,7 +137,7 @@ describe Naether do
       version = IO.read("VERSION")
       
       @naether.load_pom( 'pom.xml' )
-      @naether.pom_version.should eql version
+      @naether.pom_version.strip.should eql version.strip
     end
     
     it "should write pom file" do

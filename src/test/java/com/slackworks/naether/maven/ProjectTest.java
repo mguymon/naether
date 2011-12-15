@@ -57,7 +57,7 @@ public class ProjectTest {
 		}
 		
 		assertNotNull(mavenProject.getMavenModel());
-		assertEquals( FileUtils.readFileToString( new File("VERSION") ), mavenProject.getVersion());
+		assertEquals( FileUtils.readFileToString( new File("VERSION") ).trim(), mavenProject.getVersion());
 	}
 
 	@Test
