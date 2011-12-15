@@ -65,17 +65,19 @@ public class Project {
 	private String basePath;
 	
 	/**
-	 * New Instance
+	 * New Instance. The {@link #setBasePath(File)} defaults to current directory.
 	 */
 	public Project() {
 		Model model = new Model();
 		model.setModelVersion("4.0.0");
 		model.setPackaging("jar");
 		setMavenModel(model);
+		setBasePath( new File("." ) );
 	}
 
 	/**
-	 * New Instance loading Maven pom
+	 * New Instance loading Maven pom. The {@link #setBasePath(File)} defaults
+	 * to the pom's parent directory.
 	 * 
 	 * @param pomPath String path
 	 * @throws ProjectException 
@@ -389,6 +391,11 @@ public class Project {
 		return basePath;
 	}
 
+	/**
+	 * Set the BasePath for the POM. Path is converted to absolute path.
+	 * 
+	 * @param basePath File
+	 */
 	public void setBasePath(File basePath) {
 		this.basePath = basePath.getAbsolutePath();
 		this.addProperty( "project.basedir", this.basePath);
