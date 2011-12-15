@@ -2,7 +2,7 @@ source "http://rubygems.org"
 
 platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
 if platform != 'java'
-	gem 'rjb', '1.3.3'
+	gem 'rjb', '1.3.7'
 end
 
 group :development do
