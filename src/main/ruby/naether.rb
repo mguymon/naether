@@ -12,7 +12,7 @@ class Naether
   
   # Naether jar path will default to packaged in the gem
   JAR_LIB = "#{File.dirname(__FILE__)}/.."
-  JAR_PATH = "#{JAR_LIB}/naether-0.5.5.jar" #XXX: hardcoded, should be based on VERSION file
+  JAR_PATH = "#{JAR_LIB}/naether-0.5.6.jar" #XXX: hardcoded, should be based on VERSION file
   
   class << self
     
