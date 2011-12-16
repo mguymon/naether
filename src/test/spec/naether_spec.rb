@@ -1,11 +1,7 @@
 require 'src/main/ruby/naether'
+require 'src/main/ruby/naether/java'
 
 describe Naether do
-  
-  it "jar of correct version should be built" do
-    version = IO.read("VERSION")
-    File.exists?( "target/naether-#{version}.jar" ).should be_true
-  end
   
   context "Class" do
     
@@ -20,6 +16,7 @@ describe Naether do
   end
   
   context "Instance" do
+    
     before(:each) do
       @test_dir = 'target/test-rb'
       unless File.exists?( @test_dir )
@@ -89,7 +86,16 @@ describe Naether do
     
     it "should resolve dependencies" do
       @naether.dependencies = "ch.qos.logback:logback-classic:jar:0.9.29" 
-      @naether.resolve_dependencies.should eql ["ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"]
+      @naether.resolve_dependencies().should eql ["ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"]
+    end
+    
+
+    it "should resolve dependencies with properties" do
+      @naether.dependencies  = 'src/test/resources/pom_with_broken_dep.xml' 
+      @naether.resolve_dependencies(false, { 'project.basedir' => File.expand_path( 'src/test/resources' ) } ).should eql( 
+        ["pom:with-system-path:jar:2", "ch.qos.logback:logback-classic:jar:0.9.29", 
+         "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1", 
+          "google:gdata-spreadsheet:jar:3.0"] )
     end
     
     it "should deploy artifact" do
@@ -131,13 +137,6 @@ describe Naether do
                         
       deps = @naether.pom_dependencies( 'pom.xml', ['test'] )
       deps.should eql [ "junit:junit:jar:4.8.2" ]
-    end
-    
-    it "should load a pom to use for future pom calls" do
-      version = IO.read("VERSION")
-      
-      @naether.load_pom( 'pom.xml' )
-      @naether.pom_version.strip.should eql version.strip
     end
     
     it "should write pom file" do

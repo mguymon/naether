@@ -108,7 +108,7 @@ public class SystemPathDependencyTest {
 	@Test
 	public void setPropertiesForSystemPath() throws URLException, DependencyException {
         Map<String,String> properties = new HashMap<String,String>();
-        properties.put("project.basedir", (new File(".")).getAbsolutePath() );
+        properties.put("project.basedir", (new File("src/test/resources")).getAbsolutePath() );
 		
 		Dependency dependency =
                 new Dependency( new DefaultArtifact( "pom:with-broken-dep:1" ), "compile" );

@@ -142,7 +142,7 @@ public class Naether {
 	 * @param scope String
 	 */
 	public void addDependency(String notation, String scope) {
-		log.debug("Add dep {notation} {scope}");
+		log.debug("Add dep {} {}", notation, scope);
 		Dependency dependency = new Dependency(new DefaultArtifact(notation), scope);
 		addDependency(dependency);
 	}
@@ -370,10 +370,12 @@ public class Naether {
 		RepositorySystemSession session = newSession(repoSystem);
 		if ( properties != null ) {
 			Map<String,String> userProperties = session.getUserProperties();
-			if ( userProperties != null ) {
+			if ( userProperties == null ) {
 				userProperties = new HashMap<String,String>();
 			}
 			userProperties.putAll( properties );
+			
+			log.debug( "Session userProperties: {}", userProperties );
 			
 			session = ((MavenRepositorySystemSession)session).setUserProperties( userProperties );
 		}

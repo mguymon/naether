@@ -19,7 +19,7 @@ ttp://maven.apache.org/maven-v4_0_0.xsd ">
 		<version>3.0</version>
 		<type>jar</type>
 		<scope>system</scope>
-		<systemPath>/${project.basedir}/src/test/resources/gdata-spreadsheet-3.0.jar</systemPath> <!-- bad systemPath -->
+		<systemPath>/${project.basedir}/gdata-spreadsheet-3.0.jar</systemPath> <!-- bad systemPath -->
 	  </dependency>
   </dependencies>
 </project>

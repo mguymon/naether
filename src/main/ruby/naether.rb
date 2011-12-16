@@ -185,32 +185,36 @@ class Naether
   end
   
   # Resolve dependencies, finding related additional dependencies
-  def resolve_dependencies( download_artifacts = true )
-    @resolver.resolveDependencies( download_artifacts );
+  def resolve_dependencies( download_artifacts = true, properties = nil )
+    
+    if properties
+       # Convert to HashMap
+       map = Naether::Java.create( "java.util.HashMap" )
+       properties.each do |k,v|
+         map.put( k, v )
+       end
+    end
+    
+    @resolver.resolveDependencies( download_artifacts, map );
     dependenciesNotation
   end
   
   # Deploy artifact to remote repo url
   def deploy_artifact( notation, file_path, url, opts = {} )
-    if Naether.platform == 'java'
-      @instance = com.slackworks.naether.deploy.DeployArtifact.new 
-    else
-      deployArtifactClass = Rjb::import('com.slackworks.naether.deploy.DeployArtifact') 
-      @instance = deployArtifactClass.new
-    end
+    artifact = Naether::Java.create( "com.slackworks.naether.deploy.DeployArtifact" )
     
-    @instance.setRemoteRepo( url )
-    @instance.setNotation( notation )
-    @instance.setFilePath( file_path )
+    artifact.setRemoteRepo( url )
+    artifact.setNotation( notation )
+    artifact.setFilePath( file_path )
     if opts[:pom_path]
-      @instance.setPomPath( opts[:pom_path] )
+      artifact.setPomPath( opts[:pom_path] )
     end
     
     if opts[:username] || opts[:pub_key]
-      @instance.setAuth(opts[:username], opts[:password], opts[:pub_key], opts[:pub_key_passphrase] )
+      artifact.setAuth(opts[:username], opts[:password], opts[:pub_key], opts[:pub_key_passphrase] )
     end
     
-    @resolver.deployArtifact(@instance)
+    @resolver.deployArtifact(artifact)
   end
   
   # Install artifact or pom to local repo, must specify pom_path and/or jar_path
@@ -230,6 +234,7 @@ class Naether
     if Naether.platform == 'java'
       deps = @project_instance.getDependenciesNotation( scopes, true )
     else
+      list = nil
       if scopes
         list = Rjb::import("java.util.ArrayList").new
         scopes.each do |scope|
