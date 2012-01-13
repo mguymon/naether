@@ -36,8 +36,8 @@ import com.slackworks.naether.maven.Project;
  * 
  */
 public class Notation {
-	 
-	private static Pattern notationPattern = Pattern.compile("^(.+?):(.+?):(.+?)(:(.+))?$");
+	
+	public static Pattern NOTATION_PATTERN = Pattern.compile("^(.+?):(.+?):(.+?)(:(.+))?$");
 	
 	/**
 	 * Convert a {@link org.apache.maven.model.Dependency} to String notation of
@@ -118,15 +118,15 @@ public class Notation {
 	 *   <ul>
 	 *   <li>groupId</li>
 	 *   <li>artifactId</li>
-	 *   <li>version</li>
 	 *   <li>type - may be null if not in the notation param</li>
+	 *   <li>version</li>
 	 *   </ul>
 	 *      
 	 * @param notation String
 	 * @return Map<String,String>
 	 */
 	public static Map<String,String> parse( String notation ) {
-		Matcher matcher = notationPattern.matcher(notation);
+		Matcher matcher = NOTATION_PATTERN.matcher(notation);
 		if ( matcher.find() ) {
 			
 			Map<String,String> notationMap = new HashMap<String,String>();
