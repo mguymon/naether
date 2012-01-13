@@ -51,7 +51,7 @@ describe Naether do
     
     it "should get local paths for notations" do
       paths = @naether.to_local_paths( ["junit:junit:jar:4.8.2"] )
-      paths[0].should match /test-repo\/junit\/junit\/4.8.2\/junit-4.8.2.jar/
+      paths.first.should match /test-repo\/junit\/junit\/4.8.2\/junit-4.8.2.jar/
     end
     
     context "setting mixed list of dependencies" do

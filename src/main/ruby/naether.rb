@@ -12,7 +12,7 @@ class Naether
   
   # Naether jar path will default to packaged in the gem
   JAR_LIB = "#{File.dirname(__FILE__)}/.."
-  JAR_PATH = "#{JAR_LIB}/naether-0.5.7.jar" #XXX: hardcoded, should be based on VERSION file
+  JAR_PATH = "#{JAR_LIB}/naether-0.5.9.jar" #XXX: hardcoded, should be based on VERSION file
   
   class << self
     
@@ -200,7 +200,18 @@ class Naether
   end
 
   def to_local_paths( notations ) 
-    Naether::Java.convert_to_ruby_array( @resolver.getLocalPaths( notations ) )
+    if Naether.platform == 'java'
+      Naether::Java.convert_to_ruby_array( @resolver.getLocalPaths( notations ) )
+    else
+      list = Rjb::import("java.util.ArrayList").new
+      notations.each do |notation|
+        list.add( notation )
+      end
+      paths = @resolver._invoke('getLocalPaths', 'Ljava.util.List;', list)
+      
+      Naether::Java.convert_to_ruby_array( paths, true )
+    end
+    
   end
   
   # Deploy artifact to remote repo url
