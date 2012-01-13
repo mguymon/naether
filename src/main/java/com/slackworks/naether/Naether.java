@@ -26,29 +26,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// Apache Maven
 import org.apache.maven.model.Model;
 import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-
-// SL4J
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-// Sonatype Aether Dependency Management
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.collection.DependencyCollectionException;
+import org.sonatype.aether.connector.wagon.WagonProvider;
+import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
+import org.sonatype.aether.deployment.DeployRequest;
+import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.graph.Exclusion;
+import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManagerFactory;
 import org.sonatype.aether.installation.InstallRequest;
 import org.sonatype.aether.installation.InstallationException;
-import org.sonatype.aether.metadata.Metadata;
 import org.sonatype.aether.repository.Authentication;
 import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.LocalRepositoryManager;
+import org.sonatype.aether.repository.NoLocalRepositoryManagerException;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyRequest;
 import org.sonatype.aether.resolution.DependencyResolutionException;
@@ -58,12 +58,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 import org.sonatype.aether.util.graph.selector.AndDependencySelector;
-import org.sonatype.aether.connector.wagon.WagonProvider;
-import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
-import org.sonatype.aether.deployment.DeployRequest;
-import org.sonatype.aether.deployment.DeploymentException;
 
-// Naether
 import com.slackworks.naether.aether.ValidSystemScopeDependencySelector;
 import com.slackworks.naether.deploy.DeployArtifact;
 import com.slackworks.naether.deploy.DeployException;
@@ -513,6 +508,32 @@ public class Naether {
 			return null;
 		}
 	}
+	
+	public List<String> getLocalPaths( List<String> notations ) throws NaetherException {
+		DefaultServiceLocator locator = new DefaultServiceLocator();
+		SimpleLocalRepositoryManagerFactory factory = new SimpleLocalRepositoryManagerFactory();
+		factory.initService( locator );
+		
+		LocalRepository localRepo = new LocalRepository(getLocalRepoPath());
+		LocalRepositoryManager manager = null;
+		try {
+			manager = factory.newInstance( localRepo );
+		} catch (NoLocalRepositoryManagerException e) {
+			throw new NaetherException( "Failed to initial local repository manage", e  );
+		}
+		
+		List<String> localPaths = new ArrayList<String>();
+		
+		for ( String notation : notations ) {
+			Dependency dependency = new Dependency(new DefaultArtifact(notation), "compile");
+			String path = new StringBuilder( localRepo.getBasedir().getAbsolutePath() )
+				.append( File.separator ).append( manager.getPathForLocalArtifact( dependency.getArtifact() ) ).toString();
+			localPaths.add( path );
+		}
+		
+		return localPaths;
+	}
+	
 
 	/**
 	 * Set local repository path. This is the destination for downloaded

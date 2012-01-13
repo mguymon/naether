@@ -19,29 +19,25 @@ package com.slackworks.naether;
  */
 
 // Java SE
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// JUnit
 import org.apache.maven.model.Exclusion;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
-// Sonatype Aether
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
-import com.slackworks.naether.Bootstrap;
-import com.slackworks.naether.Naether;
-import com.slackworks.naether.Notation;
 import com.slackworks.naether.deploy.DeployArtifact;
 import com.slackworks.naether.maven.Project;
 import com.slackworks.naether.maven.ProjectException;
@@ -364,4 +360,8 @@ public class NaetherTest {
         assertTrue( "installed jar should exist", destinationJar.exists() );
 	}
 
+	@Test
+	public void getLocalPaths() throws NaetherException {
+		assertTrue( "Path to junit in test repo", naether.getLocalPaths( Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
+	}
 }

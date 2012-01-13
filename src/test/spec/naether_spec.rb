@@ -49,6 +49,11 @@ describe Naether do
       @naether.dependencies_path.should eql({"junit:junit:jar:4.8.2" => File.expand_path("target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar")})
     end
     
+    it "should get local paths for notations" do
+      paths = @naether.to_local_paths( ["junit:junit:jar:4.8.2"] )
+      paths[0].should match /test-repo\/junit\/junit\/4.8.2\/junit-4.8.2.jar/
+    end
+    
     context "setting mixed list of dependencies" do
       it "should handle a list of dependencies" do
          @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29" ]  

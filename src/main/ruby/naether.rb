@@ -198,6 +198,10 @@ class Naether
     @resolver.resolveDependencies( download_artifacts, map );
     dependenciesNotation
   end
+
+  def to_local_paths( notations ) 
+    Naether::Java.convert_to_ruby_array( @resolver.getLocalPaths( notations ) )
+  end
   
   # Deploy artifact to remote repo url
   def deploy_artifact( notation, file_path, url, opts = {} )
