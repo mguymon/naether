@@ -11,7 +11,6 @@ describe Naether do
     
     it "JAR_PATH constant should match jar" do
       version = IO.read("VERSION").strip
-      puts "|#{version}|"
       Naether::JAR_PATH.should match /naether-#{version}.jar/
     end
   end
