@@ -200,9 +200,10 @@ public class Naether {
 	 * Add dependencies from a Maven POM
 	 * 
 	 * @param project {@link Model}
+	 * @throws ProjectException 
 	 * @see {{@link #addDependencies(Project, List)}
 	 */
-	public void addDependencies( Project project ) {
+	public void addDependencies( Project project ) throws ProjectException {
 		addDependencies( project, (List<String>)null );		
 	}
 	
@@ -212,8 +213,9 @@ public class Naether {
 	 * 
 	 * @param project {@link Project}
 	 * @param scopes List<String> of dependency scopes
+	 * @throws ProjectException 
 	 */
-	public void addDependencies( Project project, List<String> scopes ) {
+	public void addDependencies( Project project, List<String> scopes ) throws ProjectException {
 		for ( org.apache.maven.model.Dependency dependency : project.getDependencies(scopes, true) ) {
 			addDependency( dependency );
 		}
@@ -221,6 +223,22 @@ public class Naether {
 		// Add remote repositories from pom
 		for ( Repository repo : project.getMavenModel().getRepositories() ) {
 			this.addRemoteRepository( repo.getId(), repo.getLayout(), repo.getUrl() );
+		}
+		
+		
+		// Add Dependencies and Repositories from parent
+		if ( project.getMavenModel().getParent() != null ) {
+			
+			Project parent = new Project( project.getBasePath() + File.separator + project.getMavenModel().getParent().getRelativePath() );
+			
+			for ( org.apache.maven.model.Dependency dependency : parent.getDependencies(scopes, true) ) {
+				addDependency( dependency );
+			}
+			
+			// Add remote repositories from pom
+			for ( Repository repo : parent.getMavenModel().getRepositories() ) {
+				this.addRemoteRepository( repo.getId(), repo.getLayout(), repo.getUrl() );
+			}
 		}
 	}
 

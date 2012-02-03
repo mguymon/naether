@@ -188,6 +188,20 @@ public class NaetherTest {
 	}
 	
 	@Test
+	public void resolveAPomShouldIncludeParent() throws ProjectException {
+		naether.addDependencies( "src/test/resources/pomWithParent/parentTest/pom.xml" );
+		List<String> dependencies = Arrays.asList( "org.apache.maven:maven-model-v3:jar:2.0", "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" );
+		assertEquals( dependencies, naether.getDependenciesNotation() );
+	
+		List<String> repos = new ArrayList<String>();
+		for ( RemoteRepository repo : naether.getRemoteRepositories()  ) {
+			repos.add( repo.getId() );
+		}
+		
+		assertEquals( Arrays.asList( "central", "org.jboss.repository" ), repos );
+	}
+	
+	@Test
 	public void resolveDepedenciesAndDownloadArtifacts() throws Exception {
 		Dependency dependency =
             new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
@@ -209,6 +223,7 @@ public class NaetherTest {
         String jarPath = "target/test-repo/org.testng/testng/5.14/testng-5.14.jar";
         assertFalse( (new File( jarPath ).exists()) );
 	}
+	
 	
 	@Test
 	public void resolveNaetherDependencies() throws Exception {
