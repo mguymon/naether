@@ -12,7 +12,18 @@ class Naether
   
   # Naether jar path will default to packaged in the gem
   JAR_LIB = "#{File.dirname(__FILE__)}/.."
-  JAR_PATH = "#{JAR_LIB}/naether-0.5.9.jar" #XXX: hardcoded, should be based on VERSION file
+  
+  # Load VERSION file to VERSION var
+  if File.exists?( File.join( JAR_LIB, "VERSION" ) )
+    VERSION = File.open( File.join( JAR_LIB, "VERSION" ) ) {|f| f.readline }.strip
+      
+  # VERSION file not found in gem dir, assume running from checkout
+  else
+    VERSION = File.open( "VERSION" ) {|f| f.readline }.strip
+  end
+  
+  # Use the VERSION to create jar file name
+  JAR_PATH = "#{JAR_LIB}/naether-#{VERSION}.jar"
   
   class << self
     

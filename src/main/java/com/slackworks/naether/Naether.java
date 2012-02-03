@@ -23,10 +23,13 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Repository;
 import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.slf4j.Logger;
@@ -84,7 +87,7 @@ public class Naether {
 
 	private String localRepoPath;
 	private List<Dependency> dependencies;
-	private List<RemoteRepository> remoteRepositories;
+	private Set<RemoteRepository> remoteRepositories;
 	private PreorderNodeListGenerator preorderedNodeList;
 
 	/**
@@ -96,9 +99,11 @@ public class Naether {
 	 */
 	public Naether() {
 		dependencies = new ArrayList<Dependency>();
-		setRemoteRepositories(new ArrayList<RemoteRepository>());
-		addRemoteRepository("central", "default",
-				"http://repo1.maven.org/maven2/");
+		
+		// Set the initial LinkedHashSet
+		clearRemoteRepositories();
+		
+		addRemoteRepository("central", "default", "http://repo1.maven.org/maven2/");
 
 		Map<String, String> env = System.getenv();
 		String m2Repo = env.get("M2_REPO");
@@ -185,6 +190,7 @@ public class Naether {
 	 * @param pomPath String path to POM
 	 * @param scopes Link<String> of scopes
 	 * @throws ProjectException
+	 * @see {{@link #addDependencies(Project, List)}
 	 */
 	public void addDependencies( String pomPath, List<String> scopes ) throws ProjectException {
 		addDependencies( new Project( pomPath), scopes );
@@ -194,13 +200,15 @@ public class Naether {
 	 * Add dependencies from a Maven POM
 	 * 
 	 * @param project {@link Model}
+	 * @see {{@link #addDependencies(Project, List)}
 	 */
 	public void addDependencies( Project project ) {
 		addDependencies( project, (List<String>)null );		
 	}
 	
 	/**
-	 * Add dependencies from a Maven POM, limited to a {@link List<String>} of scopes.
+	 * Add dependencies from a Maven POM, limited to a {@link List<String>} of scopes. Adds
+	 * all Repositories from the Maven Pom.
 	 * 
 	 * @param project {@link Project}
 	 * @param scopes List<String> of dependency scopes
@@ -209,13 +217,18 @@ public class Naether {
 		for ( org.apache.maven.model.Dependency dependency : project.getDependencies(scopes, true) ) {
 			addDependency( dependency );
 		}
+		
+		// Add remote repositories from pom
+		for ( Repository repo : project.getMavenModel().getRepositories() ) {
+			this.addRemoteRepository( repo.getId(), repo.getLayout(), repo.getUrl() );
+		}
 	}
 
 	/**
 	 * Remove all {@link RemoteRepository}
 	 */
 	public void clearRemoteRepositories() {
-		setRemoteRepositories(new ArrayList<RemoteRepository>());
+		setRemoteRepositories(new LinkedHashSet<RemoteRepository>());
 	}
 
 	/**
@@ -280,7 +293,7 @@ public class Naether {
 	 * 
 	 * @param remoteRepositories {@link List}
 	 */
-	public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
+	public void setRemoteRepositories(Set<RemoteRepository> remoteRepositories) {
 		this.remoteRepositories = remoteRepositories;
 	}
 
@@ -289,7 +302,7 @@ public class Naether {
 	 * 
 	 * @return {@link List}
 	 */
-	public List<RemoteRepository> getRemoteRepositories() {
+	public Set<RemoteRepository> getRemoteRepositories() {
 		return remoteRepositories;
 	}
 

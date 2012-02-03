@@ -27,6 +27,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.graph.Dependency;
+import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.slackworks.naether.deploy.DeployArtifact;
@@ -68,13 +70,16 @@ public class NaetherTest {
 
 	@Test
 	public void addRemoteRepository() throws NaetherException {
-		assertEquals( "central", naether.getRemoteRepositories().get(0).getId() );
+		List<RemoteRepository> repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
+		assertEquals( "central", repos.get(0).getId() );
 		
 		naether.addRemoteRepositoryByUrl( "http://test.net/hamster:7011" );
-		assertEquals( "test.net-hamster-7011", naether.getRemoteRepositories().get(1).getId() );
+		repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
+		assertEquals( "test.net-hamster-7011", repos.get(1).getId() );
 		
 		naether.addRemoteRepository( "test-id", "test-type", "http://test.net" );
-		assertEquals( "test-id", naether.getRemoteRepositories().get(2).getId() );
+		repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
+		assertEquals( "test-id", repos.get(2).getId() );
 	}
 	
 	@Test
