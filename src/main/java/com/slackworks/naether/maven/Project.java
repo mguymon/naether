@@ -200,10 +200,12 @@ public class Project {
 				String artifactId = substituteProperty(dependency.getArtifactId());
 				String groupId    = substituteProperty(dependency.getGroupId());
 				String version    = substituteProperty(dependency.getVersion());
+				String type 	  = substituteProperty(dependency.getType());
 
 				dependency.setArtifactId(artifactId);
 				dependency.setGroupId(groupId);
 				dependency.setVersion(version);
+				dependency.setType(type);
 				dependencies.add(dependency);
 			}
 

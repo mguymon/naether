@@ -19,5 +19,12 @@ ttp://maven.apache.org/maven-v4_0_0.xsd ">
           <version>4.8.2</version>
           <scope>test</scope>
 	  </dependency>
+	  <dependency>
+		    <groupId>com.google.code.greaze</groupId>
+		    <artifactId>greaze-client</artifactId>
+		    <version>0.5.1</version>
+		    <scope>test</scope>
+		    <type>test-jar</type>
+	  </dependency>
   </dependencies>
 </project>

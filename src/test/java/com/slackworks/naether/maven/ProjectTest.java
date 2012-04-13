@@ -62,22 +62,26 @@ public class ProjectTest {
 
 	@Test
 	public void getDependenciesByScope() throws ProjectException {
-		Project mavenProject = new Project("pom.xml");
+		Project mavenProject = new Project("src/test/resources/valid_pom.xml");
 		
 		List<String> scopes = new ArrayList<String>();
 		scopes.add("test");
 		
 		List<Dependency> dependencies = mavenProject.getDependencies( scopes, true );
-		assertTrue( "should only return junit", dependencies.size() == 1 );
-		
+		assertEquals( "Only junit and greaze-client should be in deps", 2, dependencies.size() );
 		assertEquals( "junit", dependencies.get(0).getArtifactId() );
 		assertEquals( "junit", dependencies.get(0).getGroupId() );
 		
+		assertEquals( "greaze-client", dependencies.get(1).getArtifactId() );
+		assertEquals( "com.google.code.greaze", dependencies.get(1).getGroupId() );
+				
 		scopes = new ArrayList<String>();
 		scopes.add("compile");
 		
 		dependencies = mavenProject.getDependencies( scopes, true );
-		assertTrue( "should return many dependencies", dependencies.size() > 1 );
+		assertEquals( "Only logback classic should be in deps", 1, dependencies.size() );
+		assertEquals( "logback-classic", dependencies.get(0).getArtifactId() );
+		assertEquals( "ch.qos.logback", dependencies.get(0).getGroupId() );
 		
 		for ( Dependency dependency : dependencies ) {
 			assertFalse( "junit dep should not be in dependencies", "junit".equals( dependency.getArtifactId() ) );

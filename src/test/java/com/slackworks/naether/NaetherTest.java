@@ -20,7 +20,6 @@ package com.slackworks.naether;
 
 // Java SE
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
+// Slackworks Naether
 import com.slackworks.naether.Bootstrap;
 import com.slackworks.naether.Naether;
 import com.slackworks.naether.Notation;
@@ -94,7 +94,8 @@ public class NaetherTest {
 		
 		List<String> dependencies = new ArrayList<String>(Arrays.asList( 
 	        "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", 
-	        "org.slf4j:slf4j-api:jar:1.6.1", "junit:junit:jar:4.8.2" ));
+	        "org.slf4j:slf4j-api:jar:1.6.1", "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:test-jar:0.5.1", 
+	        "com.google.code.gson:gson:jar:1.7.1", "com.google.code.greaze:greaze-definition:jar:0.5.1" ));
         naether.resolveDependencies(false);
 		
 		assertEquals( dependencies, naether.getDependenciesNotation() );
@@ -110,6 +111,9 @@ public class NaetherTest {
 		naether.resolveDependencies(false);
 		
 		expectedDependencies.add( "junit:junit:jar:4.8.2" );
+		expectedDependencies.add( "com.google.code.greaze:greaze-client:test-jar:0.5.1");
+		expectedDependencies.add( "com.google.code.gson:gson:jar:1.7.1" ); 
+		expectedDependencies.add( "com.google.code.greaze:greaze-definition:jar:0.5.1" );
 		assertEquals( expectedDependencies, naether.getDependenciesNotation() );
 		
 		/* XXX: invalid system scopes are removed from dependencies
@@ -181,6 +185,23 @@ public class NaetherTest {
         String classpath = (new File( "target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar")).getAbsolutePath();
         assertEquals( classpath, naether.getResolvedClassPath() );
         assertTrue( (new File( classpath ).exists()) );
+	}
+	
+
+	@Test
+	public void resolveDependencyWithTestType() throws ProjectException, URLException, DependencyException {
+		DefaultArtifact artifact = new DefaultArtifact( "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1");
+		
+		Dependency dependency =
+	            new Dependency( artifact, "compile" );
+		
+		naether.addDependency(dependency);
+        naether.resolveDependencies();
+        
+        File testClient = new File( "target/test-repo/com/google/code/greaze/greaze-client/0.5.1/greaze-client-0.5.1-test-jar.jar" );
+        
+        assertTrue( "test-jar is in classpath", naether.getResolvedClassPath().contains( testClient.getAbsolutePath()) );
+        assertTrue( testClient.exists() );
 	}
 	
 	@Test
