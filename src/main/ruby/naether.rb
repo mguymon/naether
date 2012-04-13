@@ -12,7 +12,18 @@ class Naether
   
   # Naether jar path will default to packaged in the gem
   JAR_LIB = "#{File.dirname(__FILE__)}/.."
-  JAR_PATH = "#{JAR_LIB}/naether-0.5.2.jar" #XXX: hardcoded, should be based on VERSION file
+  
+  # Load VERSION file to VERSION var
+  if File.exists?( File.join( JAR_LIB, "VERSION" ) )
+    VERSION = File.open( File.join( JAR_LIB, "VERSION" ) ) {|f| f.readline }.strip
+      
+  # VERSION file not found in gem dir, assume running from checkout
+  else
+    VERSION = File.open( "VERSION" ) {|f| f.readline }.strip
+  end
+  
+  # Use the VERSION to create jar file name
+  JAR_PATH = "#{JAR_LIB}/naether-#{VERSION}.jar"
   
   class << self
     
@@ -159,13 +170,18 @@ class Naether
   end
   
   # Get array of dependencies
-  def dependencies()
+  def dependencies
     Naether::Java.convert_to_ruby_array( @resolver.getDependencies() )
   end
   
   # Get array of dependencies as notation
-  def dependenciesNotation()
+  def dependencies_notation
     Naether::Java.convert_to_ruby_array(@resolver.getDependenciesNotation(), true)
+  end
+  alias_method :dependenciesNotation, :dependencies_notation # some javaism snuck in
+  
+  def dependencies_path
+    Naether::Java.convert_to_ruby_hash( @resolver.getDependenciesPath(), true )
   end
   
   def dependencies_classpath()
@@ -180,32 +196,51 @@ class Naether
   end
   
   # Resolve dependencies, finding related additional dependencies
-  def resolve_dependencies( download_artifacts = true )
-    @resolver.resolveDependencies( download_artifacts );
+  def resolve_dependencies( download_artifacts = true, properties = nil )
+    
+    if properties
+       # Convert to HashMap
+       map = Naether::Java.create( "java.util.HashMap" )
+       properties.each do |k,v|
+         map.put( k, v )
+       end
+    end
+    
+    @resolver.resolveDependencies( download_artifacts, map );
     dependenciesNotation
+  end
+
+  def to_local_paths( notations ) 
+    if Naether.platform == 'java'
+      Naether::Java.convert_to_ruby_array( @resolver.getLocalPaths( notations ) )
+    else
+      list = Rjb::import("java.util.ArrayList").new
+      notations.each do |notation|
+        list.add( notation )
+      end
+      paths = @resolver._invoke('getLocalPaths', 'Ljava.util.List;', list)
+      
+      Naether::Java.convert_to_ruby_array( paths, true )
+    end
+    
   end
   
   # Deploy artifact to remote repo url
   def deploy_artifact( notation, file_path, url, opts = {} )
-    if Naether.platform == 'java'
-      @instance = com.slackworks.naether.deploy.DeployArtifact.new 
-    else
-      deployArtifactClass = Rjb::import('com.slackworks.naether.deploy.DeployArtifact') 
-      @instance = deployArtifactClass.new
-    end
+    artifact = Naether::Java.create( "com.slackworks.naether.deploy.DeployArtifact" )
     
-    @instance.setRemoteRepo( url )
-    @instance.setNotation( notation )
-    @instance.setFilePath( file_path )
+    artifact.setRemoteRepo( url )
+    artifact.setNotation( notation )
+    artifact.setFilePath( file_path )
     if opts[:pom_path]
-      @instance.setPomPath( opts[:pom_path] )
+      artifact.setPomPath( opts[:pom_path] )
     end
     
     if opts[:username] || opts[:pub_key]
-      @instance.setAuth(opts[:username], opts[:password], opts[:pub_key], opts[:pub_key_passphrase] )
+      artifact.setAuth(opts[:username], opts[:password], opts[:pub_key], opts[:pub_key_passphrase] )
     end
     
-    @resolver.deployArtifact(@instance)
+    @resolver.deployArtifact(artifact)
   end
   
   # Install artifact or pom to local repo, must specify pom_path and/or jar_path
@@ -225,6 +260,7 @@ class Naether
     if Naether.platform == 'java'
       deps = @project_instance.getDependenciesNotation( scopes, true )
     else
+      list = nil
       if scopes
         list = Rjb::import("java.util.ArrayList").new
         scopes.each do |scope|

@@ -19,21 +19,25 @@ package com.slackworks.naether;
  */
 
 // Java SE
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-// JUnit
 import org.apache.maven.model.Exclusion;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
-// Sonatype Aether
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.graph.Dependency;
+import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 // Slackworks Naether
@@ -70,13 +74,16 @@ public class NaetherTest {
 
 	@Test
 	public void addRemoteRepository() throws NaetherException {
-		assertEquals( "central", naether.getRemoteRepositories().get(0).getId() );
+		List<RemoteRepository> repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
+		assertEquals( "central", repos.get(0).getId() );
 		
 		naether.addRemoteRepositoryByUrl( "http://test.net/hamster:7011" );
-		assertEquals( "test.net-hamster-7011", naether.getRemoteRepositories().get(1).getId() );
+		repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
+		assertEquals( "test.net-hamster-7011", repos.get(1).getId() );
 		
 		naether.addRemoteRepository( "test-id", "test-type", "http://test.net" );
-		assertEquals( "test-id", naether.getRemoteRepositories().get(2).getId() );
+		repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
+		assertEquals( "test-id", repos.get(2).getId() );
 	}
 	
 	@Test
@@ -86,6 +93,18 @@ public class NaetherTest {
         naether.addDependency(dependency);
         naether.resolveDependencies( false );
         assertEquals( "junit:junit:jar:4.8.2", naether.getDependenciesNotation().get(0) );
+	}
+	
+	@Test
+	public void getDependenciesPath() throws URLException, DependencyException {
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
+        naether.addDependency(dependency);
+        naether.resolveDependencies( true );
+        
+        Map<String, String> match =  naether.getDependenciesPath();
+        assertTrue( "Has notation key", match.containsKey("junit:junit:jar:4.8.2") );
+        assertTrue( "Has path", match.get("junit:junit:jar:4.8.2").contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
 	}
 	
 	@Test
@@ -177,6 +196,20 @@ public class NaetherTest {
 	}
 	
 	@Test
+	public void resolveAPomShouldIncludeParent() throws ProjectException {
+		naether.addDependencies( "src/test/resources/pomWithParent/parentTest/pom.xml" );
+		List<String> dependencies = Arrays.asList( "org.apache.maven:maven-model-v3:jar:2.0", "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" );
+		assertEquals( dependencies, naether.getDependenciesNotation() );
+	
+		List<String> repos = new ArrayList<String>();
+		for ( RemoteRepository repo : naether.getRemoteRepositories()  ) {
+			repos.add( repo.getId() );
+		}
+		
+		assertEquals( Arrays.asList( "central", "org.jboss.repository" ), repos );
+	}
+	
+	@Test
 	public void resolveDepedenciesAndDownloadArtifacts() throws Exception {
 		Dependency dependency =
             new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
@@ -215,6 +248,7 @@ public class NaetherTest {
         String jarPath = "target/test-repo/org.testng/testng/5.14/testng-5.14.jar";
         assertFalse( (new File( jarPath ).exists()) );
 	}
+	
 	
 	@Test
 	public void resolveNaetherDependencies() throws Exception {
@@ -371,4 +405,8 @@ public class NaetherTest {
         assertTrue( "installed jar should exist", destinationJar.exists() );
 	}
 
+	@Test
+	public void getLocalPaths() throws NaetherException {
+		assertTrue( "Path to junit in test repo", naether.getLocalPaths( Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
+	}
 }

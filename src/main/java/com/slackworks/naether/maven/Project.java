@@ -61,20 +61,23 @@ public class Project {
 	private static Logger log = LoggerFactory.getLogger(Project.class);
 
 	private Model mavenModel;
-	private static final Pattern propertyPattern = Pattern.compile("^\\$\\{(.+)\\}$");
-
+	private static final Pattern propertyPattern = Pattern.compile("\\$\\{(.+)\\}");
+	private String basePath;
+	
 	/**
-	 * New Instance
+	 * New Instance. The {@link #setBasePath(File)} defaults to current directory.
 	 */
 	public Project() {
 		Model model = new Model();
 		model.setModelVersion("4.0.0");
 		model.setPackaging("jar");
 		setMavenModel(model);
+		setBasePath( new File("." ) );
 	}
 
 	/**
-	 * New Instance loading Maven pom
+	 * New Instance loading Maven pom. The {@link #setBasePath(File)} defaults
+	 * to the pom's parent directory.
 	 * 
 	 * @param pomPath String path
 	 * @throws ProjectException 
@@ -84,6 +87,13 @@ public class Project {
 	 */
 	public Project(String pomPath) throws ProjectException {
 		setMavenModel( loadPOM(pomPath) );
+		
+		File parent = (new File(pomPath)).getParentFile();
+		if ( parent != null ) {
+			setBasePath( (new File(pomPath)).getParentFile() );
+		} else {
+			setBasePath( new File("." ) );
+		}
 	}
 
 	/**
@@ -194,6 +204,9 @@ public class Project {
 
 		// Substitute Properties
 		if (substituteProperties) {
+			
+			log.debug( "Project properties: {} ", this.mavenModel.getProperties() );
+			
 			// XXX: There has to be a way maven handles this automatically
 			for (Dependency dependency : getMavenModel().getDependencies()) {
 
@@ -201,7 +214,9 @@ public class Project {
 				String groupId    = substituteProperty(dependency.getGroupId());
 				String version    = substituteProperty(dependency.getVersion());
 				String type 	  = substituteProperty(dependency.getType());
+				String systemPath = substituteProperty(dependency.getSystemPath());
 
+				dependency.setSystemPath(systemPath);
 				dependency.setArtifactId(artifactId);
 				dependency.setGroupId(groupId);
 				dependency.setVersion(version);
@@ -323,6 +338,10 @@ public class Project {
 	public Model getMavenModel() {
 		return mavenModel;
 	}
+	
+	public void addProperty(String property, String value) {
+		this.mavenModel.getProperties().put( property, value );
+	}
 
 	/**
 	 * Substitute a Maven Property expression, i.e. ${aetherVersion}, to its
@@ -333,18 +352,24 @@ public class Project {
 	 * @return
 	 */
 	private String substituteProperty(String field) {
-		String property = null;
-		Matcher matcher = propertyPattern.matcher(field);
-		while (matcher.find()) {
-			property = matcher.group(1);
+		if ( field != null ) {
+			log.debug( "subsituting {}", field );
+			
+			String property = null;
+			Matcher matcher = propertyPattern.matcher(field);
+			while (matcher.find()) {
+				property = matcher.group(1);
+			}
+		
+			if (property != null) {
+				log.debug("Set property {} to {}", property, this.getMavenModel().getProperties().getProperty(property));
+				return this.getMavenModel().getProperties().getProperty(property);
+			} else {
+				return field;
+			}
 		}
-
-		if (property != null) {
-			log.debug("Set property {} to {}", property, this.getMavenModel().getProperties().getProperty(property));
-			return this.getMavenModel().getProperties().getProperty(property);
-		} else {
-			return field;
-		}
+		
+		return null;
 	}
 
 	public void writePom(String filePath) throws ProjectException {
@@ -362,5 +387,19 @@ public class Project {
 		} catch (IOException e) {
 			throw new ProjectException("Failed to write pom", e);
 		}
+	}
+
+	public String getBasePath() {
+		return basePath;
+	}
+
+	/**
+	 * Set the BasePath for the POM. Path is converted to absolute path.
+	 * 
+	 * @param basePath File
+	 */
+	public void setBasePath(File basePath) {
+		this.basePath = basePath.getAbsolutePath();
+		this.addProperty( "project.basedir", this.basePath);
 	}
 }

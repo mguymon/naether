@@ -22,32 +22,36 @@ package com.slackworks.naether;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-// Apache Maven
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Repository;
 import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-
-// SL4J
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-// Sonatype Aether Dependency Management
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.collection.DependencyCollectionException;
+import org.sonatype.aether.connector.wagon.WagonProvider;
+import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
+import org.sonatype.aether.deployment.DeployRequest;
+import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.graph.Exclusion;
+import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManagerFactory;
 import org.sonatype.aether.installation.InstallRequest;
 import org.sonatype.aether.installation.InstallationException;
-import org.sonatype.aether.metadata.Metadata;
 import org.sonatype.aether.repository.Authentication;
 import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.LocalRepositoryManager;
+import org.sonatype.aether.repository.NoLocalRepositoryManagerException;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.DependencyRequest;
 import org.sonatype.aether.resolution.DependencyResolutionException;
@@ -57,12 +61,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 import org.sonatype.aether.util.graph.selector.AndDependencySelector;
-import org.sonatype.aether.connector.wagon.WagonProvider;
-import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
-import org.sonatype.aether.deployment.DeployRequest;
-import org.sonatype.aether.deployment.DeploymentException;
 
-// Naether
 import com.slackworks.naether.aether.ValidSystemScopeDependencySelector;
 import com.slackworks.naether.deploy.DeployArtifact;
 import com.slackworks.naether.deploy.DeployException;
@@ -88,7 +87,7 @@ public class Naether {
 
 	private String localRepoPath;
 	private List<Dependency> dependencies;
-	private List<RemoteRepository> remoteRepositories;
+	private Set<RemoteRepository> remoteRepositories;
 	private PreorderNodeListGenerator preorderedNodeList;
 
 	/**
@@ -100,9 +99,11 @@ public class Naether {
 	 */
 	public Naether() {
 		dependencies = new ArrayList<Dependency>();
-		setRemoteRepositories(new ArrayList<RemoteRepository>());
-		addRemoteRepository("central", "default",
-				"http://repo1.maven.org/maven2/");
+		
+		// Set the initial LinkedHashSet
+		clearRemoteRepositories();
+		
+		addRemoteRepository("central", "default", "http://repo1.maven.org/maven2/");
 
 		Map<String, String> env = System.getenv();
 		String m2Repo = env.get("M2_REPO");
@@ -141,7 +142,7 @@ public class Naether {
 	 * @param scope String
 	 */
 	public void addDependency(String notation, String scope) {
-		log.debug("Add dep {notation} {scope}");
+		log.debug("Add dep {} {}", notation, scope);
 		Dependency dependency = new Dependency(new DefaultArtifact(notation), scope);
 		addDependency(dependency);
 	}
@@ -189,6 +190,7 @@ public class Naether {
 	 * @param pomPath String path to POM
 	 * @param scopes Link<String> of scopes
 	 * @throws ProjectException
+	 * @see {{@link #addDependencies(Project, List)}
 	 */
 	public void addDependencies( String pomPath, List<String> scopes ) throws ProjectException {
 		addDependencies( new Project( pomPath), scopes );
@@ -198,20 +200,45 @@ public class Naether {
 	 * Add dependencies from a Maven POM
 	 * 
 	 * @param project {@link Model}
+	 * @throws ProjectException 
+	 * @see {{@link #addDependencies(Project, List)}
 	 */
-	public void addDependencies( Project project ) {
+	public void addDependencies( Project project ) throws ProjectException {
 		addDependencies( project, (List<String>)null );		
 	}
 	
 	/**
-	 * Add dependencies from a Maven POM, limited to a {@link List<String>} of scopes.
+	 * Add dependencies from a Maven POM, limited to a {@link List<String>} of scopes. Adds
+	 * all Repositories from the Maven Pom.
 	 * 
 	 * @param project {@link Project}
 	 * @param scopes List<String> of dependency scopes
+	 * @throws ProjectException 
 	 */
-	public void addDependencies( Project project, List<String> scopes ) {
+	public void addDependencies( Project project, List<String> scopes ) throws ProjectException {
 		for ( org.apache.maven.model.Dependency dependency : project.getDependencies(scopes, true) ) {
 			addDependency( dependency );
+		}
+		
+		// Add remote repositories from pom
+		for ( Repository repo : project.getMavenModel().getRepositories() ) {
+			this.addRemoteRepository( repo.getId(), repo.getLayout(), repo.getUrl() );
+		}
+		
+		
+		// Add Dependencies and Repositories from parent
+		if ( project.getMavenModel().getParent() != null ) {
+			
+			Project parent = new Project( project.getBasePath() + File.separator + project.getMavenModel().getParent().getRelativePath() );
+			
+			for ( org.apache.maven.model.Dependency dependency : parent.getDependencies(scopes, true) ) {
+				addDependency( dependency );
+			}
+			
+			// Add remote repositories from pom
+			for ( Repository repo : parent.getMavenModel().getRepositories() ) {
+				this.addRemoteRepository( repo.getId(), repo.getLayout(), repo.getUrl() );
+			}
 		}
 	}
 
@@ -219,7 +246,7 @@ public class Naether {
 	 * Remove all {@link RemoteRepository}
 	 */
 	public void clearRemoteRepositories() {
-		setRemoteRepositories(new ArrayList<RemoteRepository>());
+		setRemoteRepositories(new LinkedHashSet<RemoteRepository>());
 	}
 
 	/**
@@ -284,7 +311,7 @@ public class Naether {
 	 * 
 	 * @param remoteRepositories {@link List}
 	 */
-	public void setRemoteRepositories(List<RemoteRepository> remoteRepositories) {
+	public void setRemoteRepositories(Set<RemoteRepository> remoteRepositories) {
 		this.remoteRepositories = remoteRepositories;
 	}
 
@@ -293,7 +320,7 @@ public class Naether {
 	 * 
 	 * @return {@link List}
 	 */
-	public List<RemoteRepository> getRemoteRepositories() {
+	public Set<RemoteRepository> getRemoteRepositories() {
 		return remoteRepositories;
 	}
 
@@ -306,7 +333,7 @@ public class Naether {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		locator.setServices(WagonProvider.class, new ManualWagonProvider());
 		locator.addService(RepositoryConnectorFactory.class, WagonRepositoryConnectorFactory.class);
-
+		
 		return locator.getService(RepositorySystem.class);
 	}
 
@@ -316,7 +343,7 @@ public class Naether {
 	 * @param system {@link RepositorySystem}
 	 * @return {@link RepositorySystemSession}
 	 */
-	public RepositorySystemSession newSession(RepositorySystem system) {
+	public MavenRepositorySystemSession newSession(RepositorySystem system) {
 		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
 		session = (MavenRepositorySystemSession)session.setDependencySelector( new AndDependencySelector( session.getDependencySelector(), new ValidSystemScopeDependencySelector() ) );
 		session = (MavenRepositorySystemSession)session.setTransferListener(new LogTransferListener());
@@ -326,7 +353,7 @@ public class Naether {
 		
 		LocalRepository localRepo = new LocalRepository(getLocalRepoPath());
 		session.setLocalRepositoryManager(system.newLocalRepositoryManager(localRepo));
-
+		
 		return session;
 	}
 
@@ -339,7 +366,7 @@ public class Naether {
 	 * @throws Exception
 	 */
 	public void resolveDependencies() throws URLException, DependencyException {
-		resolveDependencies(true);
+		resolveDependencies(true, null);
 	}
 
 	/**
@@ -350,6 +377,10 @@ public class Naether {
 	 * @throws DependencyException
 	 */
 	public void resolveDependencies(boolean downloadArtifacts) throws URLException, DependencyException {
+		resolveDependencies( downloadArtifacts, null );
+	}
+	
+	public void resolveDependencies(boolean downloadArtifacts, Map<String,String> properties) throws URLException, DependencyException {
 		log.info( "Resolving Dependencies" );
 		log.info("Local Repo Path: {}", localRepoPath);
 
@@ -361,8 +392,19 @@ public class Naether {
 		}
 
 		RepositorySystem repoSystem = newRepositorySystem();
-
+		
 		RepositorySystemSession session = newSession(repoSystem);
+		if ( properties != null ) {
+			Map<String,String> userProperties = session.getUserProperties();
+			if ( userProperties == null ) {
+				userProperties = new HashMap<String,String>();
+			}
+			userProperties.putAll( properties );
+			
+			log.debug( "Session userProperties: {}", userProperties );
+			
+			session = ((MavenRepositorySystemSession)session).setUserProperties( userProperties );
+		}
 		
 		CollectRequest collectRequest = new CollectRequest();
 		collectRequest.setDependencies(getDependencies());
@@ -497,6 +539,32 @@ public class Naether {
 			return null;
 		}
 	}
+	
+	public List<String> getLocalPaths( List<String> notations ) throws NaetherException {
+		DefaultServiceLocator locator = new DefaultServiceLocator();
+		SimpleLocalRepositoryManagerFactory factory = new SimpleLocalRepositoryManagerFactory();
+		factory.initService( locator );
+		
+		LocalRepository localRepo = new LocalRepository(getLocalRepoPath());
+		LocalRepositoryManager manager = null;
+		try {
+			manager = factory.newInstance( localRepo );
+		} catch (NoLocalRepositoryManagerException e) {
+			throw new NaetherException( "Failed to initial local repository manage", e  );
+		}
+		
+		List<String> localPaths = new ArrayList<String>();
+		
+		for ( String notation : notations ) {
+			Dependency dependency = new Dependency(new DefaultArtifact(notation), "compile");
+			String path = new StringBuilder( localRepo.getBasedir().getAbsolutePath() )
+				.append( File.separator ).append( manager.getPathForLocalArtifact( dependency.getArtifact() ) ).toString();
+			localPaths.add( path );
+		}
+		
+		return localPaths;
+	}
+	
 
 	/**
 	 * Set local repository path. This is the destination for downloaded
@@ -539,9 +607,9 @@ public class Naether {
 	}
 
 	/**
-	 * {@link List} of {@link Dependency} converted to String notation
+	 * {@link List<String>} of {@link Dependency} converted to String notation
 	 * 
-	 * @return {@link List}
+	 * @return {@link List<String>}
 	 */
 	public List<String> getDependenciesNotation() {
 		List<String> notations = new ArrayList<String>();
@@ -550,6 +618,22 @@ public class Naether {
 		}
 
 		return notations;
+	}
+	
+	/**
+	 * {@link Map} of String notation and the corresponding String file path 
+	 * 
+	 * @return {@link Map<String,String>}
+	 */
+	public Map<String,String> getDependenciesPath() {
+		Map<String,String> dependencies = new HashMap<String,String>();
+		for (Dependency dependency : getDependencies()) {
+			if ( dependency.getArtifact().getFile() != null ) {
+				dependencies.put( Notation.generate( dependency ), dependency.getArtifact().getFile().getAbsolutePath() );
+			}
+		}
+		
+		return dependencies;
 	}
 
 }

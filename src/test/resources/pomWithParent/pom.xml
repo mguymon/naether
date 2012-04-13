@@ -3,10 +3,17 @@
 2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 h
 ttp://maven.apache.org/maven-v4_0_0.xsd ">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>pom</groupId>
-  <artifactId>with-system-path</artifactId>
-  <version>2</version>
+  <groupId>naether</groupId>
+  <artifactId>parent</artifactId>
+  <version>3</version>
   <packaging>jar</packaging>
+  <repositories>
+	  <repository>
+	    <id>org.jboss.repository</id>
+	    <name>JBoss Repository</name>
+	    <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
+	  </repository>
+	</repositories>
   <dependencies>
       <dependency>
 	      <groupId>ch.qos.logback</groupId>
@@ -14,12 +21,10 @@ ttp://maven.apache.org/maven-v4_0_0.xsd ">
 	      <version>0.9.29</version>
 	  </dependency>
 	  <dependency>
-		<groupId>google</groupId>
-		<artifactId>gdata-spreadsheet</artifactId>
-		<version>3.0</version>
-		<type>jar</type>
-		<scope>system</scope>
-		<systemPath>/${project.basedir}/gdata-spreadsheet-3.0.jar</systemPath> <!-- bad systemPath -->
+	      <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.8.2</version>
+          <scope>test</scope>
 	  </dependency>
   </dependencies>
 </project>

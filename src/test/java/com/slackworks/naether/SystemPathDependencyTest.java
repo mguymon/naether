@@ -23,7 +23,9 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -96,7 +98,29 @@ public class SystemPathDependencyTest {
             
         List<String> dependencies = naether.getDependenciesNotation();        
         List<String> expectedDependencies = new ArrayList<String>( Arrays.asList(
-        	"pom:with-broken-dep:jar:1", "pom:with-system-path:jar:2", "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"));       
+        	"pom:with-broken-dep:jar:1", "pom:with-system-path:jar:2", 
+        	"ch.qos.logback:logback-classic:jar:0.9.29", 
+        	"ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"));       
+        assertEquals( expectedDependencies, dependencies );
+        
+	}
+	
+	@Test
+	public void setPropertiesForSystemPath() throws URLException, DependencyException {
+        Map<String,String> properties = new HashMap<String,String>();
+        properties.put("project.basedir", (new File("src/test/resources")).getAbsolutePath() );
+		
+		Dependency dependency =
+                new Dependency( new DefaultArtifact( "pom:with-broken-dep:1" ), "compile" );
+        naether.addDependency(dependency);
+        naether.resolveDependencies( false, properties );
+            
+        List<String> dependencies = naether.getDependenciesNotation();        
+        List<String> expectedDependencies = new ArrayList<String>( Arrays.asList(
+        	"pom:with-broken-dep:jar:1", "pom:with-system-path:jar:2", 
+        	"ch.qos.logback:logback-classic:jar:0.9.29", 
+        	"ch.qos.logback:logback-core:jar:0.9.29", 
+        	"org.slf4j:slf4j-api:jar:1.6.1", "google:gdata-spreadsheet:jar:3.0"));       
         assertEquals( expectedDependencies, dependencies );
         
 	}

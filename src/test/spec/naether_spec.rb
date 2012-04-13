@@ -1,11 +1,7 @@
 require 'src/main/ruby/naether'
+require 'src/main/ruby/naether/java'
 
 describe Naether do
-  
-  it "jar of correct version should be built" do
-    version = IO.read("VERSION")
-    File.exists?( "target/naether-#{version}.jar" ).should be_true
-  end
   
   context "Class" do
     
@@ -14,12 +10,13 @@ describe Naether do
     end
     
     it "JAR_PATH constant should match jar" do
-      version = IO.read("VERSION")
+      version = IO.read("VERSION").strip
       Naether::JAR_PATH.should match /naether-#{version}.jar/
     end
   end
   
   context "Instance" do
+    
     before(:each) do
       @test_dir = 'target/test-rb'
       unless File.exists?( @test_dir )
@@ -43,18 +40,29 @@ describe Naether do
     
     it "should add a dependency from notation" do
       @naether.dependencies = "junit:junit:jar:4.8.2" 
-      @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2"]
+      @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2"]
+    end
+    
+    it "should get paths for dependencies" do
+      @naether.dependencies = "junit:junit:jar:4.8.2" 
+      @naether.resolve_dependencies
+      @naether.dependencies_path.should eql({"junit:junit:jar:4.8.2" => File.expand_path("target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar")})
+    end
+    
+    it "should get local paths for notations" do
+      paths = @naether.to_local_paths( ["junit:junit:jar:4.8.2"] )
+      paths.first.should match /test-repo\/junit\/junit\/4.8.2\/junit-4.8.2.jar/
     end
     
     context "setting mixed list of dependencies" do
       it "should handle a list of dependencies" do
          @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29" ]  
-         @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+         @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
       end
       
       it "should handle poms in a list of dependencies" do
          @naether.dependencies = [  "pom.xml", "does.not:exist:jar:0.1" ]  
-         @naether.dependenciesNotation.should eql [
+         @naether.dependencies_notation.should eql [
             "ch.qos.logback:logback-classic:jar:0.9.29",
             "org.slf4j:slf4j-api:jar:1.6.2",
             "org.slf4j:jcl-over-slf4j:jar:1.6.2",
@@ -77,13 +85,22 @@ describe Naether do
       
       it "should handle scopes" do
         @naether.dependencies = [ {"pom.xml" => ["test"]}, {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
-        @naether.dependenciesNotation.should eql ["junit:junit:jar:4.8.2", "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+        @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2", "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
       end
     end
     
     it "should resolve dependencies" do
       @naether.dependencies = "ch.qos.logback:logback-classic:jar:0.9.29" 
-      @naether.resolve_dependencies.should eql ["ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"]
+      @naether.resolve_dependencies().should eql ["ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"]
+    end
+    
+
+    it "should resolve dependencies with properties" do
+      @naether.dependencies  = 'src/test/resources/pom_with_broken_dep.xml' 
+      @naether.resolve_dependencies(false, { 'project.basedir' => File.expand_path( 'src/test/resources' ) } ).should eql( 
+        ["pom:with-system-path:jar:2", "ch.qos.logback:logback-classic:jar:0.9.29", 
+         "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1", 
+          "google:gdata-spreadsheet:jar:3.0"] )
     end
     
     it "should deploy artifact" do
@@ -99,7 +116,7 @@ describe Naether do
     
     it "should get version from pom file" do
       version = IO.read("VERSION")
-      @naether.pom_version( 'pom.xml' ).should eql version
+      @naether.pom_version( 'pom.xml' ).strip.should eql version.strip
     end
     
     it "should get dependencies from pom file" do
@@ -125,13 +142,6 @@ describe Naether do
                         
       deps = @naether.pom_dependencies( 'pom.xml', ['test'] )
       deps.should eql [ "junit:junit:jar:4.8.2" ]
-    end
-    
-    it "should load a pom to use for future pom calls" do
-      version = IO.read("VERSION")
-      
-      @naether.load_pom( 'pom.xml' )
-      @naether.pom_version.should eql version
     end
     
     it "should write pom file" do
