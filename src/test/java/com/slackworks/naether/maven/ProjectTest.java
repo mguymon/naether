@@ -51,13 +51,13 @@ public class ProjectTest {
 	public void createInstanceWithPomPath() throws IOException {
 		Project mavenProject = null;
 		try {
-			mavenProject = new Project("pom.xml");
+			mavenProject = new Project("src/test/resources/valid_pom.xml");
 		} catch (ProjectException e) {
 			fail("failed to read pom: " + e.toString());
 		}
 		
 		assertNotNull(mavenProject.getMavenModel());
-		assertEquals( FileUtils.readFileToString( new File("VERSION") ).trim(), mavenProject.getVersion());
+		assertEquals( "3", mavenProject.getVersion());
 	}
 
 	@Test

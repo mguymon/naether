@@ -4,7 +4,7 @@
 
     <groupId>com.slackworks</groupId>
     <artifactId>naether</artifactId>
-    <version>0.5.11</version>
+    <version>0.5.12</version>
     <packaging>jar</packaging>
     <name>naether</name>
     <url>https://github.com/mguymon/naether</url>
