@@ -12,7 +12,7 @@ gem install naether
 
 === About
 
-The Java {Naether.java}[https://github.com/mguymon/naether/blob/master/src/main/java/com/slackworks/naether/Naether.java] 
+{Naether.java}[https://github.com/mguymon/naether/blob/master/src/main/java/com/slackworks/naether/Naether.java] 
 is a wrapper for {Aether}[https://github.com/sonatype/sonatype-aether], the Maven dependency resolution framework. 
 The Ruby {naether.rb}[https://github.com/mguymon/naether/blob/master/src/main/ruby/naether.rb] provides access to Java 
 from Ruby. JRuby is natively supported, other Ruby VMs will use {Rjb}[http://rjb.rubyforge.org] to proxy over JNI.
