@@ -161,7 +161,18 @@ public class Naether {
 	 */
 	public void addDependency(org.apache.maven.model.Dependency projectDependency) {
 		log.debug( "Adding dependency: {}", projectDependency );
-		Dependency dependency = new Dependency(new DefaultArtifact(Notation.generate( projectDependency ) ), projectDependency.getScope());
+		
+		String classifier = null;
+		if ( "test-jar".equals( projectDependency.getType() ) ) {
+			classifier = "test-jar";
+		}
+		
+		DefaultArtifact artifact = new DefaultArtifact( projectDependency.getGroupId(), projectDependency.getArtifactId(),
+				classifier, "jar", projectDependency.getVersion() );
+		
+		log.debug( "!!! {}", artifact );
+		
+		Dependency dependency = new Dependency( artifact , projectDependency.getScope());
 		dependency.setOptional( projectDependency.isOptional() );
 		
 		List<Exclusion> exclusions = new ArrayList<Exclusion>();

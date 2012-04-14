@@ -214,6 +214,7 @@ public class Project {
 				String groupId    = substituteProperty(dependency.getGroupId());
 				String version    = substituteProperty(dependency.getVersion());
 				String type 	  = substituteProperty(dependency.getType());
+				String classifier = substituteProperty(dependency.getClassifier());
 				String systemPath = substituteProperty(dependency.getSystemPath());
 
 				dependency.setSystemPath(systemPath);
@@ -221,6 +222,7 @@ public class Project {
 				dependency.setGroupId(groupId);
 				dependency.setVersion(version);
 				dependency.setType(type);
+				dependency.setClassifier( classifier );
 				dependencies.add(dependency);
 			}
 

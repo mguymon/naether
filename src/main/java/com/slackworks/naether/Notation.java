@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.aether.artifact.Artifact;
 
 import com.slackworks.naether.maven.Project;
@@ -37,11 +39,14 @@ import com.slackworks.naether.maven.Project;
  */
 public class Notation {
 	
+	private static Logger log = LoggerFactory.getLogger(Notation.class);
+	
+	
 	public static Pattern NOTATION_PATTERN = Pattern.compile("^(.+?):(.+?):(.+?)(:(.+))?$");
 	
 	/**
 	 * Convert a {@link org.apache.maven.model.Dependency} to String notation of
-	 * groupId:artifactId:type:version
+	 * groupId:artifactId:type:version or groupId:artifactId:type:classifier:version
 	 * 
 	 * @param dependency
 	 * @return String notation
@@ -49,10 +54,21 @@ public class Notation {
 	public static String generate(org.apache.maven.model.Dependency dependency) {
 		StringBuilder notation = new StringBuilder()
 				.append(dependency.getGroupId()).append(":")
-				.append(dependency.getArtifactId()).append(":")
-				.append(dependency.getType()).append(":")
-				.append(dependency.getVersion());
-
+				.append(dependency.getArtifactId()).append(":");
+		
+		String classifier = dependency.getClassifier();
+		if ( classifier != null ) {
+			notation.append( classifier ).append(":");
+		}
+		
+		String type = dependency.getType();
+		if ( "test-jar".equals( type ) && classifier == null ) {
+			notation.append("jar:test-jar:");
+		} else {
+			notation.append(dependency.getType()).append(":");
+		}
+		notation.append(dependency.getVersion());
+		
 		return notation.toString();
 	}
 
@@ -76,20 +92,13 @@ public class Notation {
 	
 	/**
 	 * Convert a {@link org.sonatype.aether.graph.Dependency} to String notation of
-	 * groupId:artifactId:type:version
+	 * groupId:artifactId:extension:version or groupId:artifactId::type:classifier:version
 	 * 
 	 * @param dependency
 	 * @return String notation
 	 */
 	public static String generate(org.sonatype.aether.graph.Dependency dependency) {
-		Artifact artifact = dependency.getArtifact();
-		StringBuilder notation = new StringBuilder()
-				.append(artifact.getGroupId()).append(":")
-				.append(artifact.getArtifactId()).append(":")
-				.append(artifact.getExtension()).append(":")
-				.append(artifact.getVersion());
-
-		return notation.toString();
+		return dependency.getArtifact().toString();		
 	}
 	
 	/**

@@ -84,8 +84,9 @@ describe Naether do
       end
       
       it "should handle scopes" do
-        @naether.dependencies = [ {"pom.xml" => ["test"]}, {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
-        @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2", "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+        @naether.dependencies = [ {"src/test/resources/valid_pom.xml" => ["test"]}, {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
+        @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+        @naether.resolve_dependencies().should eql ["junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", "com.google.code.gson:gson:jar:1.7.1", "com.google.code.greaze:greaze-definition:jar:0.5.1", "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"]
       end
     end
     
@@ -120,28 +121,11 @@ describe Naether do
     end
     
     it "should get dependencies from pom file" do
-      deps = @naether.pom_dependencies( 'pom.xml' )
-      deps.should eql [ "ch.qos.logback:logback-classic:jar:0.9.29",
-                        "org.slf4j:slf4j-api:jar:1.6.2",
-                        "org.slf4j:jcl-over-slf4j:jar:1.6.2",
-                        "org.slf4j:log4j-over-slf4j:jar:1.6.2",
-                        "org.codehaus.plexus:plexus-utils:jar:3.0",
-                        "org.apache.maven:maven-model-v3:jar:2.0",
-                        "org.codehaus.plexus:plexus-container-default:jar:1.5.5",
-                        "org.sonatype.aether:aether-api:jar:1.13",
-                        "org.sonatype.aether:aether-util:jar:1.13",
-                        "org.sonatype.aether:aether-impl:jar:1.13",
-                        "org.sonatype.aether:aether-connector-file:jar:1.13",
-                        "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13",
-                        "org.sonatype.aether:aether-connector-wagon:jar:1.13",
-                        "org.apache.maven:maven-aether-provider:jar:3.0.3",
-                        "org.apache.maven.wagon:wagon-ssh:jar:1.0",
-                        "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0",
-                        "org.apache.maven.wagon:wagon-file:jar:1.0",
-                        "junit:junit:jar:4.8.2" ]
+      deps = @naether.pom_dependencies( 'src/test/resources/valid_pom.xml' )
+      deps.should eql [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1" ]
                         
-      deps = @naether.pom_dependencies( 'pom.xml', ['test'] )
-      deps.should eql [ "junit:junit:jar:4.8.2" ]
+      deps = @naether.pom_dependencies( 'src/test/resources/valid_pom.xml', ['test'] )
+      deps.should eql [ "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1" ]
     end
     
     it "should write pom file" do

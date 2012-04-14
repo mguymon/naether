@@ -113,9 +113,9 @@ public class NaetherTest {
 		
 		List<String> dependencies = new ArrayList<String>(Arrays.asList( 
 	        "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", 
-	        "org.slf4j:slf4j-api:jar:1.6.1", "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:test-jar:0.5.1", 
+	        "org.slf4j:slf4j-api:jar:1.6.1", "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", 
 	        "com.google.code.gson:gson:jar:1.7.1", "com.google.code.greaze:greaze-definition:jar:0.5.1" ));
-        naether.resolveDependencies(false);
+        naether.resolveDependencies(true);
 		
 		assertEquals( dependencies, naether.getDependenciesNotation() );
 	}
@@ -130,7 +130,7 @@ public class NaetherTest {
 		naether.resolveDependencies(false);
 		
 		expectedDependencies.add( "junit:junit:jar:4.8.2" );
-		expectedDependencies.add( "com.google.code.greaze:greaze-client:test-jar:0.5.1");
+		expectedDependencies.add( "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1");
 		expectedDependencies.add( "com.google.code.gson:gson:jar:1.7.1" ); 
 		expectedDependencies.add( "com.google.code.greaze:greaze-definition:jar:0.5.1" );
 		assertEquals( expectedDependencies, naether.getDependenciesNotation() );
@@ -189,9 +189,10 @@ public class NaetherTest {
 		List<String> scopes = new ArrayList<String>();
 		scopes.add("test");
 		
-		naether.addDependencies( "pom.xml", scopes );
+		naether.addDependencies( "src/test/resources/valid_pom.xml", scopes );
 		List<String> dependencies = new ArrayList<String>();
 		dependencies.add( "junit:junit:jar:4.8.2" );
+		dependencies.add( "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1" );
 		assertEquals( dependencies, naether.getDependenciesNotation() );
 	}
 	
@@ -271,7 +272,7 @@ public class NaetherTest {
 		List<String> completeDeps = Bootstrap.dependencies;
 		
 		// Jars excluded from bootstrap dependencies
-		completeDeps.add( "org.sonatype.sisu:sisu-guice:jar:3.0.3");
+		completeDeps.add( "org.sonatype.sisu:sisu-guice:jar:no_aop:3.0.3");
 		completeDeps.add( "org.jboss.netty:netty:jar:3.2.5.Final");
 		completeDeps.add( "junit:junit:jar:4.8.2");
 		completeDeps.add( "log4j:log4j:jar:1.2.12");
