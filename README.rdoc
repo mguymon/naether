@@ -17,6 +17,8 @@ is a wrapper for {Aether}[https://github.com/sonatype/sonatype-aether], the Mave
 {Naether.rb}[https://github.com/mguymon/naether/blob/master/src/main/ruby/naether.rb] provides access to Aether.
 from Ruby. JRuby is natively supported, other Ruby VMs will use {Rjb}[http://rjb.rubyforge.org] to proxy over JNI.
 
+Beyond dependency resolution, provides support to install and deploy artifacts to a Maven repository.
+
 
 == License
 
