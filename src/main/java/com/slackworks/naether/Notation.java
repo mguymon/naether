@@ -57,15 +57,15 @@ public class Notation {
 				.append(dependency.getArtifactId()).append(":");
 		
 		String classifier = dependency.getClassifier();
-		if ( classifier != null ) {
-			notation.append( classifier ).append(":");
-		}
-		
-		String type = dependency.getType();
-		if ( "test-jar".equals( type ) && classifier == null ) {
-			notation.append("jar:test-jar:");
+		if ( classifier != null && "test-jar".equals( classifier ) ) {
+			notation.append( "jar:test-jar:");
 		} else {
-			notation.append(dependency.getType()).append(":");
+			String type = dependency.getType();
+			if ( "test-jar".equals( type ) ) {
+				notation.append("jar:test-jar:");
+			} else {
+				notation.append(dependency.getType()).append(":");
+			}
 		}
 		notation.append(dependency.getVersion());
 		
