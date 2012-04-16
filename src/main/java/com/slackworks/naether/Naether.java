@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.artifact.ArtifactType;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.collection.DependencyCollectionException;
@@ -58,6 +59,7 @@ import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.resolution.DependencyResult;
 import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.sonatype.aether.util.artifact.DefaultArtifactType;
 import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 import org.sonatype.aether.util.graph.selector.AndDependencySelector;
@@ -162,15 +164,18 @@ public class Naether {
 	public void addDependency(org.apache.maven.model.Dependency projectDependency) {
 		log.debug( "Adding dependency: {}", projectDependency );
 		
-		String classifier = null;
+		DefaultArtifact artifact = null;
+		
 		if ( "test-jar".equals( projectDependency.getType() ) ) {
-			classifier = "test-jar";
+			
+			ArtifactType artifactType = new DefaultArtifactType( "test-jar", "jar", "test-jar", null );
+			
+			artifact = new DefaultArtifact( projectDependency.getGroupId(), projectDependency.getArtifactId(),
+					null, "jar", projectDependency.getVersion(), artifactType );
+		} else {
+			artifact = new DefaultArtifact( projectDependency.getGroupId(), projectDependency.getArtifactId(),
+					null, "jar", projectDependency.getVersion() );
 		}
-		
-		DefaultArtifact artifact = new DefaultArtifact( projectDependency.getGroupId(), projectDependency.getArtifactId(),
-				classifier, "jar", projectDependency.getVersion() );
-		
-		log.debug( "!!! {}", artifact );
 		
 		Dependency dependency = new Dependency( artifact , projectDependency.getScope());
 		dependency.setOptional( projectDependency.isOptional() );
@@ -227,7 +232,7 @@ public class Naether {
 	 * @throws ProjectException 
 	 */
 	public void addDependencies( Project project, List<String> scopes ) throws ProjectException {
-		for ( org.apache.maven.model.Dependency dependency : project.getDependencies(scopes, true) ) {
+		for ( org.apache.maven.model.Dependency dependency : project.getDependencies(scopes) ) {
 			addDependency( dependency );
 		}
 		
@@ -242,7 +247,7 @@ public class Naether {
 			
 			Project parent = new Project( project.getBasePath() + File.separator + project.getMavenModel().getParent().getRelativePath() );
 			
-			for ( org.apache.maven.model.Dependency dependency : parent.getDependencies(scopes, true) ) {
+			for ( org.apache.maven.model.Dependency dependency : parent.getDependencies(scopes) ) {
 				addDependency( dependency );
 			}
 			
