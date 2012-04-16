@@ -8,7 +8,10 @@
     <packaging>jar</packaging>
     <name>naether</name>
     <url>https://github.com/mguymon/naether</url>
-	  <licenses>
+    <description>
+        A Java Dependency Resolver using Maven’s Aether.
+    </description>
+	<licenses>
 	    <license>
 	      <name>The Apache Software License, Version 2.0</name>
 	      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
@@ -20,7 +23,20 @@
 		<developerConnection>scm:git:git@github.com/mguymon/naether.git</developerConnection>
         <connection>git@github.com/mguymon/naether.git</connection>
     </scm>
-
+    <developers>
+	    <developer>
+	      <id>mguymon</id>
+	      <name>Michael Guymon</name>
+	      <email>michael.guymon@gmail.com</email>
+	    </developer>
+    </developers>
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement> 
     <properties>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<aetherVersion>1.13</aetherVersion>
