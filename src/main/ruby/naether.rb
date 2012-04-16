@@ -278,8 +278,12 @@ class Naether
         scopes.each do |scope|
           list.add( scope )
         end
+        
+        deps = @project_instance._invoke('getDependenciesNotation', 'Ljava.util.List;', list)
+      else
+        deps = @project_instance.getDependenciesNotation()
       end
-      deps = @project_instance._invoke('getDependenciesNotation', 'Ljava.util.List;Z', list)
+      
     end
     
     Naether::Java.convert_to_ruby_array( deps, true )
