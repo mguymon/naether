@@ -254,7 +254,7 @@ public class NaetherTest {
 	@Test
 	public void resolveNaetherDependencies() throws Exception {
 		Project mavenProject = new Project("pom.xml");
-		for( org.apache.maven.model.Dependency mavenDep : mavenProject.getDependencies(null, true) ) {
+		for( org.apache.maven.model.Dependency mavenDep : mavenProject.getDependencies() ) {
 			String notation = Notation.generate( mavenDep );
 			
 			Dependency dependency =
