@@ -122,7 +122,11 @@ class Naether
     end
   end
   
-  # Array of mixed dependencies
+  # Array of mixed dependencies.
+  #  * Artifact notation in the format of groupId:artifactId:version or groupId:artifactId:type:version - 'junit:junit:4.7' 
+  #  * Hash of a single artifaction notation => scope - { 'junit:junit:4.7' => 'test' }
+  #  * Path to a local pom - 'lib/pom.xml'
+  #  * Hash of a single path to a local pom => scope - { 'lib/pom.xml' => ['compile','test'] }
   def dependencies=(dependencies)
     @resolver.clearDependencies()
     
@@ -180,14 +184,17 @@ class Naether
   end
   alias_method :dependenciesNotation, :dependencies_notation # some javaism snuck in
   
+  # Hash of dependency paths
   def dependencies_path
     Naether::Java.convert_to_ruby_hash( @resolver.getDependenciesPath(), true )
   end
   
+  # Convert dependencies to Classpath friendly string
   def dependencies_classpath()
     @resolver.getResolvedClassPath()
   end
   
+  # Load dependencies to Classpath
   def load_dependencies_to_classpath
     jars = dependencies_classpath.split(":")
     Naether::Java.load_jars(jars)
@@ -258,7 +265,12 @@ class Naether
     end
 
     if Naether.platform == 'java'
-      deps = @project_instance.getDependenciesNotation( scopes, true )
+      if scopes.nil?
+        deps = @project_instance.getDependenciesNotation()
+      else
+        deps = @project_instance.getDependenciesNotation( scopes )
+      end
+      
     else
       list = nil
       if scopes
@@ -267,7 +279,7 @@ class Naether
           list.add( scope )
         end
       end
-      deps = @project_instance._invoke('getDependenciesNotation', 'Ljava.util.List;Z', list, true)
+      deps = @project_instance._invoke('getDependenciesNotation', 'Ljava.util.List;Z', list)
     end
     
     Naether::Java.convert_to_ruby_array( deps, true )
@@ -282,8 +294,23 @@ class Naether
     return @project_instance.getVersion()
   end
   
-  # filePath to write the pom 
+  # Create the XML for a Maven Pom for the notation, groupId:artifactId:type:version
+  #
+  # loads all resolved dependencies into pom
+  def build_pom( notation )
+    @project_instance = Naether::Java.create("com.slackworks.naether.maven.Project")
+    @project_instance.setProjectNotation( notation )
+    
+    dependencies().each do |notation|
+      @project_instance.addDependency( notation )
+    end
+    
+    @project_instance.toXml()
+    
+  end
+  
   # notation of the pom, groupId:artifactId:type:version
+  # filePath to write the pom 
   #
   # loads all resolved dependencies into pom
   def write_pom( notation, file_path )

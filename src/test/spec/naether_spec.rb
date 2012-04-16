@@ -122,10 +122,18 @@ describe Naether do
     
     it "should get dependencies from pom file" do
       deps = @naether.pom_dependencies( 'src/test/resources/valid_pom.xml' )
-      deps.should eql [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1" ]
+      deps.should eql ["ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1"]
                         
       deps = @naether.pom_dependencies( 'src/test/resources/valid_pom.xml', ['test'] )
-      deps.should eql [ "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1" ]
+      deps.should eql ["junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1"]
+    end
+    
+    it "should create pom xml" do
+      @naether.dependencies = [ "org.apache.maven.wagon:wagon-file:jar:1.0", {"junit:junit:jar:4.8.2" => 'test'} ]
+      xml = @naether.build_pom( 'testGroup:testArtifact:jar:test' )
+      
+      pom = IO.read( "src/test/resources/generated_pom.xml" ) 
+      xml.should eql( pom )
     end
     
     it "should write pom file" do
