@@ -102,7 +102,7 @@ class Naether
       
       def check_local_repo_for_deps(local_repo = nil)
         
-        local_repo = local_repo || ENV['M2_REPO'] || '~/.m2/repository'
+        local_repo = local_repo || ENV['M2_REPO'] || File.expand_path('~/.m2/repository')
         local_repo = File.expand_path(local_repo)
         
         puts "Checking #{local_repo} for jars to bootstrap Naether"
