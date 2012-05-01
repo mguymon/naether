@@ -7,8 +7,18 @@ https://github.com/mguymon/naether
 
 === Install
 
-gem install naether
+==== Ruby
 
+  gem install naether
+
+
+==== Java
+
+  <dependency>
+    <groupId>com.slackworks</groupId>
+    <artifactId>naether</artifactId>
+    <version>0.6.1</version>
+  </dependency>
 
 === About
 
