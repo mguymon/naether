@@ -54,6 +54,16 @@ describe Naether do
       paths.first.should match /test-repo\/junit\/junit\/4.8.2\/junit-4.8.2.jar/
     end
     
+    it "should set build artifacts" do
+      @naether.build_artifacts = { "build_artifact:test:0.1" => 'target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar' }
+      @naether.dependencies = [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" ]
+      @naether.resolve_dependencies().should eql [
+        "ch.qos.logback:logback-classic:jar:0.9.29",
+        "ch.qos.logback:logback-core:jar:0.9.29",
+        "org.slf4j:slf4j-api:jar:1.6.1",
+        "junit:junit:jar:4.8.2"]
+    end
+    
     context "setting mixed list of dependencies" do
       it "should handle a list of dependencies" do
          @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29" ]  
@@ -96,7 +106,7 @@ describe Naether do
     end
     
 
-    it "should resolve dependencies with properties" do
+    it "should resolve pom dependencies with properties" do
       @naether.dependencies  = 'src/test/resources/pom_with_broken_dep.xml' 
       @naether.resolve_dependencies(false, { 'project.basedir' => File.expand_path( 'src/test/resources' ) } ).should eql( 
         ["pom:with-system-path:jar:2", "ch.qos.logback:logback-classic:jar:0.9.29", 

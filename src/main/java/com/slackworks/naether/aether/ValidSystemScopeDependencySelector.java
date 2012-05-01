@@ -20,15 +20,13 @@ package com.slackworks.naether.aether;
 
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.aether.collection.DependencyCollectionContext;
 import org.sonatype.aether.collection.DependencySelector;
 import org.sonatype.aether.graph.Dependency;
 
 /**
  * {@link DependencySelector} that checks the existence of system scoped 
- * dependencie's systemPath. If it does not exist on the file system, the 
+ * dependency's systemPath. If it does not exist on the file system, the 
  * dependency is excluded. 
  * 
  * @author Michael Guymon

@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
@@ -315,6 +316,46 @@ public class NaetherTest {
         results.add("org.springframework:org.springframework.expression:jar:3.0.5.RELEASE");
         		
         assertEquals( results, naether.getDependenciesNotation() );
+	}
+	
+
+	@Test
+	public void resolveFromBuildArtifacts() throws NaetherException {
+		naether.addBuildArtifact("buildArtifact:test:jar:0.1", "target/lib/xbean-reflect-3.4.jar" );
+		
+		Dependency dependency =
+	            new Dependency( new DefaultArtifact( "buildArtifact:test:jar:0.1" ), "compile" );
+		naether.addDependency(dependency);
+		
+		dependency =
+	            new Dependency( new DefaultArtifact( "org.testng:testng:jar:5.14" ), "compile" );
+		naether.addDependency(dependency);
+		
+        naether.resolveDependencies();	
+        
+        assertEquals( Arrays.asList( "buildArtifact:test:jar:0.1", "org.testng:testng:jar:5.14", "junit:junit:jar:3.8.1", 
+        		"org.beanshell:bsh:jar:2.0b4", "com.google.inject:guice:jar:2.0", "aopalliance:aopalliance:jar:1.0", 
+        		"com.beust:jcommander:jar:1.5" ), naether.getDependenciesNotation() );
+	}
+		
+    @Test
+	public void resolveFromBuildArtifactsWithPom() throws URLException, DependencyException {
+		naether.addBuildArtifact("valid:pom:jar:3", "target/lib/xbean-reflect-3.4.jar", "src/test/resources/valid_pom.xml" );
+		
+		Dependency dependency =
+	            new Dependency( new DefaultArtifact( "valid:pom:jar:3" ), "compile" );
+		naether.addDependency(dependency);
+		
+		dependency =
+	            new Dependency( new DefaultArtifact( "org.testng:testng:jar:5.14" ), "compile" );
+		naether.addDependency(dependency);
+		
+        naether.resolveDependencies();	
+        
+        assertEquals( Arrays.asList( "valid:pom:jar:3", "ch.qos.logback:logback-classic:jar:0.9.29", 
+        		"ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1", "org.testng:testng:jar:5.14", 
+        		"junit:junit:jar:3.8.1", "org.beanshell:bsh:jar:2.0b4", "com.google.inject:guice:jar:2.0", 
+        		"aopalliance:aopalliance:jar:1.0", "com.beust:jcommander:jar:1.5" ), naether.getDependenciesNotation() );
 	}
 	
 	@Test

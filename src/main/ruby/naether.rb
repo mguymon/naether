@@ -55,7 +55,7 @@ class Naether
   
   # Create new instance. Naether.create_from_paths and Naether.create_from_jars should be
   # used instead of Naether.new to ensure the dependencies for Naether are set into the classpath
-  def initialize()
+  def initialize
     
     if Naether.platform == 'java'
       @resolver = com.slackworks.naether.Naether.new 
@@ -92,6 +92,39 @@ class Naether
   # Set path to local maven repo
   def local_repo_path=( path )
     @resolver.setLocalRepoPath( path )
+  end
+  
+  def add_build_artifact( notation, path, pom = nil )
+    @resolver.addBuildArtifact(notation, path, pom )
+  end
+  
+  def build_artifacts=( artifacts )
+    @resolver.clearBuildArtifacts()
+    
+    unless artifacts.is_a? Array
+      artifacts = [artifacts]
+    end
+    
+    artifacts.each do |artifact|
+      # Hash of notation => path or notation => { :path =>, :pom => }
+      if artifact.is_a? Hash
+        
+        notation, opts = artifact.shift
+        
+        if opts.is_a? Hash
+          @resolver.add_build_artifact( notation, opts[:path], opts[:pom] )
+        else
+          @resolver.add_build_artifact( notation, opts )
+        end
+        
+      else
+        raise "invalid build_artifacts format" 
+      end
+    end
+  end
+  
+  def build_artifacts
+    Naether::Java.convert_to_ruby_array( @resolver.getBuildArtifacts() )
   end
   
   # Add a dependency in the notation: groupId:artifactId:type:version

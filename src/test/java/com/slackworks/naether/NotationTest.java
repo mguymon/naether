@@ -23,6 +23,8 @@ import static org.junit.Assert.*;
 import java.util.Map;
 
 import org.junit.Test;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 /**
  * Notation test
@@ -45,5 +47,12 @@ public class NotationTest {
 		assertEquals( "testArtifact", results.get( "artifactId" ) );
 		assertEquals( null, results.get( "type" ) );
 		assertEquals( "testVersion", results.get( "version" ) );
+	}
+	
+	@Test
+	public void generateForArtifact() {
+		Artifact artifact = new DefaultArtifact("groupId", "artifactId", "classifier", "extension", "version");
+	
+		assertEquals( "groupId:artifactId:extension:classifier:version", Notation.generate(artifact) );
 	}
 }

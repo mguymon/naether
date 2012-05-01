@@ -155,4 +155,22 @@ public class Notation {
 			return null;
 		}
 	}
+
+	/**
+	 * Convert a {@link Artifact} to String notation of
+	 * groupId:artifactId::type:classifier:version
+	 * 
+	 * @param dependency
+	 * @return String notation
+	 */
+	public static String generate(Artifact artifact) {
+		StringBuilder notation = new StringBuilder()
+			.append(artifact.getGroupId()).append(":")
+			.append(artifact.getArtifactId()).append(":")
+			.append(artifact.getExtension()).append(":")
+			.append(artifact.getClassifier()).append(":")
+			.append(artifact.getBaseVersion());
+		
+		return notation.toString();
+	}
 }

@@ -352,10 +352,14 @@ public class Project {
 	}
 
 	public void writePom(String filePath) throws ProjectException {
-		log.debug("Writing pom: {}", filePath);
+		writePom( new File( filePath ) );
+	}
+	
+	public void writePom(File file) throws ProjectException {
+		log.debug("Writing pom: {}", file.getPath());
 		Writer writer;
 		try {
-			writer = new BufferedWriter(new FileWriter(filePath));
+			writer = new BufferedWriter(new FileWriter(file));
 		} catch (IOException e) {
 			throw new ProjectException(e);
 		}
