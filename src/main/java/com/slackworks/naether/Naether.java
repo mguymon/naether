@@ -104,8 +104,11 @@ public class Naether {
 	 * The default remote repository is http://repo1.maven.org/maven2/
 	 */
 	public Naether() {
-		dependencies = new ArrayList<Dependency>();
-		buildArtifacts = new ArrayList<Artifact>();
+		// Set the initial ArrayList
+		clearDependencies();
+		
+		// Set the initial ArrayList
+		clearBuildArtifacts();
 		
 		// Set the initial LinkedHashSet
 		clearRemoteRepositories();
@@ -460,7 +463,7 @@ public class Naether {
 	}
 	
 	public void resolveDependencies(boolean downloadArtifacts, Map<String,String> properties) throws URLException, DependencyException {
-		log.info( "Resolving Dependencies" );
+		log.debug( "Resolving Dependencies" );
 		
 		log.debug("Local Repo Path: {}", localRepoPath);
 

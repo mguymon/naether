@@ -105,7 +105,7 @@ class Naether
         local_repo = local_repo || ENV['M2_REPO'] || File.expand_path('~/.m2/repository')
         local_repo = File.expand_path(local_repo)
         
-        puts "Checking #{local_repo} for jars to bootstrap Naether"
+        #puts "Checking #{local_repo} for jars to bootstrap Naether"
         
         deps = {:exists => [], :missing => [] }
         

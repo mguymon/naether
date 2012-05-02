@@ -51,6 +51,7 @@ class Naether
       
       Naether.new
     end
+    
   end
   
   # Create new instance. Naether.create_from_paths and Naether.create_from_jars should be
@@ -354,5 +355,9 @@ class Naether
     
     @project_instance.writePom( file_path )
     
+  end
+
+  def set_log_level( level )
+    Naether::Java.java_class('com.slackworks.naether.LogUtil').changeLevel( 'com.slackworks', level )
   end
 end

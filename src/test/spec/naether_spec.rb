@@ -9,10 +9,11 @@ describe Naether do
       Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.13"
     end
     
-    it "JAR_PATH constant should match jar" do
+    it "should have JAR_PATH constant in naether jar" do
       version = IO.read("VERSION").strip
       Naether::JAR_PATH.should match /naether-#{version}.jar/
     end
+    
   end
   
   context "Instance" do
@@ -161,6 +162,15 @@ describe Naether do
       xml.should match /.+ch.qos.logback<\/groupId>\s+<artifactId>logback-core<\/artifactId>\s+<version>0.9.29.+/
       xml.should match /.+org.slf4j<\/groupId>\s+<artifactId>slf4j-api<\/artifactId>\s+<version>1.6.1.+/
       
+    end
+    
+    it "should change logging level" do
+      @naether.set_log_level( 'debug' )
+      Naether::Java.java_class("com.slackworks.naether.LogUtil").getLogLevel("com.slackworks").to_s.should eql( "DEBUG" )
+      
+      @naether.set_log_level( 'info' )
+      Naether::Java.java_class("com.slackworks.naether.LogUtil").getLogLevel("com.slackworks").to_s.should eql( "INFO" )
+          
     end
   end
 end

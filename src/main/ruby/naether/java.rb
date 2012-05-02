@@ -57,10 +57,6 @@ class Naether
       instance.java.load_paths(paths)
     end
     
-    def self.set_log_level( level )
-      instance.java.set_log_level( level )
-    end
-    
     def self.create( target_class, *args )
       instance.java.create( target_class, *args )
     end
@@ -99,10 +95,6 @@ class Naether
       
       def java_class( target_class ) 
         eval(target_class)
-      end
-      
-      def set_log_level( level )
-        com.slackworks.naether.LogUtil.changeLevel( 'com.slackworks', level )
       end
       
       def load_paths(paths)
@@ -177,10 +169,6 @@ class Naether
       
       def java_class( target_class ) 
         Rjb::import( target_class )
-      end
-      
-      def set_log_level( level )
-        java_class('com.slackworks.naether.LogUtil').changeLevel( 'com.slackworks', level )
       end
       
       def load_paths(paths)
