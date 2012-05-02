@@ -27,7 +27,6 @@ class Naether
       instance.java.loaded_jars
     end
     
-  
     # Loads all jars from the array of paths
     def self.load_jars_dir(paths)
       unless paths.is_a? Array
@@ -48,12 +47,26 @@ class Naether
       instance.java.load_jars(jars)
     end
     
+    # Paths loaded
+    def self.loaded_paths
+      instance.java.loaded_paths
+    end
+    
+    # Load paths for the runtime platform
+    def self.load_paths(paths)
+      instance.java.load_paths(paths)
+    end
+    
     def self.set_log_level( level )
       instance.java.set_log_level( level )
     end
     
-    def self.create( java_class, *args )
-      instance.java.create( java_class, *args )
+    def self.create( target_class, *args )
+      instance.java.create( target_class, *args )
+    end
+    
+    def self.java_class( target_class ) 
+      instance.java.java_class( target_class )
     end
     
     def self.convert_to_ruby_array( java_array, to_string = false )
@@ -70,25 +83,48 @@ class Naether
     class JRuby
       include Singleton
       
-      attr_reader :loaded_jars
+      attr_reader :loaded_jars, :loaded_paths
       
       def initialize
         require 'java'
         
         @loaded_jars = []
+        @loaded_paths = []
       end
       
-      def create( java_class, *args )
-        java_class = eval(java_class)
+      def create( target_class, *args )
+        java_class = java_class(target_class)
         java_class.new( *args )
+      end
+      
+      def java_class( target_class ) 
+        eval(target_class)
       end
       
       def set_log_level( level )
         com.slackworks.naether.LogUtil.changeLevel( 'com.slackworks', level )
       end
       
+      def load_paths(paths)
+        load_paths = []
+        unless paths.is_a? Array
+          paths = [paths]
+        end
+        
+        paths.each do |path|
+          expanded_path = File.expand_path(path)
+          if !@loaded_paths.include? expanded_path
+            $CLASSPATH << expanded_path
+            load_paths << expanded_path
+            @loaded_paths << expanded_path
+          end
+        end
+        
+        load_paths
+      end
+      
       def load_jars(jars)
-        loaded_jars = []
+        load_jars = []
         unless jars.is_a? Array
           jars = [jars]
         end
@@ -97,12 +133,12 @@ class Naether
           expanded_jar = File.expand_path(jar)
           if !@loaded_jars.include? expanded_jar
             require expanded_jar
-            loaded_jars << expanded_jar
+            load_jars << expanded_jar
             @loaded_jars << expanded_jar
           end
         end
         
-        loaded_jars
+        load_jars
       end
       
       def convert_to_ruby_array( java_array, to_string = false )
@@ -121,7 +157,7 @@ class Naether
     class Ruby
       include Singleton
       
-      attr_reader :loaded_jars
+      attr_reader :loaded_jars, :loaded_paths
       
       def initialize()
         require 'rjb' 
@@ -131,15 +167,39 @@ class Naether
         Rjb::load("", java_opts)
         
         @loaded_jars = []
+        @loaded_paths = []
       end
       
-      def create( java_class, *args )
-        java_class = Rjb::import(java_class) 
-        java_class.new( *args )
+      def create( target_class, *args )
+        target_class = java_class(target_class) 
+        target_class.new( *args )
+      end
+      
+      def java_class( target_class ) 
+        Rjb::import( target_class )
       end
       
       def set_log_level( level )
-        Rjb::import('com.slackworks.naether.LogUtil').changeLevel( 'com.slackworks', level )
+        java_class('com.slackworks.naether.LogUtil').changeLevel( 'com.slackworks', level )
+      end
+      
+      def load_paths(paths)
+        loadable_paths = []
+        unless paths.is_a? Array
+          paths = [paths]
+        end
+        
+        paths.each do |path|
+          expanded_path = File.expand_path(path)
+          if !@loaded_paths.include? expanded_path
+            @loaded_paths << expanded_path
+            loadable_paths << expanded_path
+          end
+        end
+        
+        Rjb::load(loadable_paths.join(File::PATH_SEPARATOR))
+        
+        loadable_paths
       end
       
       def load_jars(jars)

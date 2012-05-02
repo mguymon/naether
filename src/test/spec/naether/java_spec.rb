@@ -1,4 +1,5 @@
 require 'src/main/ruby/naether'
+require 'zip/zip'
 
 describe Naether::Java do
   context "Class" do
@@ -23,6 +24,13 @@ describe Naether::Java do
       @naether = Naether::create_from_paths( 'target/lib', 'target' )
       instance = Naether::Java.create("com.slackworks.naether.maven.Project")
       instance.getClass().getName().should eql "com.slackworks.naether.maven.Project" 
+    end
+    
+    it "should load paths" do
+      Naether::Java.load_paths( 'src/test/classes/commons-io' )
+      file = Naether::Java.create( "java.io.File", "VERSION" )
+      version = Naether::Java.java_class( 'org.apache.commons.io.FileUtils' ).readFileToString( file )
+      version.should eql IO.read("VERSION").strip
     end
     
   end

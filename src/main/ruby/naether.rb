@@ -56,13 +56,7 @@ class Naether
   # Create new instance. Naether.create_from_paths and Naether.create_from_jars should be
   # used instead of Naether.new to ensure the dependencies for Naether are set into the classpath
   def initialize
-    
-    if Naether.platform == 'java'
-      @resolver = com.slackworks.naether.Naether.new 
-    else
-      naetherClass = Rjb::import('com.slackworks.naether.Naether') 
-      @resolver = naetherClass.new
-    end
+    @resolver = Naether::Java.create('com.slackworks.naether.Naether')
   end
   
   # Clear all remote repositories
