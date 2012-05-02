@@ -1,9 +1,9 @@
 = Naether
 
-Naether is a Java Dependency Resolver using Maven's {Aether}[https://github.com/sonatype/sonatype-aether]
+Naether is a Java Dependency Resolver using Maven's {Aether}[https://github.com/sonatype/sonatype-aether] 
+that can be used by Ruby or Java.
 
 https://github.com/mguymon/naether
-
 
 === Install
 
@@ -11,13 +11,12 @@ https://github.com/mguymon/naether
 
   gem install naether
 
-
 ==== Java
 
   <dependency>
     <groupId>com.slackworks</groupId>
     <artifactId>naether</artifactId>
-    <version>0.6.1</version>
+    <version>0.7.0</version>
   </dependency>
 
 === About

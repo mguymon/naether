@@ -1,5 +1,4 @@
 require 'src/main/ruby/naether'
-require 'zip/zip'
 
 describe Naether::Java do
   context "Class" do
