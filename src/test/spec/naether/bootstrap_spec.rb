@@ -1,4 +1,4 @@
-require 'src/main/ruby/naether'
+require File.expand_path(File.join(File.dirname(__FILE__),'../../../../src/main/ruby/naether'))
 require 'fileutils'
 
 describe Naether::Bootstrap do

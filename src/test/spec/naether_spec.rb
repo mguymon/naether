@@ -1,5 +1,5 @@
-require 'src/main/ruby/naether'
-require 'src/main/ruby/naether/java'
+require File.expand_path(File.join(File.dirname(__FILE__),'../../../src/main/ruby/naether'))
+require File.expand_path(File.join(File.dirname(__FILE__),'../../../src/main/ruby/naether/java'))
 
 describe Naether do
   
