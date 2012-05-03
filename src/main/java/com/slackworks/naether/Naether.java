@@ -211,7 +211,17 @@ public class Naether {
 	 */
 	public void addDependency(String notation, String scope) {
 		log.debug("Add dep {} {}", notation, scope);
-		Dependency dependency = new Dependency(new DefaultArtifact(notation), scope);
+		
+		DefaultArtifact artifact = new DefaultArtifact( notation );
+		
+		if ( "test".equals( artifact.getClassifier() ) || "test-jar".equals( artifact.getClassifier() ) ) {
+			
+			ArtifactType artifactType = new DefaultArtifactType( "test-jar", "jar", "test-jar", null );
+			
+			artifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+					null, "jar", artifact.getBaseVersion(), artifactType );
+		}
+		Dependency dependency = new Dependency(artifact, scope);
 		addDependency(dependency);
 	}
 
@@ -221,6 +231,16 @@ public class Naether {
 	 * @param dependency {@link Dependency}
 	 */
 	public void addDependency(Dependency dependency) {
+		String classifier = dependency.getArtifact().getClassifier();
+		if ( "test".equals( classifier ) || "test-jar".equals( classifier ) ) {
+			ArtifactType artifactType = new DefaultArtifactType( "test-jar", "jar", "test-jar", null );
+			
+			Artifact artifact = dependency.getArtifact();
+			
+			artifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+					null, "jar", artifact.getBaseVersion(), artifactType );
+			dependency = new Dependency(artifact, dependency.getScope());
+		}
 		dependencies.add(dependency);
 	}
 	
@@ -232,7 +252,7 @@ public class Naether {
 		
 		DefaultArtifact artifact = null;
 		
-		if ( "test-jar".equals( projectDependency.getType() ) ) {
+		if ( "test".equals( projectDependency.getType() ) || "test-jar".equals( projectDependency.getType() ) ) {
 			
 			ArtifactType artifactType = new DefaultArtifactType( "test-jar", "jar", "test-jar", null );
 			

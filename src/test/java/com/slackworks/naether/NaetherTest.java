@@ -224,7 +224,7 @@ public class NaetherTest {
 
 	@Test
 	public void resolveDependencyWithTestType() throws ProjectException, URLException, DependencyException {
-		DefaultArtifact artifact = new DefaultArtifact( "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1");
+		DefaultArtifact artifact = new DefaultArtifact( "com.google.code.greaze:greaze-client:jar:test:0.5.1");
 		
 		Dependency dependency =
 	            new Dependency( artifact, "compile" );
