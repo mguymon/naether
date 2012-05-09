@@ -654,6 +654,13 @@ public class Naether {
 		}
 	}
 	
+	/**
+	 * Get local path for a {@link List<String>} of dependency notations
+	 * 
+	 * @param notations {@link List<String>}
+	 * @return {@link List<String>} of paths
+	 * @throws NaetherException
+	 */
 	public List<String> getLocalPaths( List<String> notations ) throws NaetherException {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		SimpleLocalRepositoryManagerFactory factory = new SimpleLocalRepositoryManagerFactory();
