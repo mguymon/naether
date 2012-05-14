@@ -86,6 +86,11 @@ public class LogUtil {
 	 	log.setLevel( logLevel );
 	}
 	
+	public static Level getLogLevel( String logger ) {
+		Logger log = (Logger)LoggerFactory.getLogger(logger);
+	 	return log.getLevel();
+	}
+	
 	/**
 	 * Get the current {@link Level} for the root logger
 	 * @return {@link Level}

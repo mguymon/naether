@@ -23,3 +23,5 @@ Gemfile.lock
 .classpath
 target
 *.gem
+
+autotest

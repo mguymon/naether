@@ -10,10 +10,11 @@ describe Naether do
       Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.13"
     end
     
-    it "JAR_PATH constant should match jar" do
+    it "should have JAR_PATH constant in naether jar" do
       version = IO.read("VERSION").strip
       Naether::JAR_PATH.should match /naether-#{version}.jar/
     end
+    
   end
   
   context "Instance" do
@@ -53,6 +54,16 @@ describe Naether do
     it "should get local paths for notations" do
       paths = @naether.to_local_paths( ["junit:junit:jar:4.8.2"] )
       paths.first.should match /test-repo\/junit\/junit\/4.8.2\/junit-4.8.2.jar/
+    end
+    
+    it "should set build artifacts" do
+      @naether.build_artifacts = { "build_artifact:test:0.1" => 'target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar' }
+      @naether.dependencies = [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" ]
+      @naether.resolve_dependencies().should eql [
+        "ch.qos.logback:logback-classic:jar:0.9.29",
+        "ch.qos.logback:logback-core:jar:0.9.29",
+        "org.slf4j:slf4j-api:jar:1.6.1",
+        "junit:junit:jar:4.8.2"]
     end
     
     context "setting mixed list of dependencies" do
@@ -97,7 +108,7 @@ describe Naether do
     end
     
 
-    it "should resolve dependencies with properties" do
+    it "should resolve pom dependencies with properties" do
       @naether.dependencies  = 'src/test/resources/pom_with_broken_dep.xml' 
       @naether.resolve_dependencies(false, { 'project.basedir' => File.expand_path( 'src/test/resources' ) } ).should eql( 
         ["pom:with-system-path:jar:2", "ch.qos.logback:logback-classic:jar:0.9.29", 
@@ -123,10 +134,18 @@ describe Naether do
     
     it "should get dependencies from pom file" do
       deps = @naether.pom_dependencies( 'src/test/resources/valid_pom.xml' )
-      deps.should eql [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1" ]
+      deps.should eql ["ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1"]
                         
       deps = @naether.pom_dependencies( 'src/test/resources/valid_pom.xml', ['test'] )
-      deps.should eql [ "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1" ]
+      deps.should eql ["junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1"]
+    end
+    
+    it "should create pom xml" do
+      @naether.dependencies = [ "org.apache.maven.wagon:wagon-file:jar:1.0", {"junit:junit:jar:4.8.2" => 'test'} ]
+      xml = @naether.build_pom( 'testGroup:testArtifact:jar:test' )
+      
+      pom = IO.read( "src/test/resources/generated_pom.xml" ) 
+      xml.should eql( pom )
     end
     
     it "should write pom file" do
@@ -144,6 +163,15 @@ describe Naether do
       xml.should match /.+ch.qos.logback<\/groupId>\s+<artifactId>logback-core<\/artifactId>\s+<version>0.9.29.+/
       xml.should match /.+org.slf4j<\/groupId>\s+<artifactId>slf4j-api<\/artifactId>\s+<version>1.6.1.+/
       
+    end
+    
+    it "should change logging level" do
+      @naether.set_log_level( 'debug' )
+      Naether::Java.java_class("com.slackworks.naether.LogUtil").getLogLevel("com.slackworks").toString().should eql( "DEBUG" )
+      
+      @naether.set_log_level( 'info' )
+      Naether::Java.java_class("com.slackworks.naether.LogUtil").getLogLevel("com.slackworks").toString().should eql( "INFO" )
+          
     end
   end
 end

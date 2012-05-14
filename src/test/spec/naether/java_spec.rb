@@ -26,5 +26,12 @@ describe Naether::Java do
       instance.getClass().getName().should eql "com.slackworks.naether.maven.Project" 
     end
     
+    it "should load paths" do
+      Naether::Java.load_paths( 'src/test/classes/commons-io' )
+      file = Naether::Java.create( "java.io.File", "VERSION" )
+      version = Naether::Java.java_class( 'org.apache.commons.io.FileUtils' ).readFileToString( file )
+      version.should eql IO.read("VERSION").strip
+    end
+    
   end
 end

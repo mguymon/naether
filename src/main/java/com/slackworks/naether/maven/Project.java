@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -160,7 +161,7 @@ public class Project {
 	public void setType(String type) {
 		getMavenModel().setPackaging(type);
 	}
-
+	
 	/**
 	 * Get the String notation for the Maven Project
 	 * 
@@ -184,54 +185,40 @@ public class Project {
 	}
 	
 	public List<Dependency> getDependencies() {
-		return getDependencies(null, true);
-	}
-	
-	public List<Dependency> getDependencies(boolean substituteProperties) {
-		return getDependencies(null, substituteProperties);
+		return getDependencies(null);
 	}
 	
 	/**
-	 * Get List of {@link Dependency} for the Maven Project, with boolean to
-	 * substitute Project Properties.
+	 * Get List of {@link Dependency} for the Maven Project.
 	 * 
-	 * @param substituteProperties boolean
 	 * @return List<Dependency>
 	 */
-	public List<Dependency> getDependencies(List<String> scopes, boolean substituteProperties) {
+	public List<Dependency> getDependencies(List<String> scopes) {
 		log.debug( "Valid scopes: {}", scopes );
 		List<Dependency> dependencies = new ArrayList<Dependency>();
 
-		// Substitute Properties
-		if (substituteProperties) {
-			
-			log.debug( "Project properties: {} ", this.mavenModel.getProperties() );
-			
+		for (Dependency dependency : getMavenModel().getDependencies()) {
+
+			// Substitute Properties
 			// XXX: There has to be a way maven handles this automatically
-			for (Dependency dependency : getMavenModel().getDependencies()) {
-
-				String artifactId = substituteProperty(dependency.getArtifactId());
-				String groupId    = substituteProperty(dependency.getGroupId());
-				String version    = substituteProperty(dependency.getVersion());
-				String type 	  = substituteProperty(dependency.getType());
-				String classifier = substituteProperty(dependency.getClassifier());
-				String systemPath = substituteProperty(dependency.getSystemPath());
-
-				dependency.setSystemPath(systemPath);
-				dependency.setArtifactId(artifactId);
-				dependency.setGroupId(groupId);
-				dependency.setVersion(version);
-				dependency.setType(type);
-				dependency.setClassifier( classifier );
-				dependencies.add(dependency);
-			}
-
-		// Keep value as is
-		} else {
-			for (Dependency dependency : getMavenModel().getDependencies()) {
-				dependencies.add(dependency);
-			}
+			log.debug( "Project properties: {} ", this.mavenModel.getProperties() );
+			String artifactId = substituteProperty(dependency.getArtifactId());
+			String groupId    = substituteProperty(dependency.getGroupId());
+			String version    = substituteProperty(dependency.getVersion());
+			String type 	  = substituteProperty(dependency.getType());
+			String classifier = substituteProperty(dependency.getClassifier());
+			String systemPath = substituteProperty(dependency.getSystemPath());
+			
+			dependency.setSystemPath(systemPath);
+			dependency.setArtifactId(artifactId);
+			dependency.setGroupId(groupId);
+			dependency.setVersion(version);
+			dependency.setType(type);
+			dependency.setClassifier( classifier );
+		
+			dependencies.add(dependency);
 		}
+
 		
 		if ( scopes != null ) {
 			for ( Iterator<Dependency> iterator = dependencies.iterator(); iterator.hasNext(); ) {
@@ -261,31 +248,19 @@ public class Project {
 	 * @return List<String>
 	 */
 	public List<String> getDependenciesNotation() {
-		return getDependenciesNotation(null, true);
+		return getDependenciesNotation(null);
 	}
 
 	/**
 	 * Get List<String> of dependencies in format of
 	 * groupId:artifactId:packageType:version
 	 * 
-	 * @param substituteProperties boolean
 	 * @return List<String>
 	 */
-	public List<String> getDependenciesNotation(boolean substituteProperties) {
-		return getDependenciesNotation( null, substituteProperties );
-	}
-	
-	/**
-	 * Get List<String> of dependencies in format of
-	 * groupId:artifactId:packageType:version
-	 * 
-	 * @param substituteProperties boolean
-	 * @return List<String>
-	 */
-	public List<String> getDependenciesNotation(List<String> scopes, boolean substituteProperties) {
+	public List<String> getDependenciesNotation(List<String> scopes) {
 		List<String> notations = new ArrayList<String>();
 
-		for (Dependency dependency : getDependencies(scopes, substituteProperties)) {
+		for (Dependency dependency : getDependencies(scopes)) {
 			notations.add(Notation.generate(dependency));
 		}
 
@@ -344,6 +319,10 @@ public class Project {
 	public void addProperty(String property, String value) {
 		this.mavenModel.getProperties().put( property, value );
 	}
+	
+	public void removeProperty(String property) {
+		this.mavenModel.getProperties().remove( property );
+	}
 
 	/**
 	 * Substitute a Maven Property expression, i.e. ${aetherVersion}, to its
@@ -355,8 +334,6 @@ public class Project {
 	 */
 	private String substituteProperty(String field) {
 		if ( field != null ) {
-			log.debug( "subsituting {}", field );
-			
 			String property = null;
 			Matcher matcher = propertyPattern.matcher(field);
 			while (matcher.find()) {
@@ -375,10 +352,14 @@ public class Project {
 	}
 
 	public void writePom(String filePath) throws ProjectException {
-		log.debug("Writing pom: {}", filePath);
+		writePom( new File( filePath ) );
+	}
+	
+	public void writePom(File file) throws ProjectException {
+		log.debug("Writing pom: {}", file.getPath());
 		Writer writer;
 		try {
-			writer = new BufferedWriter(new FileWriter(filePath));
+			writer = new BufferedWriter(new FileWriter(file));
 		} catch (IOException e) {
 			throw new ProjectException(e);
 		}
@@ -389,6 +370,25 @@ public class Project {
 		} catch (IOException e) {
 			throw new ProjectException("Failed to write pom", e);
 		}
+	}
+	
+	public String toXml() throws ProjectException {
+		log.debug("Writing xml");
+		
+		Project copy = this;
+		copy.removeProperty( "project.basedir" );
+		
+		StringWriter writer = new StringWriter();
+		
+		MavenXpp3Writer pomWriter = new MavenXpp3Writer();
+		try {
+			pomWriter.write(writer, this.mavenModel);
+		} catch (IOException e) {
+			throw new ProjectException("Failed to create pom xml", e);
+		}
+		
+		writer.flush();
+		return writer.toString();
 	}
 
 	public String getBasePath() {

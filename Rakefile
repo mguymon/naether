@@ -9,7 +9,9 @@ rescue Bundler::BundlerError => e
 end
 require 'rake'
 
+
 require File.expand_path(File.join(File.dirname(__FILE__), 'src/main/ruby/naether'))
+
 namespace :naether do
   require "fileutils"
   task :setup_naether_gem_build do

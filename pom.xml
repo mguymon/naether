@@ -4,11 +4,14 @@
 
     <groupId>com.slackworks</groupId>
     <artifactId>naether</artifactId>
-    <version>0.5.12</version>
+    <version>0.8.1</version>
     <packaging>jar</packaging>
     <name>naether</name>
     <url>https://github.com/mguymon/naether</url>
-	  <licenses>
+    <description>
+        A Java Dependency Resolver using Maven’s Aether.
+    </description>
+	<licenses>
 	    <license>
 	      <name>The Apache Software License, Version 2.0</name>
 	      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
@@ -16,18 +19,31 @@
 	    </license>
     </licenses>
     <scm>
-        <url>>scm:git:git@github.com/mguymon/naether.git</url>
+        <url>scm:git:git@github.com/mguymon/naether.git</url>
 		<developerConnection>scm:git:git@github.com/mguymon/naether.git</developerConnection>
         <connection>git@github.com/mguymon/naether.git</connection>
     </scm>
-
+    <developers>
+	    <developer>
+	      <id>mguymon</id>
+	      <name>Michael Guymon</name>
+	      <email>michael.guymon@gmail.com</email>
+	    </developer>
+    </developers>
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement> 
     <properties>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		  <aetherVersion>1.13</aetherVersion>
+		<aetherVersion>1.13</aetherVersion>
 	    <mavenVersion>3.0.3</mavenVersion>
 	    <wagonVersion>1.0</wagonVersion>
-		  <org.slf4j.version>1.6.2</org.slf4j.version>
-	  </properties>
+		<org.slf4j.version>1.6.2</org.slf4j.version>
+	</properties>
     <dependencies>
 		  <dependency>
 		      <groupId>ch.qos.logback</groupId>
@@ -125,7 +141,6 @@
   </dependencies>
   
   <build>
-  	
 		<plugins>
 		  <plugin>
 		    <groupId>org.apache.maven.plugins</groupId>
@@ -146,6 +161,43 @@
 		      </execution>
 		    </executions>
 		  </plugin>
+		  <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-gpg-plugin</artifactId>
+		        <executions>
+		          <execution>
+		            <id>sign-artifacts</id>
+		            <phase>verify</phase>
+		            <goals>
+		              <goal>sign</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		    </plugin>
 		</plugins>
   </build>
   

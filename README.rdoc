@@ -1,21 +1,32 @@
 = Naether
 
-A Java Dependency Resolver using Maven's {Aether}[https://github.com/sonatype/sonatype-aether]
+Naether is a Java Dependency Resolver using Maven's {Aether}[https://github.com/sonatype/sonatype-aether] 
+that can be used by Ruby or Java.
 
 https://github.com/mguymon/naether
 
-
 === Install
 
-gem install naether
+==== Ruby
 
+  gem install naether
+
+==== Java
+
+  <dependency>
+    <groupId>com.slackworks</groupId>
+    <artifactId>naether</artifactId>
+    <version>0.7.1</version>
+  </dependency>
 
 === About
 
-{Naether.java}[https://github.com/mguymon/naether/blob/master/src/main/java/com/slackworks/naether/Naether.java] 
+{Naether}[https://github.com/mguymon/naether/blob/master/src/main/java/com/slackworks/naether/Naether.java] 
 is a wrapper for {Aether}[https://github.com/sonatype/sonatype-aether], the Maven dependency resolution framework. 
-The Ruby {naether.rb}[https://github.com/mguymon/naether/blob/master/src/main/ruby/naether.rb] provides access to Java 
+{Naether.rb}[https://github.com/mguymon/naether/blob/master/src/main/ruby/naether.rb] provides access to Aether 
 from Ruby. JRuby is natively supported, other Ruby VMs will use {Rjb}[http://rjb.rubyforge.org] to proxy over JNI.
+
+Beyond dependency resolution, provides support to install and deploy artifacts to a Maven repository.
 
 
 == License

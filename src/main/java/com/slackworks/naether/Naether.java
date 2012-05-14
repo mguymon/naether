@@ -20,6 +20,7 @@ package com.slackworks.naether;
 
 // Java SE
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.artifact.ArtifactType;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.collection.DependencyCollectionException;
@@ -58,6 +61,7 @@ import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.resolution.DependencyResult;
 import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.sonatype.aether.util.artifact.DefaultArtifactType;
 import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 import org.sonatype.aether.util.graph.selector.AndDependencySelector;
@@ -68,6 +72,7 @@ import com.slackworks.naether.deploy.DeployException;
 import com.slackworks.naether.deploy.InstallException;
 import com.slackworks.naether.maven.Project;
 import com.slackworks.naether.maven.ProjectException;
+import com.slackworks.naether.repo.BuildWorkspaceReader;
 import com.slackworks.naether.repo.LogRepositoryListener;
 import com.slackworks.naether.repo.LogTransferListener;
 import com.slackworks.naether.repo.ManualWagonProvider;
@@ -87,6 +92,7 @@ public class Naether {
 
 	private String localRepoPath;
 	private List<Dependency> dependencies;
+	private List<Artifact> buildArtifacts;
 	private Set<RemoteRepository> remoteRepositories;
 	private PreorderNodeListGenerator preorderedNodeList;
 
@@ -98,7 +104,11 @@ public class Naether {
 	 * The default remote repository is http://repo1.maven.org/maven2/
 	 */
 	public Naether() {
-		dependencies = new ArrayList<Dependency>();
+		// Set the initial ArrayList
+		clearDependencies();
+		
+		// Set the initial ArrayList
+		clearBuildArtifacts();
 		
 		// Set the initial LinkedHashSet
 		clearRemoteRepositories();
@@ -120,6 +130,64 @@ public class Naether {
 	 */
 	public void clearDependencies() {
 		setDependencies(new ArrayList<Dependency>());
+	}
+	
+	/**
+	 * Clear dependencies
+	 */
+	public void clearBuildArtifacts() {
+		setBuildArtifacts(new ArrayList<Artifact>());
+	}
+	
+	public void addBuildArtifact(String notation, String path, String pom) {
+		Artifact artifact = new DefaultArtifact(notation);
+		artifact = artifact.setFile( new File(path) );
+		
+		this.buildArtifacts.add( artifact );
+		
+		String pomNotation = new StringBuilder( artifact.getGroupId() ).append(":")
+			.append( artifact.getArtifactId() ).append(":")
+			.append( "pom").append(":").append( artifact.getBaseVersion() ).toString();
+		
+		artifact = new DefaultArtifact(pomNotation);
+		artifact = artifact.setFile( new File(pom) );
+		
+		this.buildArtifacts.add( artifact );
+	}
+	
+	public void addBuildArtifact(String notation, String path) throws NaetherException {
+		Artifact artifact = new DefaultArtifact(notation);
+		artifact = artifact.setFile( new File(path) );
+		
+		this.buildArtifacts.add( artifact );
+		
+		File tempPom = null;
+		try {
+			tempPom = File.createTempFile( "pom", "xml" );
+		} catch (IOException e) {
+			throw new NaetherException( "Failed to create temp file", e );
+		}
+		
+		tempPom.deleteOnExit();
+		
+		Project project = new Project();
+		project.setGroupId( artifact.getGroupId() );
+		project.setArtifactId( artifact.getArtifactId() );
+		project.setVersion( artifact.getBaseVersion() );
+		try {
+			project.writePom( tempPom );
+		} catch (ProjectException e) {
+			throw new NaetherException( "Failed to create temp POM", e );
+		}
+		
+		String pomNotation = new StringBuilder( artifact.getGroupId() ).append(":")
+			.append( artifact.getArtifactId() ).append(":")
+			.append( "pom").append(":").append( artifact.getBaseVersion() ).toString();
+		
+		artifact = new DefaultArtifact(pomNotation);
+		artifact = artifact.setFile( tempPom );
+		
+		this.buildArtifacts.add( artifact );
 	}
 
 	/**
@@ -143,7 +211,17 @@ public class Naether {
 	 */
 	public void addDependency(String notation, String scope) {
 		log.debug("Add dep {} {}", notation, scope);
-		Dependency dependency = new Dependency(new DefaultArtifact(notation), scope);
+		
+		DefaultArtifact artifact = new DefaultArtifact( notation );
+		
+		if ( "test".equals( artifact.getClassifier() ) || "test-jar".equals( artifact.getClassifier() ) ) {
+			
+			ArtifactType artifactType = new DefaultArtifactType( "test-jar", "jar", "test-jar", null );
+			
+			artifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+					null, "jar", artifact.getBaseVersion(), artifactType );
+		}
+		Dependency dependency = new Dependency(artifact, scope);
 		addDependency(dependency);
 	}
 
@@ -153,6 +231,16 @@ public class Naether {
 	 * @param dependency {@link Dependency}
 	 */
 	public void addDependency(Dependency dependency) {
+		String classifier = dependency.getArtifact().getClassifier();
+		if ( "test".equals( classifier ) || "test-jar".equals( classifier ) ) {
+			ArtifactType artifactType = new DefaultArtifactType( "test-jar", "jar", "test-jar", null );
+			
+			Artifact artifact = dependency.getArtifact();
+			
+			artifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+					null, "jar", artifact.getBaseVersion(), artifactType );
+			dependency = new Dependency(artifact, dependency.getScope());
+		}
 		dependencies.add(dependency);
 	}
 	
@@ -162,15 +250,18 @@ public class Naether {
 	public void addDependency(org.apache.maven.model.Dependency projectDependency) {
 		log.debug( "Adding dependency: {}", projectDependency );
 		
-		String classifier = null;
-		if ( "test-jar".equals( projectDependency.getType() ) ) {
-			classifier = "test-jar";
+		DefaultArtifact artifact = null;
+		
+		if ( "test".equals( projectDependency.getType() ) || "test-jar".equals( projectDependency.getType() ) ) {
+			
+			ArtifactType artifactType = new DefaultArtifactType( "test-jar", "jar", "test-jar", null );
+			
+			artifact = new DefaultArtifact( projectDependency.getGroupId(), projectDependency.getArtifactId(),
+					null, "jar", projectDependency.getVersion(), artifactType );
+		} else {
+			artifact = new DefaultArtifact( projectDependency.getGroupId(), projectDependency.getArtifactId(),
+					null, "jar", projectDependency.getVersion() );
 		}
-		
-		DefaultArtifact artifact = new DefaultArtifact( projectDependency.getGroupId(), projectDependency.getArtifactId(),
-				classifier, "jar", projectDependency.getVersion() );
-		
-		log.debug( "!!! {}", artifact );
 		
 		Dependency dependency = new Dependency( artifact , projectDependency.getScope());
 		dependency.setOptional( projectDependency.isOptional() );
@@ -227,7 +318,7 @@ public class Naether {
 	 * @throws ProjectException 
 	 */
 	public void addDependencies( Project project, List<String> scopes ) throws ProjectException {
-		for ( org.apache.maven.model.Dependency dependency : project.getDependencies(scopes, true) ) {
+		for ( org.apache.maven.model.Dependency dependency : project.getDependencies(scopes) ) {
 			addDependency( dependency );
 		}
 		
@@ -242,7 +333,7 @@ public class Naether {
 			
 			Project parent = new Project( project.getBasePath() + File.separator + project.getMavenModel().getParent().getRelativePath() );
 			
-			for ( org.apache.maven.model.Dependency dependency : parent.getDependencies(scopes, true) ) {
+			for ( org.apache.maven.model.Dependency dependency : parent.getDependencies(scopes) ) {
 				addDependency( dependency );
 			}
 			
@@ -392,8 +483,9 @@ public class Naether {
 	}
 	
 	public void resolveDependencies(boolean downloadArtifacts, Map<String,String> properties) throws URLException, DependencyException {
-		log.info( "Resolving Dependencies" );
-		log.info("Local Repo Path: {}", localRepoPath);
+		log.debug( "Resolving Dependencies" );
+		
+		log.debug("Local Repo Path: {}", localRepoPath);
 
 		if ( log.isDebugEnabled() ) {
 			log.debug("Remote Repositories:");
@@ -404,7 +496,7 @@ public class Naether {
 
 		RepositorySystem repoSystem = newRepositorySystem();
 		
-		RepositorySystemSession session = newSession(repoSystem);
+		MavenRepositorySystemSession session = newSession(repoSystem);
 		if ( properties != null ) {
 			Map<String,String> userProperties = session.getUserProperties();
 			if ( userProperties == null ) {
@@ -414,7 +506,18 @@ public class Naether {
 			
 			log.debug( "Session userProperties: {}", userProperties );
 			
-			session = ((MavenRepositorySystemSession)session).setUserProperties( userProperties );
+			session = (MavenRepositorySystemSession)session.setUserProperties( userProperties );
+		}
+		
+		if ( buildArtifacts.size() > 0 ) {
+			BuildWorkspaceReader reader = new BuildWorkspaceReader();
+			
+			for ( Artifact artifact : buildArtifacts ) {
+				reader.addArtifact( artifact );
+			}
+			
+			session = (MavenRepositorySystemSession)session.setWorkspaceReader( reader );
+			
 		}
 		
 		CollectRequest collectRequest = new CollectRequest();
@@ -551,6 +654,13 @@ public class Naether {
 		}
 	}
 	
+	/**
+	 * Get local path for a {@link List<String>} of dependency notations
+	 * 
+	 * @param notations {@link List<String>}
+	 * @return {@link List<String>} of paths
+	 * @throws NaetherException
+	 */
 	public List<String> getLocalPaths( List<String> notations ) throws NaetherException {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		SimpleLocalRepositoryManagerFactory factory = new SimpleLocalRepositoryManagerFactory();
@@ -575,7 +685,38 @@ public class Naether {
 		
 		return localPaths;
 	}
+
+	/**
+	 * {@link List<String>} of {@link Dependency} converted to String notation
+	 * 
+	 * @return {@link List<String>}
+	 */
+	public List<String> getDependenciesNotation() {
+		List<String> notations = new ArrayList<String>();
+		for (Dependency dependency : getDependencies()) {
+			notations.add(Notation.generate(dependency));
+		}
+
+		return notations;
+	}
 	
+	/**
+	 * {@link Map} of String notation and the corresponding String file path 
+	 * 
+	 * @return {@link Map<String,String>}
+	 */
+	public Map<String,String> getDependenciesPath() {
+		Map<String,String> dependencies = new HashMap<String,String>();
+		for (Dependency dependency : getDependencies()) {
+			if ( dependency.getArtifact().getFile() != null ) {
+				dependencies.put( Notation.generate( dependency ), dependency.getArtifact().getFile().getAbsolutePath() );
+			}
+		}
+		
+		return dependencies;
+	}
+	
+
 
 	/**
 	 * Set local repository path. This is the destination for downloaded
@@ -617,34 +758,12 @@ public class Naether {
 		return dependencies;
 	}
 
-	/**
-	 * {@link List<String>} of {@link Dependency} converted to String notation
-	 * 
-	 * @return {@link List<String>}
-	 */
-	public List<String> getDependenciesNotation() {
-		List<String> notations = new ArrayList<String>();
-		for (Dependency dependency : getDependencies()) {
-			notations.add(Notation.generate(dependency));
-		}
-
-		return notations;
+	public List<Artifact> getBuildArtifacts() {
+		return buildArtifacts;
 	}
-	
-	/**
-	 * {@link Map} of String notation and the corresponding String file path 
-	 * 
-	 * @return {@link Map<String,String>}
-	 */
-	public Map<String,String> getDependenciesPath() {
-		Map<String,String> dependencies = new HashMap<String,String>();
-		for (Dependency dependency : getDependencies()) {
-			if ( dependency.getArtifact().getFile() != null ) {
-				dependencies.put( Notation.generate( dependency ), dependency.getArtifact().getFile().getAbsolutePath() );
-			}
-		}
-		
-		return dependencies;
+
+	public void setBuildArtifacts(List<Artifact> buildArtifacts) {
+		this.buildArtifacts = buildArtifacts;
 	}
 
 }

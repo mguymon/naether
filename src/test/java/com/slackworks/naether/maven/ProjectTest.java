@@ -26,11 +26,15 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.model.Dependency;
 import org.junit.Test;
 
@@ -67,7 +71,7 @@ public class ProjectTest {
 		List<String> scopes = new ArrayList<String>();
 		scopes.add("test");
 		
-		List<Dependency> dependencies = mavenProject.getDependencies( scopes, true );
+		List<Dependency> dependencies = mavenProject.getDependencies( scopes );
 		assertEquals( "Only junit and greaze-client should be in deps", 2, dependencies.size() );
 		assertEquals( "junit", dependencies.get(0).getArtifactId() );
 		assertEquals( "junit", dependencies.get(0).getGroupId() );
@@ -78,7 +82,7 @@ public class ProjectTest {
 		scopes = new ArrayList<String>();
 		scopes.add("compile");
 		
-		dependencies = mavenProject.getDependencies( scopes, true );
+		dependencies = mavenProject.getDependencies( scopes );
 		assertEquals( "Only logback classic should be in deps", 1, dependencies.size() );
 		assertEquals( "logback-classic", dependencies.get(0).getArtifactId() );
 		assertEquals( "ch.qos.logback", dependencies.get(0).getGroupId() );
@@ -90,39 +94,20 @@ public class ProjectTest {
 	
 	@Test
 	public void getDependenciesNotation() throws ProjectException {
-		Project mavenProject = new Project("pom.xml");
+		Project mavenProject = new Project("src/test/resources/valid_pom.xml");
 		List<String> notations = new ArrayList<String>();
 		notations.add("ch.qos.logback:logback-classic:jar:0.9.29");
-		notations.add("org.slf4j:slf4j-api:jar:1.6.2");
-		notations.add("org.slf4j:jcl-over-slf4j:jar:1.6.2");
-		notations.add("org.slf4j:log4j-over-slf4j:jar:1.6.2");
-		notations.add("org.codehaus.plexus:plexus-utils:jar:3.0");
-		notations.add("org.apache.maven:maven-model-v3:jar:2.0");
-		notations.add("org.codehaus.plexus:plexus-container-default:jar:1.5.5");
-		notations.add("org.sonatype.aether:aether-api:jar:1.13");
-		notations.add("org.sonatype.aether:aether-util:jar:1.13");
-		notations.add("org.sonatype.aether:aether-impl:jar:1.13");
-		notations.add("org.sonatype.aether:aether-connector-file:jar:1.13");
-		notations.add("org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13");
-		notations.add("org.sonatype.aether:aether-connector-wagon:jar:1.13");
-		notations.add("org.apache.maven:maven-aether-provider:jar:3.0.3");
-		notations.add("org.apache.maven.wagon:wagon-ssh:jar:1.0");
-		notations.add("org.apache.maven.wagon:wagon-http-lightweight:jar:1.0");
-		notations.add("org.apache.maven.wagon:wagon-file:jar:1.0");
-		notations.add("commons-logging:commons-logging:jar:1.1.1" );
-		notations.add("commons-logging:commons-logging-api:jar:1.1" );
 		notations.add("junit:junit:jar:4.8.2");
+		notations.add("com.google.code.greaze:greaze-client:jar:test-jar:0.5.1");
 				
-		List<String> missingDeps = new ArrayList<String>();
-		for (String dep : mavenProject.getDependenciesNotation()) {
-			if (notations.indexOf(dep) == -1) {
-				missingDeps.add(dep);
-			}
-		}
+		assertEquals( notations, mavenProject.getDependenciesNotation() );
 
-		if (missingDeps.size() > 0) {
-			fail("Missing Dependencies: " + missingDeps);
-		}
+		mavenProject = new Project("src/test/resources/valid_pom.xml");
+		notations = new ArrayList<String>();
+		notations.add("junit:junit:jar:4.8.2");
+		notations.add("com.google.code.greaze:greaze-client:jar:test-jar:0.5.1");
+				
+		assertEquals( notations, mavenProject.getDependenciesNotation( Arrays.asList( "test" ) ) );
 	}
 
 	@Test
@@ -135,6 +120,21 @@ public class ProjectTest {
 				assertEquals( (new File( "src/test/resources")).getAbsolutePath(), dependency.getSystemPath() );
 			}
 		}
+	}
+	
+	@Test
+	public void toXml() throws ProjectException, FileNotFoundException, IOException {
+		Project project = new Project();
+		project.setArtifactId("testArtifact");
+		project.setGroupId("testGroup");
+		project.setVersion("test");
+		project.setType("jar");
+		project.addDependency("org.apache.maven.wagon:wagon-file:jar:1.0");
+		project.addDependency("junit:junit:jar:4.8.2", "test");
+		
+		String xml = project.toXml();
+		
+		assertEquals( IOUtils.toString( new FileReader("src/test/resources/generated_pom.xml") ), xml );
 	}
 	
 	@Test
