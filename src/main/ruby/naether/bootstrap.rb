@@ -17,6 +17,10 @@ class Naether
     
     class << self
       
+      def default_local_repo
+        ENV['M2_REPO'] || File.expand_path('~/.m2/repository')
+      end
+      
       # Find naether jar relative to the gem install
       def naether_jar
         Dir.glob(File.expand_path("#{File.dirname(__FILE__)}/../../naether*.jar")).first
@@ -102,7 +106,7 @@ class Naether
       
       def check_local_repo_for_deps(local_repo = nil)
         
-        local_repo = local_repo || ENV['M2_REPO'] || File.expand_path('~/.m2/repository')
+        local_repo = local_repo || default_local_repo
         local_repo = File.expand_path(local_repo)
         
         #puts "Checking #{local_repo} for jars to bootstrap Naether"
@@ -166,6 +170,7 @@ class Naether
           
         end
         
+        @naether
       end
     end
   end
