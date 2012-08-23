@@ -25,11 +25,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Exclusion;
 import org.junit.Before;
 import org.junit.Test;
@@ -449,5 +451,49 @@ public class NaetherTest {
 	@Test
 	public void getLocalPaths() throws NaetherException {
 		assertTrue( "Path to junit in test repo", naether.getLocalPaths( Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
+	}
+	
+	@Test
+	public void downloadArtifactsFromStringNotations() throws IOException, NaetherException {
+		File jar1 = new File( "target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar");
+        if ( jar1.exists() ) {
+        	FileUtils.deleteDirectory( jar1.getParentFile() );
+        }
+        
+        File jar2 = new File( "target/test-repo/junit/junit/4.10/junit-4.10.jar");
+        if ( jar2.exists() ) {
+        	FileUtils.deleteDirectory( jar2.getParentFile() );
+        }
+		
+        assertFalse( "Jar1 should remove to test downloaded", jar1.exists() );
+        assertFalse( "Jar2 should remove to test downloaded", jar2.exists() );
+        
+		List<String> notations = Arrays.asList( "junit:junit:4.10", "junit:junit:4.8.2" );
+		naether.downloadArtifacts( notations );
+		
+		assertTrue( "Jar1 downloaded", jar1.exists() );
+		assertTrue( "Jar2 downloaded", jar2.exists() );
+	}
+	
+	@Test
+	public void downloadArtifactsFromArtifacts() throws IOException, NaetherException {
+		File jar1 = new File( "target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar");
+        if ( jar1.exists() ) {
+        	FileUtils.deleteDirectory( jar1.getParentFile() );
+        }
+        
+        File jar2 = new File( "target/test-repo/junit/junit/4.10/junit-4.10.jar");
+        if ( jar2.exists() ) {
+        	FileUtils.deleteDirectory( jar2.getParentFile() );
+        }
+		
+        assertFalse( "Jar1 should remove to test downloaded", jar1.exists() );
+        assertFalse( "Jar2 should remove to test downloaded", jar2.exists() );
+        
+		List<DefaultArtifact> notations = Arrays.asList( new DefaultArtifact("junit:junit:4.10"), new DefaultArtifact("junit:junit:4.8.2") );
+		naether.downloadArtifacts( notations );
+		
+		assertTrue( "Jar1 downloaded", jar1.exists() );
+		assertTrue( "Jar2 downloaded", jar2.exists() );
 	}
 }

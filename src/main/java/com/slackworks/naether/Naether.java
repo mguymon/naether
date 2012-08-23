@@ -56,6 +56,9 @@ import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.LocalRepositoryManager;
 import org.sonatype.aether.repository.NoLocalRepositoryManagerException;
 import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.resolution.ArtifactRequest;
+import org.sonatype.aether.resolution.ArtifactResolutionException;
+import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.DependencyRequest;
 import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.resolution.DependencyResult;
@@ -764,6 +767,54 @@ public class Naether {
 
 	public void setBuildArtifacts(List<Artifact> buildArtifacts) {
 		this.buildArtifacts = buildArtifacts;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public List<File> downloadArtifacts( List artifactsOrNotations ) throws NaetherException {
+		RepositorySystem system = this.newRepositorySystem();
+
+		List<Artifact> artifacts = new ArrayList<Artifact>();
+		
+		for ( Object artifactsOrNotation : artifactsOrNotations ) {
+			if ( artifactsOrNotation != null ) {
+				if ( artifactsOrNotation instanceof String ) {
+					artifacts.add( new DefaultArtifact( (String) artifactsOrNotation ) );
+				} else if ( artifactsOrNotation instanceof Artifact ) {
+					artifacts.add( (Artifact)artifactsOrNotation );
+				} else {
+					throw new NaetherException( "Only String notations or Artifact instances allowed. Found " + artifactsOrNotation.getClass() );
+				}
+			} else {
+				log.warn( "Null found in list of artifacts to download" );
+			}
+		}
+		
+        RepositorySystemSession session = this.newSession(system);
+
+        List<File> files = new ArrayList<File>();
+        
+        for ( Artifact artifact : artifacts ) {
+	        
+        	log.debug( "Downloading {}", artifact );
+        	
+	        ArtifactRequest artifactRequest = new ArtifactRequest();
+	        artifactRequest.setArtifact( artifact );
+	        for ( RemoteRepository repo : this.getRemoteRepositories() ) {
+	        	artifactRequest.addRepository( repo );
+	        }
+	
+	        ArtifactResult artifactResult = null;
+			try {
+				artifactResult = system.resolveArtifact( session, artifactRequest );
+			} catch (ArtifactResolutionException e) {
+				throw new ResolveException(e);
+			}
+	
+	        Artifact downloadedArtifact = artifactResult.getArtifact();
+	        files.add( downloadedArtifact.getFile() );
+        }
+        
+        return files;
 	}
 
 }
