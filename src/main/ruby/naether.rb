@@ -259,6 +259,32 @@ class Naether
     end
     
   end
+
+  def download_artifacts( notations )
+    if( notations.is_a? String )
+      notations = [notations]
+    end
+    
+    files = nil
+    if Naether.platform == 'java'
+      files = @resolver.downloadArtifacts( notations )
+    else
+      list = Rjb::import("java.util.ArrayList").new
+      notations.each do |notation|
+        list.add( notation )
+      end
+      
+      files = @resolver._invoke('downloadArtifacts', 'Ljava.util.List;', list)
+    end
+    
+    paths = []
+    Naether::Java.convert_to_ruby_array(files).each do |file|
+      paths << file.getAbsolutePath();
+    end
+    
+    paths
+  end
+  
   
   # Deploy artifact to remote repo url
   def deploy_artifact( notation, file_path, url, opts = {} )
@@ -333,8 +359,8 @@ class Naether
     @project_instance = Naether::Java.create("com.slackworks.naether.maven.Project")
     @project_instance.setProjectNotation( notation )
     
-    dependencies().each do |notation|
-      @project_instance.addDependency( notation )
+    dependencies().each do |dep|
+      @project_instance.addDependency( dep )
     end
     
     @project_instance.toXml()
