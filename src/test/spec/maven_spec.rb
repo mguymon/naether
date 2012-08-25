@@ -34,7 +34,7 @@ describe Naether do
       xml = @naether.build_pom( 'testGroup:testArtifact:jar:test' )
       
       pom = IO.read( "src/test/resources/generated_pom.xml" ) 
-      pom.should eql(xml)
+      xml.should eql(pom)
     end
     
     it "should write pom file" do

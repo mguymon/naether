@@ -340,7 +340,7 @@ class Naether
       
     end
     
-    @project_instance.getRepositoryUrls().each do |url|
+    Naether::Java.convert_to_ruby_array(@project_instance.getRepositoryUrls()).each do |url|
       add_remote_repository( url )
     end
     
@@ -365,9 +365,7 @@ class Naether
     
     @project_instance.setRepositories( @resolver.getRemoteRepositoryUrls() )
       
-    dependencies().each do |dep|
-      @project_instance.addDependency( dep )
-    end
+    @project_instance.setDependencies( @resolver.getDependencies() )
     
     @project_instance.toXml()
     
@@ -381,9 +379,7 @@ class Naether
     @project_instance = Naether::Java.create("com.slackworks.naether.maven.Project")
     @project_instance.setProjectNotation( notation )
     
-    dependencies().each do |notation|
-      @project_instance.addDependency( notation )
-    end
+    @project_instance.setDependencies( @resolver.getDependencies() )
     
     @project_instance.writePom( file_path )
     

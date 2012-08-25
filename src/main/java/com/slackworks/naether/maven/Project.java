@@ -345,6 +345,12 @@ public class Project {
 		dependency.setScope( aetherDep.getScope() );
 		addDependency( dependency );
 	}
+	
+	public void setDependencies( List<org.sonatype.aether.graph.Dependency> dependencies ) {
+		for ( org.sonatype.aether.graph.Dependency dep : dependencies ) {
+			addDependency( dep );
+		}
+	}
 
 	/**
 	 * Set the Maven {@link Model}
@@ -405,6 +411,10 @@ public class Project {
 	
 	public void writePom(File file) throws ProjectException {
 		log.debug("Writing pom: {}", file.getPath());
+		
+		Project copy = this;
+		copy.removeProperty( "project.basedir" );
+		
 		Writer writer;
 		try {
 			writer = new BufferedWriter(new FileWriter(file));
@@ -414,7 +424,7 @@ public class Project {
 		
 		MavenXpp3Writer pomWriter = new MavenXpp3Writer();
 		try {
-			pomWriter.write(writer, this.mavenModel);
+			pomWriter.write(writer, copy.mavenModel);
 		} catch (IOException e) {
 			throw new ProjectException("Failed to write pom", e);
 		}
@@ -430,7 +440,7 @@ public class Project {
 		
 		MavenXpp3Writer pomWriter = new MavenXpp3Writer();
 		try {
-			pomWriter.write(writer, this.mavenModel);
+			pomWriter.write(writer, copy.mavenModel);
 		} catch (IOException e) {
 			throw new ProjectException("Failed to create pom xml", e);
 		}
