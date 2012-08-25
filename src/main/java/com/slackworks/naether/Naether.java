@@ -101,7 +101,7 @@ public class Naether {
 
 	/**
 	 * Create new instance. Default local repository is environment M2_REPO
-	 * setting or user home .m2/. The local repository is the destination for
+	 * setting or user home .m2/repository. The local repository is the destination for
 	 * downloaded metadata and artifacts.
 	 * 
 	 * The default remote repository is http://repo1.maven.org/maven2/
@@ -136,12 +136,20 @@ public class Naether {
 	}
 	
 	/**
-	 * Clear dependencies
+	 * Clear local BuildArtifacts
 	 */
 	public void clearBuildArtifacts() {
 		setBuildArtifacts(new ArrayList<Artifact>());
 	}
 	
+	/**
+	 * Add a local Build Artifact manually by String notation, path to the artifact,
+	 * and path to the POM.
+	 * 
+	 * @param notation String
+	 * @param path String
+	 * @param pom String
+	 */
 	public void addBuildArtifact(String notation, String path, String pom) {
 		Artifact artifact = new DefaultArtifact(notation);
 		artifact = artifact.setFile( new File(path) );
@@ -158,6 +166,14 @@ public class Naether {
 		this.buildArtifacts.add( artifact );
 	}
 	
+	/**
+	 * Add a local Build Artifact manually by String notation and path to the artifact.
+	 * The POM for the artifact is created automatically based on the String notation.
+	 * 
+	 * @param notation String
+	 * @param path String
+	 * @throws NaetherException if failed to create a POM
+	 */
 	public void addBuildArtifact(String notation, String path) throws NaetherException {
 		Artifact artifact = new DefaultArtifact(notation);
 		artifact = artifact.setFile( new File(path) );
@@ -512,6 +528,8 @@ public class Naether {
 			session = (MavenRepositorySystemSession)session.setUserProperties( userProperties );
 		}
 		
+		// If there are local build artifacts, create a BuildWorkspaceReader to
+		// override remote artifacts with the local build artifacts.
 		if ( buildArtifacts.size() > 0 ) {
 			BuildWorkspaceReader reader = new BuildWorkspaceReader();
 			
@@ -761,14 +779,33 @@ public class Naether {
 		return dependencies;
 	}
 
+	/**
+	 * Get List<Artifact> of local artifacts that are used in dependency
+	 * resolution.
+	 * 
+	 * @return List<Artifact>
+	 */
 	public List<Artifact> getBuildArtifacts() {
 		return buildArtifacts;
 	}
 
+	/**
+	 * Set List<Artifact> for local artifacts that are used in depdency resolution.
+	 * 
+	 * @param buildArtifacts List<Artifact>
+	 */
 	public void setBuildArtifacts(List<Artifact> buildArtifacts) {
 		this.buildArtifacts = buildArtifacts;
 	}
 	
+	/**
+	 * Download to the local repository a List of {@link Artifact} or String
+	 * notations.
+	 * 
+	 * @param artifactsOrNotations @{link List} of {@link Artifact} or String notation
+	 * @return List<File>
+	 * @throws NaetherException
+	 */
 	@SuppressWarnings("rawtypes")
 	public List<File> downloadArtifacts( List artifactsOrNotations ) throws NaetherException {
 		RepositorySystem system = this.newRepositorySystem();
