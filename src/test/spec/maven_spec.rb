@@ -30,11 +30,11 @@ describe Naether do
     
     it "should create pom xml" do
       @naether.dependencies = [ "org.apache.maven.wagon:wagon-file:jar:1.0", {"junit:junit:jar:4.8.2" => 'test'} ]
-      
+      @naether.add_remote_repository( 'http://repository.jboss.org/nexus/content/groups/public-jboss' )
       xml = @naether.build_pom( 'testGroup:testArtifact:jar:test' )
       
       pom = IO.read( "src/test/resources/generated_pom.xml" ) 
-      xml.should eql( pom )
+      pom.should eql(xml)
     end
     
     it "should write pom file" do

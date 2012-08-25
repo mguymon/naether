@@ -11,7 +11,7 @@ import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.repository.WorkspaceReader;
 import org.sonatype.aether.repository.WorkspaceRepository;
 
-import com.slackworks.naether.Notation;
+import com.slackworks.naether.util.Notation;
 
 @Component(role = WorkspaceReader.class, hint = "local-build")
 public class BuildWorkspaceReader implements WorkspaceReader {

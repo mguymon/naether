@@ -45,10 +45,10 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 // Slackworks Naether
 import com.slackworks.naether.Bootstrap;
 import com.slackworks.naether.Naether;
-import com.slackworks.naether.Notation;
 import com.slackworks.naether.deploy.DeployArtifact;
 import com.slackworks.naether.maven.Project;
 import com.slackworks.naether.maven.ProjectException;
+import com.slackworks.naether.util.Notation;
 
 
 /**
@@ -86,6 +86,13 @@ public class NaetherTest {
 		naether.addRemoteRepository( "test-id", "test-type", "http://test.net" );
 		repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
 		assertEquals( "test-id", repos.get(2).getId() );
+	}
+	
+	@Test
+	public void getRemoteRepositoryUrls() throws NaetherException {
+		naether.addRemoteRepositoryByUrl( "http://test.net/hamster:7011" );
+		
+		assertEquals( Arrays.asList("http://repo1.maven.org/maven2/", "http://test.net/hamster:7011"), naether.getRemoteRepositoryUrls() );
 	}
 	
 	@Test

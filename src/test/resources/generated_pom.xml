@@ -19,4 +19,16 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <repositories>
+    <repository>
+      <id>repo1.maven.org-maven2-</id>
+      <name>repo1.maven.org</name>
+      <url>http://repo1.maven.org/maven2/</url>
+    </repository>
+    <repository>
+      <id>repository.jboss.org-nexus-content-groups-public-jboss</id>
+      <name>repository.jboss.org</name>
+      <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
+    </repository>
+  </repositories>
 </project>

@@ -1,4 +1,4 @@
-package com.slackworks.naether.repo;
+package com.slackworks.naether.util;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,6 +21,7 @@ package com.slackworks.naether.repo;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.maven.model.Repository;
 import org.sonatype.aether.repository.RemoteRepository;
 
 /**
@@ -29,7 +30,7 @@ import org.sonatype.aether.repository.RemoteRepository;
  * @author Michael Guymon
  *
  */
-public class RemoteRepoBuilder {
+public class RepoBuilder {
 
 	/**
 	 * Create a {@link RemoteRepository} from a String url
@@ -38,7 +39,7 @@ public class RemoteRepoBuilder {
 	 * @return {@link RemoteRepository}
 	 * @throws MalformedURLException
 	 */
-	public static RemoteRepository createFromUrl(String url) throws MalformedURLException {
+	public static RemoteRepository remoteRepositoryFromUrl(String url) throws MalformedURLException {
 		URL parsedUrl = new URL(url);
 
 		StringBuffer id = new StringBuffer(parsedUrl.getHost());
@@ -55,5 +56,36 @@ public class RemoteRepoBuilder {
 		}
 
 		return new RemoteRepository(id.toString(), "default", url);
+	}
+	
+	/**
+	 * Create a {@link Repository} from a String url
+	 * 
+	 * @param url
+	 * @return {@link Repository}
+	 * @throws MalformedURLException
+	 */
+	public static Repository repositoryFromUrl(String url) throws MalformedURLException {
+		URL parsedUrl = new URL(url);
+
+		StringBuffer id = new StringBuffer(parsedUrl.getHost());
+		String path = parsedUrl.getPath();
+		if (path.length() > 0) {
+			path = path.replaceFirst("/", "").replaceAll("/", "-").replaceAll(":", "-");
+			id.append("-");
+			id.append(path);
+		}
+
+		if (parsedUrl.getPort() > -1) {
+			id.append("-");
+			id.append(parsedUrl.getPort());
+		}
+
+		Repository repo = new Repository();
+		repo.setId( id.toString() );
+		repo.setName( parsedUrl.getHost() );
+		repo.setUrl( url );
+		
+		return repo;
 	}
 }

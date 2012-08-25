@@ -340,6 +340,10 @@ class Naether
       
     end
     
+    @project_instance.getRepositoryUrls().each do |url|
+      add_remote_repository( url )
+    end
+    
     Naether::Java.convert_to_ruby_array( deps, true )
   end
   
@@ -359,6 +363,8 @@ class Naether
     @project_instance = Naether::Java.create("com.slackworks.naether.maven.Project")
     @project_instance.setProjectNotation( notation )
     
+    @project_instance.setRepositories( @resolver.getRemoteRepositoryUrls() )
+      
     dependencies().each do |dep|
       @project_instance.addDependency( dep )
     end
@@ -384,6 +390,6 @@ class Naether
   end
 
   def set_log_level( level )
-    Naether::Java.java_class('com.slackworks.naether.LogUtil').changeLevel( 'com.slackworks', level )
+    Naether::Java.java_class('com.slackworks.naether.util.LogUtil').changeLevel( 'com.slackworks', level )
   end
 end

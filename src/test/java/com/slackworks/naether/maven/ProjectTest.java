@@ -63,6 +63,14 @@ public class ProjectTest {
 		assertNotNull(mavenProject.getMavenModel());
 		assertEquals( "3", mavenProject.getVersion());
 	}
+	
+	@Test
+	public void getRepositories() throws ProjectException {
+		Project mavenProject = new Project("src/test/resources/valid_pom.xml");
+		List<String> repositories = mavenProject.getRepositoryUrls();
+		
+		assertEquals( Arrays.asList( "http://repository.jboss.org/nexus/content/groups/public-jboss" ), repositories );
+	}
 
 	@Test
 	public void getDependenciesByScope() throws ProjectException {
@@ -131,7 +139,8 @@ public class ProjectTest {
 		project.setType("jar");
 		project.addDependency("org.apache.maven.wagon:wagon-file:jar:1.0");
 		project.addDependency("junit:junit:jar:4.8.2", "test");
-		
+		project.addRepository( "http://repo1.maven.org/maven2/" );
+		project.addRepository( "http://repository.jboss.org/nexus/content/groups/public-jboss" );
 		String xml = project.toXml();
 		
 		assertEquals( IOUtils.toString( new FileReader("src/test/resources/generated_pom.xml") ), xml );

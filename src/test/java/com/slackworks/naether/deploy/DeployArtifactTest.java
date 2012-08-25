@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.slackworks.naether.deploy.DeployArtifact;
-import com.slackworks.naether.repo.RemoteRepoBuilder;
+import com.slackworks.naether.util.RepoBuilder;
 
 import static org.junit.Assert.*;
 
@@ -40,7 +40,7 @@ public class DeployArtifactTest {
 	
 	@Test
 	public void createDeployArtifactWithParameters() throws MalformedURLException {
-		instance = new DeployArtifact( "groupId:artifactId:extension:version", "non-existing-path", RemoteRepoBuilder.createFromUrl( "http://example.net/repo" ) );
+		instance = new DeployArtifact( "groupId:artifactId:extension:version", "non-existing-path", RepoBuilder.remoteRepositoryFromUrl( "http://example.net/repo" ) );
 		assertEquals( "artifactId", instance.getJarArtifact().getArtifactId() );
 		assertEquals( "groupId", instance.getJarArtifact().getGroupId() );
 		assertEquals( "version", instance.getJarArtifact().getVersion() );

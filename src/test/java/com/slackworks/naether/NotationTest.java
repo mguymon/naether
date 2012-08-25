@@ -26,6 +26,8 @@ import org.junit.Test;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
+import com.slackworks.naether.util.Notation;
+
 /**
  * Notation test
  * 

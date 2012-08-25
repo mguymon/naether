@@ -29,7 +29,7 @@ import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
-import com.slackworks.naether.repo.RemoteRepoBuilder;
+import com.slackworks.naether.util.RepoBuilder;
 
 /**
  * Information for deploying an {@link Artifact}
@@ -79,7 +79,7 @@ public class DeployArtifact {
 
 
 	public void setRemoteRepo( String url ) throws MalformedURLException {
-		this.setRemoteRepo( RemoteRepoBuilder.createFromUrl( url ) );
+		this.setRemoteRepo( RepoBuilder.remoteRepositoryFromUrl( url ) );
 	}
 	
 	public void setRemoteRepo( RemoteRepository remoteRepo ) {

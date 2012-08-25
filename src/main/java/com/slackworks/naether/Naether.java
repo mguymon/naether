@@ -29,12 +29,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+// Apache Maven 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
+
+// SLF4J Logger
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+// Sonatype Aether
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -69,6 +74,7 @@ import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 import org.sonatype.aether.util.graph.selector.AndDependencySelector;
 
+// Naether
 import com.slackworks.naether.aether.ValidSystemScopeDependencySelector;
 import com.slackworks.naether.deploy.DeployArtifact;
 import com.slackworks.naether.deploy.DeployException;
@@ -79,7 +85,8 @@ import com.slackworks.naether.repo.BuildWorkspaceReader;
 import com.slackworks.naether.repo.LogRepositoryListener;
 import com.slackworks.naether.repo.LogTransferListener;
 import com.slackworks.naether.repo.ManualWagonProvider;
-import com.slackworks.naether.repo.RemoteRepoBuilder;
+import com.slackworks.naether.util.Notation;
+import com.slackworks.naether.util.RepoBuilder;
 
 /**
  * Dependency Resolver using Maven's Aether
@@ -379,7 +386,7 @@ public class Naether {
 	 */
 	public void addRemoteRepositoryByUrl(String url) throws NaetherException {
 		try {
-			addRemoteRepository(RemoteRepoBuilder.createFromUrl(url));
+			addRemoteRepository(RepoBuilder.remoteRepositoryFromUrl(url));
 		} catch (MalformedURLException e) {
 			log.error( "Malformed url: {}", url, e);
 			throw new NaetherException(e);
@@ -399,7 +406,7 @@ public class Naether {
 	public void addRemoteRepositoryByUrl(String url, String username, String password) throws URLException {
 		RemoteRepository remoteRepo;
 		try {
-			remoteRepo = RemoteRepoBuilder.createFromUrl(url);
+			remoteRepo = RepoBuilder.remoteRepositoryFromUrl(url);
 		} catch (MalformedURLException e) {
 			throw new URLException(e);
 		}
@@ -443,6 +450,15 @@ public class Naether {
 	 */
 	public Set<RemoteRepository> getRemoteRepositories() {
 		return remoteRepositories;
+	}
+	
+	public List<String> getRemoteRepositoryUrls() {
+		List<String> urls = new ArrayList<String>();
+		for( RemoteRepository repo : getRemoteRepositories() ) {
+			urls.add( repo.getUrl() );
+		}
+		
+		return urls;
 	}
 
 	/**
@@ -545,7 +561,7 @@ public class Naether {
 		collectRequest.setDependencies(getDependencies());
 		
 		try {
-			collectRequest.addRepository(RemoteRepoBuilder.createFromUrl("file:" + this.getLocalRepoPath()));
+			collectRequest.addRepository(RepoBuilder.remoteRepositoryFromUrl("file:" + this.getLocalRepoPath()));
 		} catch (MalformedURLException e) {
 			throw new URLException("Failed to add local repo to request", e);
 		}

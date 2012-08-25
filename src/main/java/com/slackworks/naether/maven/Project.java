@@ -28,6 +28,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,6 +39,7 @@ import java.util.regex.Pattern;
 // Apache Maven
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 
@@ -49,7 +51,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.artifact.Artifact;
 
-import com.slackworks.naether.Notation;
+import com.slackworks.naether.util.Notation;
+import com.slackworks.naether.util.RepoBuilder;
 
 /**
  * Maven Project Model
@@ -160,6 +163,51 @@ public class Project {
 
 	public void setType(String type) {
 		getMavenModel().setPackaging(type);
+	}
+	
+
+	public void addRepository(String url) throws ProjectException {
+		List<Repository> repositories = getRepositories();
+		
+		if ( repositories == null ) {
+			repositories = new ArrayList<Repository>();
+		}
+		
+		try {
+			Repository repository = RepoBuilder.repositoryFromUrl( url );
+			repositories.add( repository );
+		} catch (MalformedURLException e) {
+			throw new ProjectException( e );
+		}
+		
+		getMavenModel().setRepositories( repositories );
+	}
+	
+	public void setRepositories( List<String> urls ) throws ProjectException {
+		List<Repository> repositories = new ArrayList<Repository>();
+		for ( String url : urls  ) {
+			try {
+				Repository repository = RepoBuilder.repositoryFromUrl( url );
+				repositories.add( repository );
+			} catch (MalformedURLException e) {
+				throw new ProjectException( e );
+			}
+		}
+		getMavenModel().setRepositories( repositories);
+	}
+	
+	public List<Repository> getRepositories() {
+		return getMavenModel().getRepositories();
+	}
+	
+	public List<String> getRepositoryUrls() {
+		List<String> urls = new ArrayList<String>();
+		
+		for ( Repository repo : getRepositories() ) {
+			urls.add( repo.getUrl() );
+		}
+		
+		return urls;
 	}
 	
 	/**
