@@ -79,6 +79,10 @@ class Naether
     Naether::Java.convert_to_ruby_array(@resolver.getRemoteRepositories())
   end
   
+  def remote_repository_urls
+    Naether::Java.convert_to_ruby_array(@resolver.getRemoteRepositoryUrls(), true)
+  end
+  
   # Path to local maven repo
   def local_repo_path
     @resolver.getLocalRepoPath()
