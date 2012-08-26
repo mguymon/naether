@@ -28,9 +28,8 @@ describe Naether do
       deps.should eql ["junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1"]
     end
     
-    it "should set remote repositories from pom file" do
+    it "should set unique remote repositories from pom file" do
       @naether.pom_dependencies( 'src/test/resources/valid_pom.xml' )
-      
       @naether.remote_repository_urls.should eql( ["http://repo1.maven.org/maven2/", "http://repository.jboss.org/nexus/content/groups/public-jboss"] )
     end
     

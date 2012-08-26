@@ -40,6 +40,13 @@ describe Naether do
       @naether.remote_repositories[1].getId().should eql( "test.net-7011" )
     end
     
+    it "should only add a unique remote repository" do
+      @naether.add_remote_repository("http://test.net:7011")
+      @naether.add_remote_repository("http://test.net:7011")
+      
+      @naether.remote_repository_urls.should eql(["http://repo1.maven.org/maven2/", "http://test.net:7011"])
+    end
+    
     it "should add a dependency from notation" do
       @naether.dependencies = "junit:junit:jar:4.8.2" 
       @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2"]
