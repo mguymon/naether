@@ -29,7 +29,7 @@ describe Naether::Java do
     it "should load paths" do
       Naether::Java.load_paths( 'src/test/classes/commons-io' )
       file = Naether::Java.create( "java.io.File", "VERSION" )
-      version = Naether::Java.java_class( 'org.apache.commons.io.FileUtils' ).readFileToString( file )
+      version = Naether::Java.java_class( 'org.apache.commons.io.FileUtils' ).readFileToString( file ).strip
       version.should eql IO.read("VERSION").strip
     end
     
