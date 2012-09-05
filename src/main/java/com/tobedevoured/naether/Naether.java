@@ -32,22 +32,17 @@ import java.util.Set;
 // Apache Maven 
 import org.apache.maven.model.Repository;
 import org.apache.maven.repository.internal.DefaultServiceLocator;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 
 // SLF4J Logger
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // Sonatype Aether
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.artifact.ArtifactType;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.collection.DependencyCollectionException;
-import org.sonatype.aether.connector.wagon.WagonProvider;
-import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
 import org.sonatype.aether.deployment.DeployRequest;
 import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.graph.Dependency;
@@ -66,24 +61,18 @@ import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.DependencyRequest;
 import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.resolution.DependencyResult;
-import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.DefaultArtifactType;
 import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
-import org.sonatype.aether.util.graph.selector.AndDependencySelector;
 
 // Naether
-import com.tobedevoured.naether.aether.ValidSystemScopeDependencySelector;
 import com.tobedevoured.naether.deploy.DeployArtifact;
 import com.tobedevoured.naether.deploy.DeployException;
 import com.tobedevoured.naether.deploy.InstallException;
 import com.tobedevoured.naether.maven.Project;
 import com.tobedevoured.naether.maven.ProjectException;
-import com.tobedevoured.naether.repo.BuildWorkspaceReader;
-import com.tobedevoured.naether.repo.LogRepositoryListener;
-import com.tobedevoured.naether.repo.LogTransferListener;
-import com.tobedevoured.naether.repo.ManualWagonProvider;
+import com.tobedevoured.naether.repo.RepositoryClient;
 import com.tobedevoured.naether.util.Notation;
 import com.tobedevoured.naether.util.RepoBuilder;
 
@@ -113,6 +102,7 @@ public class Naether {
 	 * The default remote repository is http://repo1.maven.org/maven2/
 	 */
 	public Naether() {
+		
 		// Set the initial ArrayList
 		this.dependencies = new ArrayList<Dependency>();
 		
@@ -464,39 +454,6 @@ public class Naether {
 	}
 
 	/**
-	 * Create new {@link RepositorySystem}
-	 * 
-	 * @return {@link RepositorySystem}
-	 */
-	public RepositorySystem newRepositorySystem() {
-		DefaultServiceLocator locator = new DefaultServiceLocator();
-		locator.setServices(WagonProvider.class, new ManualWagonProvider());
-		locator.addService(RepositoryConnectorFactory.class, WagonRepositoryConnectorFactory.class);
-		
-		return locator.getService(RepositorySystem.class);
-	}
-
-	/**
-	 * Create new {@link RepositorySystemSession}
-	 * 
-	 * @param system {@link RepositorySystem}
-	 * @return {@link RepositorySystemSession}
-	 */
-	public MavenRepositorySystemSession newSession(RepositorySystem system) {
-		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
-		session = (MavenRepositorySystemSession)session.setDependencySelector( new AndDependencySelector( session.getDependencySelector(), new ValidSystemScopeDependencySelector() ) );
-		session = (MavenRepositorySystemSession)session.setTransferListener(new LogTransferListener());
-		session = (MavenRepositorySystemSession)session.setRepositoryListener(new LogRepositoryListener());
-		
-		session = (MavenRepositorySystemSession)session.setIgnoreMissingArtifactDescriptor( false );
-		
-		LocalRepository localRepo = new LocalRepository(getLocalRepoPath());
-		session.setLocalRepositoryManager(system.newLocalRepositoryManager(localRepo));
-		
-		return session;
-	}
-
-	/**
 	 * Resolve dependencies and download artifacts
 	 * 
 	 * @throws DependencyException
@@ -531,32 +488,15 @@ public class Naether {
 			}
 		}
 
-		RepositorySystem repoSystem = newRepositorySystem();
-		
-		MavenRepositorySystemSession session = newSession(repoSystem);
+		RepositoryClient repoClient = new RepositoryClient(this.getLocalRepoPath());
 		if ( properties != null ) {
-			Map<String,String> userProperties = session.getUserProperties();
-			if ( userProperties == null ) {
-				userProperties = new HashMap<String,String>();
-			}
-			userProperties.putAll( properties );
-			
-			log.debug( "Session userProperties: {}", userProperties );
-			
-			session = (MavenRepositorySystemSession)session.setUserProperties( userProperties );
+			repoClient.setProperties( properties );
 		}
 		
 		// If there are local build artifacts, create a BuildWorkspaceReader to
 		// override remote artifacts with the local build artifacts.
 		if ( buildArtifacts.size() > 0 ) {
-			BuildWorkspaceReader reader = new BuildWorkspaceReader();
-			
-			for ( Artifact artifact : buildArtifacts ) {
-				reader.addArtifact( artifact );
-			}
-			
-			session = (MavenRepositorySystemSession)session.setWorkspaceReader( reader );
-			
+			repoClient.setBuildWorkspaceReader( buildArtifacts );
 		}
 		
 		CollectRequest collectRequest = new CollectRequest();
@@ -574,7 +514,7 @@ public class Naether {
 
 		CollectResult collectResult;
 		try {
-			collectResult = repoSystem.collectDependencies(session,collectRequest);
+			collectResult = repoClient.collectDependencies(collectRequest);
 		} catch (DependencyCollectionException e) {
 			throw new DependencyException(e);
 		}
@@ -586,7 +526,7 @@ public class Naether {
 			log.debug("Resolving dependencies to files");
 			DependencyResult dependencyResult;
 			try {
-				dependencyResult = repoSystem.resolveDependencies(session, dependencyRequest);
+				dependencyResult = repoClient.resolveDependencies(dependencyRequest);
 			} catch (DependencyResolutionException e) {
 				throw new DependencyException(e);
 			}
@@ -608,10 +548,9 @@ public class Naether {
 	 */
 	public void deployArtifact(DeployArtifact deployArtifact) throws DeployException {
 		log.debug("deploy artifact: {} ", deployArtifact.getNotation());
-		RepositorySystem system = newRepositorySystem();
-
-		RepositorySystemSession session = newSession(system);
-
+		
+		RepositoryClient repoClient = new RepositoryClient(this.getLocalRepoPath());
+		
 		DeployRequest deployRequest = new DeployRequest();
 		deployRequest.addArtifact(deployArtifact.getJarArtifact());
 		if (deployArtifact.getPomArtifact() != null) {
@@ -621,7 +560,7 @@ public class Naether {
 
 		log.debug("deploying artifact {}", deployArtifact.getNotation());
 		try {
-			system.deploy(session, deployRequest);
+			repoClient.deploy(deployRequest);
 		} catch (DeploymentException e) {
 			log.error("Failed to deploy artifact", e);
 			throw new DeployException(e);
@@ -644,10 +583,7 @@ public class Naether {
 	public void install(String notation, String pomPath, String filePath ) throws InstallException {
 		log.debug("installing artifact: {} ", notation);
 		
-		RepositorySystem system = newRepositorySystem();
-
-		RepositorySystemSession session = newSession(system);
-
+		RepositoryClient repoClient = new RepositoryClient(this.getLocalRepoPath());
 		InstallRequest installRequest = new InstallRequest();
 		
 		if ( filePath != null ) {
@@ -673,7 +609,7 @@ public class Naether {
 		}
 				
 		try {
-			system.install(session, installRequest);
+			repoClient.install(installRequest);
 		} catch (InstallationException e) {
 			log.error("Failed to install artifact", e);
 			throw new InstallException(e);
@@ -826,8 +762,7 @@ public class Naether {
 	 */
 	@SuppressWarnings("rawtypes")
 	public List<File> downloadArtifacts( List artifactsOrNotations ) throws NaetherException {
-		RepositorySystem system = this.newRepositorySystem();
-
+		
 		List<Artifact> artifacts = new ArrayList<Artifact>();
 		
 		for ( Object artifactsOrNotation : artifactsOrNotations ) {
@@ -844,8 +779,6 @@ public class Naether {
 			}
 		}
 		
-        RepositorySystemSession session = this.newSession(system);
-
         List<File> files = new ArrayList<File>();
         
         for ( Artifact artifact : artifacts ) {
@@ -858,9 +791,11 @@ public class Naether {
 	        	artifactRequest.addRepository( repo );
 	        }
 	
+	        RepositoryClient repoClient = new RepositoryClient(this.getLocalRepoPath());
+	        
 	        ArtifactResult artifactResult = null;
 			try {
-				artifactResult = system.resolveArtifact( session, artifactRequest );
+				artifactResult = repoClient.resolveArtifact(artifactRequest );
 			} catch (ArtifactResolutionException e) {
 				throw new ResolveException(e);
 			}
