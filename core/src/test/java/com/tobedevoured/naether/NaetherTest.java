@@ -37,7 +37,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
@@ -263,6 +262,9 @@ public class NaetherTest {
 	@Test
 	public void resolveNaetherDependencies() throws Exception {
 		Project mavenProject = new Project("pom.xml");
+		
+		assertEquals( "core", mavenProject.getArtifactId() );
+		
 		for( org.apache.maven.model.Dependency mavenDep : mavenProject.getDependencies() ) {
 			String notation = Notation.generate( mavenDep );
 			
@@ -283,7 +285,8 @@ public class NaetherTest {
 		// Jars excluded from bootstrap dependencies
 		completeDeps.add( "org.sonatype.sisu:sisu-guice:jar:no_aop:3.0.3");
 		completeDeps.add( "org.jboss.netty:netty:jar:3.2.5.Final");
-		completeDeps.add( "junit:junit:jar:4.8.2");
+		completeDeps.add( "junit:junit:jar:4.10");
+		completeDeps.add( "org.hamcrest:hamcrest-core:jar:1.1");
 		completeDeps.add( "log4j:log4j:jar:1.2.12");
 		completeDeps.add( "commons-logging:commons-logging-api:jar:1.1");
 		completeDeps.add( "commons-logging:commons-logging:jar:1.1.1");
@@ -298,6 +301,7 @@ public class NaetherTest {
         }
         
         if ( missingDeps.size() > 0 ) {
+        	LoggerFactory.getLogger(this.getClass()).warn( "Resolved Deps: {}", naether.getDependenciesNotation() );
         	fail( "Missing Dependencies: " + missingDeps );
         }
 		
