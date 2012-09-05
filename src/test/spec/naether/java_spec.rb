@@ -20,10 +20,10 @@ describe Naether::Java do
       
     end
     
-    it "should create an instance of com.slackworks.naether.maven.Project" do
+    it "should create an instance of com.tobedevoured.naether.maven.Project" do
       @naether = Naether::create_from_paths( 'target/lib', 'target' )
-      instance = Naether::Java.create("com.slackworks.naether.maven.Project")
-      instance.getClass().getName().should eql "com.slackworks.naether.maven.Project" 
+      instance = Naether::Java.create("com.tobedevoured.naether.maven.Project")
+      instance.getClass().getName().should eql "com.tobedevoured.naether.maven.Project" 
     end
     
     it "should load paths" do

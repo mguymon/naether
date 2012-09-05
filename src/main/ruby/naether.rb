@@ -57,7 +57,7 @@ class Naether
   # Create new instance. Naether.create_from_paths and Naether.create_from_jars should be
   # used instead of Naether.new to ensure the dependencies for Naether are set into the classpath
   def initialize
-    @resolver = Naether::Java.create('com.slackworks.naether.Naether')
+    @resolver = Naether::Java.create('com.tobedevoured.naether.Naether')
   end
   
   # Clear all remote repositories
@@ -292,7 +292,7 @@ class Naether
   
   # Deploy artifact to remote repo url
   def deploy_artifact( notation, file_path, url, opts = {} )
-    artifact = Naether::Java.create( "com.slackworks.naether.deploy.DeployArtifact" )
+    artifact = Naether::Java.create( "com.tobedevoured.naether.deploy.DeployArtifact" )
     
     artifact.setRemoteRepo( url )
     artifact.setNotation( notation )
@@ -314,7 +314,7 @@ class Naether
   end
   
   def load_pom( file_path )
-    @project_instance = Naether::Java.create("com.slackworks.naether.maven.Project", file_path )
+    @project_instance = Naether::Java.create("com.tobedevoured.naether.maven.Project", file_path )
   end
   
   def pom_dependencies( file_path=nil, scopes = nil)
@@ -364,7 +364,7 @@ class Naether
   #
   # loads all resolved dependencies into pom
   def build_pom( notation )
-    @project_instance = Naether::Java.create("com.slackworks.naether.maven.Project")
+    @project_instance = Naether::Java.create("com.tobedevoured.naether.maven.Project")
     @project_instance.setProjectNotation( notation )
     
     @project_instance.setRepositories( @resolver.getRemoteRepositoryUrls() )
@@ -380,7 +380,7 @@ class Naether
   #
   # loads all resolved dependencies into pom
   def write_pom( notation, file_path )
-    @project_instance = Naether::Java.create("com.slackworks.naether.maven.Project")
+    @project_instance = Naether::Java.create("com.tobedevoured.naether.maven.Project")
     @project_instance.setProjectNotation( notation )
     
     @project_instance.setDependencies( @resolver.getDependencies() )
@@ -390,6 +390,6 @@ class Naether
   end
 
   def set_log_level( level )
-    Naether::Java.java_class('com.slackworks.naether.util.LogUtil').changeLevel( 'com.slackworks', level )
+    Naether::Java.java_class('com.tobedevoured.naether.util.LogUtil').changeLevel( 'com.tobedevoured', level )
   end
 end

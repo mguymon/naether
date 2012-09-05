@@ -82,12 +82,12 @@ Jeweler::Tasks.new do |gem|
   Naether::Java.load_jars_dir( ['target', 'target/lib'])
   
   if platform == 'java'
-    java_import com.slackworks.naether.maven.Project
+    java_import com.tobedevoured.naether.maven.Project
     
     maven_project = Project.new('pom.xml')
     naether_jar = "naether-#{maven_project.get_version}.jar"
   else
-    mavenProjectClass = Rjb::import('com.slackworks.naether.maven.Project')
+    mavenProjectClass = Rjb::import('com.tobedevoured.naether.maven.Project')
     maven_project = mavenProjectClass.new('pom.xml')
     naether_jar = "naether-#{maven_project.getVersion()}.jar"
   end
@@ -102,7 +102,7 @@ Jeweler::Tasks.new do |gem|
   gem.license = "Apache"
   gem.summary = %Q{Java dependency resolver using Maven's Aether}
   gem.description = %Q{Java dependency resolver using Maven's Aether}
-  gem.email = "michael.guymon@gmail.com"
+  gem.email = "michael@tobedevoured.com"
   gem.authors = ["Michael Guymon"]
   gem.platform       = platform
   gem.require_paths = %w[lib]

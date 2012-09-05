@@ -14,7 +14,7 @@ https://github.com/mguymon/naether
 ==== Java
 
   <dependency>
-    <groupId>com.slackworks</groupId>
+    <groupId>com.tobedevoured</groupId>
     <artifactId>naether</artifactId>
     <version>0.8.2</version>
   </dependency>

@@ -151,10 +151,10 @@ describe Naether do
    
     it "should change logging level" do
       @naether.set_log_level( 'debug' )
-      Naether::Java.java_class("com.slackworks.naether.util.LogUtil").getLogLevel("com.slackworks").toString().should eql( "DEBUG" )
+      Naether::Java.java_class("com.tobedevoured.naether.util.LogUtil").getLogLevel("com.tobedevoured").toString().should eql( "DEBUG" )
       
       @naether.set_log_level( 'info' )
-      Naether::Java.java_class("com.slackworks.naether.util.LogUtil").getLogLevel("com.slackworks").toString().should eql( "INFO" )
+      Naether::Java.java_class("com.tobedevoured.naether.util.LogUtil").getLogLevel("com.tobedevoured").toString().should eql( "INFO" )
           
     end
   end

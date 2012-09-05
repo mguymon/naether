@@ -31,9 +31,9 @@ class Naether
         Naether::Java.load_jars_dir( jar_path || Naether::JAR_LIB )
         deps = {};
         if Naether.platform == 'java'
-          deps[:dependencies] = com.slackworks.naether.Bootstrap.dependencies.to_a
+          deps[:dependencies] = com.tobedevoured.naether.Bootstrap.dependencies.to_a
         else
-          bootstrap = Rjb::import('com.slackworks.naether.Bootstrap')
+          bootstrap = Rjb::import('com.tobedevoured.naether.Bootstrap')
           deps[:dependencies] = bootstrap.dependencies.toArray().map{ |dep| dep.toString() }
         end  
         

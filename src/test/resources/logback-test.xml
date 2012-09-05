@@ -7,7 +7,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.slackworks" level="DEBUG" />
+    <logger name="com.tobedevoured" level="DEBUG" />
 	
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
