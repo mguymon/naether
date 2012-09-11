@@ -24,8 +24,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -69,8 +71,8 @@ public class SystemPathDependencyTest {
         naether.addDependency(dependency);
         naether.resolveDependencies( false );
         
-        List<String> dependencies = naether.getDependenciesNotation();
-        List<String> expectedDependencies = new ArrayList<String>( Arrays.asList( 
+        Set<String> dependencies = naether.getDependenciesNotation();
+        Set<String> expectedDependencies = new HashSet<String>( Arrays.asList( 
         	"valid:pom:jar:3", "ch.qos.logback:logback-classic:jar:0.9.29", 
         	"ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1" ));
         assertEquals( expectedDependencies, dependencies );
@@ -83,8 +85,8 @@ public class SystemPathDependencyTest {
         naether.addDependency(dependency);
         naether.resolveDependencies( false );
             
-        List<String> dependencies = naether.getDependenciesNotation();
-        List<String> expectedDependencies = new ArrayList<String>( Arrays.asList(
+        Set<String> dependencies = naether.getDependenciesNotation();
+        Set<String> expectedDependencies = new HashSet<String>( Arrays.asList(
         	"pom:with-system-path:jar:2", "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1" ));
         assertEquals( expectedDependencies, dependencies );   
 	}
@@ -96,8 +98,8 @@ public class SystemPathDependencyTest {
         naether.addDependency(dependency);
         naether.resolveDependencies( false );
             
-        List<String> dependencies = naether.getDependenciesNotation();        
-        List<String> expectedDependencies = new ArrayList<String>( Arrays.asList(
+        Set<String> dependencies = naether.getDependenciesNotation();        
+        Set<String> expectedDependencies = new HashSet<String>( Arrays.asList(
         	"pom:with-broken-dep:jar:1", "pom:with-system-path:jar:2", 
         	"ch.qos.logback:logback-classic:jar:0.9.29", 
         	"ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"));       
@@ -115,12 +117,12 @@ public class SystemPathDependencyTest {
         naether.addDependency(dependency);
         naether.resolveDependencies( false, properties );
             
-        List<String> dependencies = naether.getDependenciesNotation();        
-        List<String> expectedDependencies = new ArrayList<String>( Arrays.asList(
+        Set<String> dependencies = naether.getDependenciesNotation();        
+        Set<String> expectedDependencies = new HashSet<String>( Arrays.asList(
         	"pom:with-broken-dep:jar:1", "pom:with-system-path:jar:2", 
         	"ch.qos.logback:logback-classic:jar:0.9.29", 
         	"ch.qos.logback:logback-core:jar:0.9.29", 
-        	"org.slf4j:slf4j-api:jar:1.6.1", "google:gdata-spreadsheet:jar:3.0"));       
+        	"org.slf4j:slf4j-api:jar:1.6.1", "commons-beanutils:commons-beanutils:jar:1.8.3"));       
         assertEquals( expectedDependencies, dependencies );
         
 	}

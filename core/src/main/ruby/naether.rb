@@ -1,3 +1,4 @@
+require "#{File.dirname(__FILE__)}/naether/configuration"
 require "#{File.dirname(__FILE__)}/naether/bootstrap"
 require "#{File.dirname(__FILE__)}/naether/java"
 
@@ -10,45 +11,21 @@ require "#{File.dirname(__FILE__)}/naether/java"
 #
 class Naether
   
-  # Naether jar path will default to packaged in the gem
-  JAR_LIB = "#{File.dirname(__FILE__)}/.."
-  
-  # Load VERSION file to VERSION var
-  if File.exists?( File.join( JAR_LIB, "VERSION" ) )
-    VERSION = File.open( File.join( JAR_LIB, "VERSION" ) ) {|f| f.readline }.strip
-      
-  # VERSION file not found in gem dir, assume running from checkout
-  else
-    VERSION = File.open( "VERSION" ) {|f| f.readline }.strip
-  end
-  
-  # Use the VERSION to create jar file name
-  JAR_PATH = "#{JAR_LIB}/naether-#{VERSION}.jar"
-  
   class << self
-    
-    # Helper to determine the platform
-    def platform
-      $platform || RUBY_PLATFORM[/java/] || 'ruby'
-    end
     
     # Java dependencies needed to bootstrap Naether
     def bootstrap_dependencies( dep_file=nil )
       Naether::Bootstrap.dependencies( dep_file )
     end
     
-    # Loads all jars from paths and creates a new instance of Naether
-    def create_from_paths( deps_jar_dir, naether_jar_dir = nil )
-      naether_jar_dir = naether_jar_dir || JAR_LIB
-      Naether::Java.load_jars_dir( [deps_jar_dir, naether_jar_dir] )
-      
-      Naether.new
+    def platform
+      Naether::Configuration.platform
     end
     
+
     # Loads all jars creates a new instance of Naether
     def create_from_jars( jars )
-      Naether::Java.load_jars( jars )
-      
+      Naether::Java.internal_load_paths( jars )
       Naether.new
     end
     
@@ -136,10 +113,7 @@ class Naether
     if Naether.platform == 'java'
       @resolver.addDependencies( pom_path, scopes )
     else
-      list = Rjb::import("java.util.ArrayList").new
-      scopes.each do |scope|
-        list.add( scope )
-      end
+      list = Naether::Java.convert_to_java_list( scopes )
       @resolver._invoke( 'addDependencies', 'Ljava.lang.String;Ljava.util.List;', pom_path, list )
     end
   end
@@ -251,14 +225,18 @@ class Naether
 
   def to_local_paths( notations ) 
     if Naether.platform == 'java'
-      Naether::Java.convert_to_ruby_array( @resolver.getLocalPaths( notations ) )
+      Naether::Java.convert_to_ruby_array( 
+        Naether::Java.exec_static_method( 
+          'com.tobedevoured.naether.util.Notation', 
+          'getLocalPaths', 
+          [local_repo_path, notations ], 
+          ['java.lang.String', 'java.util.List'] ) )
     else
-      list = Rjb::import("java.util.ArrayList").new
-      notations.each do |notation|
-        list.add( notation )
-      end
-      paths = @resolver._invoke('getLocalPaths', 'Ljava.util.List;', list)
-      
+      paths =  Naether::Java.exec_static_method( 
+        'com.tobedevoured.naether.util.Notation', 
+        'getLocalPaths', 
+        [local_repo_path, Naether::Java.convert_to_java_list(notations) ], 
+        ['java.lang.String', 'java.util.List'] ) 
       Naether::Java.convert_to_ruby_array( paths, true )
     end
     
@@ -273,11 +251,7 @@ class Naether
     if Naether.platform == 'java'
       files = @resolver.downloadArtifacts( notations )
     else
-      list = Rjb::import("java.util.ArrayList").new
-      notations.each do |notation|
-        list.add( notation )
-      end
-      
+      list = Naether::Java.convert_to_java_list( notations )
       files = @resolver._invoke('downloadArtifacts', 'Ljava.util.List;', list)
     end
     
@@ -304,8 +278,11 @@ class Naether
     if opts[:username] || opts[:pub_key]
       artifact.setAuth(opts[:username], opts[:password], opts[:pub_key], opts[:pub_key_passphrase] )
     end
-    
-    @resolver.deployArtifact(artifact)
+    if Naether.platform == 'java'
+      @resolver.deployArtifact(artifact)
+    else
+      @resolver._invoke( 'deployArtifact', 'Lcom.tobedevoured.naether.deploy.DeployArtifact;', artifact )
+    end
   end
   
   # Install artifact or pom to local repo, must specify pom_path and/or jar_path
@@ -332,10 +309,7 @@ class Naether
     else
       list = nil
       if scopes
-        list = Rjb::import("java.util.ArrayList").new
-        scopes.each do |scope|
-          list.add( scope )
-        end
+        list = Naether::Java.convert_to_java_list( scopes )
         
         deps = @project_instance._invoke('getDependenciesNotation', 'Ljava.util.List;', list)
       else
@@ -390,6 +364,6 @@ class Naether
   end
 
   def set_log_level( level )
-    Naether::Java.java_class('com.tobedevoured.naether.util.LogUtil').changeLevel( 'com.tobedevoured', level )
+    Naether::Java.exec_static_method('com.tobedevoured.naether.util.LogUtil', 'changeLevel', ['com.tobedevoured', level] )
   end
 end

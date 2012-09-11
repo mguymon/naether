@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class Naether {
 	private static Logger log = LoggerFactory.getLogger(Naether.class);
 
 	private String localRepoPath;
-	private List<Dependency> dependencies;
+	private Set<Dependency> dependencies;
 	private List<Artifact> buildArtifacts;
 	private Set<RemoteRepository> remoteRepositories;
 	private PreorderNodeListGenerator preorderedNodeList;
@@ -104,7 +105,7 @@ public class Naether {
 	public Naether() {
 		
 		// Set the initial ArrayList
-		this.dependencies = new ArrayList<Dependency>();
+		this.dependencies = new HashSet<Dependency>();
 		
 		// Set the initial ArrayList
 		this.buildArtifacts = new ArrayList<Artifact>();
@@ -128,7 +129,7 @@ public class Naether {
 	 * Clear dependencies
 	 */
 	public void clearDependencies() {
-		setDependencies(new ArrayList<Dependency>());
+		setDependencies(new HashSet<Dependency>());
 	}
 	
 	/**
@@ -500,7 +501,7 @@ public class Naether {
 		}
 		
 		CollectRequest collectRequest = new CollectRequest();
-		collectRequest.setDependencies(getDependencies());
+		collectRequest.setDependencies( new ArrayList<Dependency>(getDependencies()));
 		
 		try {
 			collectRequest.addRepository(RepoBuilder.remoteRepositoryFromUrl("file:" + this.getLocalRepoPath()));
@@ -536,7 +537,7 @@ public class Naether {
 			collectResult.getRoot().accept(preorderedNodeList);
 		}
 
-		this.setDependencies(preorderedNodeList.getDependencies(true));
+		this.setDependencies( new HashSet<Dependency>(preorderedNodeList.getDependencies(true)));
 		log.debug("Setting resolved dependencies: {}", this.getDependencies());
 	}
 
@@ -628,46 +629,14 @@ public class Naether {
 			return null;
 		}
 	}
-	
-	/**
-	 * Get local path for a {@link List<String>} of dependency notations
-	 * 
-	 * @param notations {@link List<String>}
-	 * @return {@link List<String>} of paths
-	 * @throws NaetherException
-	 */
-	public List<String> getLocalPaths( List<String> notations ) throws NaetherException {
-		DefaultServiceLocator locator = new DefaultServiceLocator();
-		SimpleLocalRepositoryManagerFactory factory = new SimpleLocalRepositoryManagerFactory();
-		factory.initService( locator );
-		
-		LocalRepository localRepo = new LocalRepository(getLocalRepoPath());
-		LocalRepositoryManager manager = null;
-		try {
-			manager = factory.newInstance( localRepo );
-		} catch (NoLocalRepositoryManagerException e) {
-			throw new NaetherException( "Failed to initial local repository manage", e  );
-		}
-		
-		List<String> localPaths = new ArrayList<String>();
-		
-		for ( String notation : notations ) {
-			Dependency dependency = new Dependency(new DefaultArtifact(notation), "compile");
-			String path = new StringBuilder( localRepo.getBasedir().getAbsolutePath() )
-				.append( File.separator ).append( manager.getPathForLocalArtifact( dependency.getArtifact() ) ).toString();
-			localPaths.add( path );
-		}
-		
-		return localPaths;
-	}
 
 	/**
 	 * {@link List<String>} of {@link Dependency} converted to String notation
 	 * 
 	 * @return {@link List<String>}
 	 */
-	public List<String> getDependenciesNotation() {
-		List<String> notations = new ArrayList<String>();
+	public Set<String> getDependenciesNotation() {
+		Set<String> notations = new HashSet<String>();
 		for (Dependency dependency : getDependencies()) {
 			notations.add(Notation.generate(dependency));
 		}
@@ -720,7 +689,7 @@ public class Naether {
 	 * @param dependencies
 	 *            {@link List}
 	 */
-	public void setDependencies(List<Dependency> dependencies) {
+	public void setDependencies(Set<Dependency> dependencies) {
 		this.dependencies = dependencies;
 	}
 
@@ -729,7 +698,7 @@ public class Naether {
 	 * 
 	 * @return {@link List}
 	 */
-	public List<Dependency> getDependencies() {
+	public Set<Dependency> getDependencies() {
 		return dependencies;
 	}
 
@@ -806,5 +775,4 @@ public class Naether {
         
         return files;
 	}
-
 }

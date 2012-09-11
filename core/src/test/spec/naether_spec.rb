@@ -7,12 +7,7 @@ describe Naether do
   context "Class" do
     
     it "should have bootstrap dependencies" do
-      Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.13"
-    end
-    
-    it "should have JAR_PATH constant in naether jar" do
-      version = IO.read("VERSION").strip
-      Naether::JAR_PATH.should match /naether-#{version}.jar/
+      Naether.bootstrap_dependencies( 'jar_dependencies.yml' ).should include "org.sonatype.aether:aether-util:jar:1.13.1"
     end
     
   end
@@ -25,8 +20,7 @@ describe Naether do
         Dir.mkdir @test_dir
       end
       
-      @naether = Naether.create_from_paths("target/lib", 'target')
-      @naether.should_not be_nil
+      @naether = Naether.new
       @naether.local_repo_path = 'target/test-repo'
     end
     
@@ -67,10 +61,10 @@ describe Naether do
       @naether.build_artifacts = { "build_artifact:test:0.1" => 'target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar' }
       @naether.dependencies = [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" ]
       @naether.resolve_dependencies().should eql [
-        "ch.qos.logback:logback-classic:jar:0.9.29",
         "ch.qos.logback:logback-core:jar:0.9.29",
-        "org.slf4j:slf4j-api:jar:1.6.1",
-        "junit:junit:jar:4.8.2"]
+        "ch.qos.logback:logback-classic:jar:0.9.29",
+        "junit:junit:jar:4.8.2",
+        "org.slf4j:slf4j-api:jar:1.6.1" ]
     end
     
     context "setting mixed list of dependencies" do
@@ -82,45 +76,51 @@ describe Naether do
       it "should handle poms in a list of dependencies" do
          @naether.dependencies = [  "pom.xml", "does.not:exist:jar:0.1" ]  
          @naether.dependencies_notation.should eql [
-            "ch.qos.logback:logback-classic:jar:0.9.29",
-            "org.slf4j:slf4j-api:jar:1.6.2",
-            "org.slf4j:jcl-over-slf4j:jar:1.6.2",
-            "org.slf4j:log4j-over-slf4j:jar:1.6.2",
-            "org.codehaus.plexus:plexus-utils:jar:3.0",
-            "org.apache.maven:maven-model-v3:jar:2.0",
-            "org.codehaus.plexus:plexus-container-default:jar:1.5.5",
-            "org.sonatype.aether:aether-api:jar:1.13",
-            "org.sonatype.aether:aether-util:jar:1.13",
-            "org.sonatype.aether:aether-impl:jar:1.13",
-            "org.sonatype.aether:aether-connector-file:jar:1.13",
-            "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13",
-            "org.sonatype.aether:aether-connector-wagon:jar:1.13",
-            "org.apache.maven:maven-aether-provider:jar:3.0.3",
-            "org.apache.maven.wagon:wagon-ssh:jar:1.0",
-            "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0",
-            "org.apache.maven.wagon:wagon-file:jar:1.0",
-            "does.not:exist:jar:0.1" ]
+           "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0", 
+           "org.sonatype.aether:aether-api:jar:1.13.1", 
+           "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13.1", 
+           "org.apache.maven.wagon:wagon-file:jar:1.0", 
+           "ch.qos.logback:logback-classic:jar:1.0.6", 
+           "org.slf4j:jcl-over-slf4j:jar:1.6.6", "does.not:exist:jar:0.1", 
+           "org.sonatype.aether:aether-util:jar:1.13.1", 
+           "org.sonatype.aether:aether-impl:jar:1.13.1", 
+           "org.apache.maven.wagon:wagon-ssh:jar:1.0", 
+           "org.apache.maven:maven-aether-provider:jar:3.0.3", 
+           "org.slf4j:slf4j-api:jar:1.6.6", "org.slf4j:log4j-over-slf4j:jar:1.6.6", 
+           "org.sonatype.aether:aether-connector-wagon:jar:1.13.1", 
+           "org.sonatype.aether:aether-connector-file:jar:1.13.1" ]
       end
       
       it "should handle scopes" do
         @naether.dependencies = [ {"src/test/resources/valid_pom.xml" => ["test"]}, {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
-        @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
-        @naether.resolve_dependencies().should eql ["junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", "com.google.code.gson:gson:jar:1.7.1", "com.google.code.greaze:greaze-definition:jar:0.5.1", "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"]
+        @naether.dependencies_notation.should eql [
+          "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", 
+          "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2"]
+        @naether.resolve_dependencies().should eql [
+          "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", 
+          "com.google.code.gson:gson:jar:1.7.1", 
+          "ch.qos.logback:logback-core:jar:0.9.29", 
+          "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2", 
+          "org.slf4j:slf4j-api:jar:1.6.1", 
+          "com.google.code.greaze:greaze-definition:jar:0.5.1"]
       end
     end
     
     it "should resolve dependencies" do
       @naether.dependencies = "ch.qos.logback:logback-classic:jar:0.9.29" 
-      @naether.resolve_dependencies().should eql ["ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"]
+      @naether.resolve_dependencies().should eql [
+        "ch.qos.logback:logback-core:jar:0.9.29", 
+        "ch.qos.logback:logback-classic:jar:0.9.29", 
+        "org.slf4j:slf4j-api:jar:1.6.1"]
     end
     
 
     it "should resolve pom dependencies with properties" do
       @naether.dependencies  = 'src/test/resources/pom_with_broken_dep.xml' 
       @naether.resolve_dependencies(false, { 'project.basedir' => File.expand_path( 'src/test/resources' ) } ).should eql( 
-        ["pom:with-system-path:jar:2", "ch.qos.logback:logback-classic:jar:0.9.29", 
-         "ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1", 
-          "google:gdata-spreadsheet:jar:3.0"] )
+        ["commons-beanutils:commons-beanutils:jar:1.8.3", 
+         "ch.qos.logback:logback-core:jar:0.9.29", "pom:with-system-path:jar:2", 
+         "ch.qos.logback:logback-classic:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"] )
     end
 
     it "should download artifacts" do
@@ -151,10 +151,10 @@ describe Naether do
    
     it "should change logging level" do
       @naether.set_log_level( 'debug' )
-      Naether::Java.java_class("com.tobedevoured.naether.util.LogUtil").getLogLevel("com.tobedevoured").toString().should eql( "DEBUG" )
+      Naether::Java.exec_static_method("com.tobedevoured.naether.util.LogUtil", 'getLogLevel', "com.tobedevoured").toString().should eql( "DEBUG" )
       
       @naether.set_log_level( 'info' )
-      Naether::Java.java_class("com.tobedevoured.naether.util.LogUtil").getLogLevel("com.tobedevoured").toString().should eql( "INFO" )
+      Naether::Java.exec_static_method("com.tobedevoured.naether.util.LogUtil", 'getLogLevel', "com.tobedevoured").toString().should eql( "INFO" )
           
     end
   end

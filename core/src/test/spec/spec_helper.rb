@@ -2,9 +2,19 @@ $:.unshift File.expand_path('.')
 $:.unshift File.expand_path(File.join(File.dirname(__FILE__),'../../../'))
 $:.unshift File.expand_path(File.join(File.dirname(__FILE__),'../../../src/main/ruby'))
 
-require 'rubygems'
-require 'rspec'
+puts File.expand_path(File.join(File.dirname(__FILE__),'../../../'))
 
+require 'rubygems'
+require 'naether/configuration'
+require 'rspec'
+require 'naether/bootstrap'
+
+Naether::Configuration.naether_jar = "target/core-#{Naether::Configuration.version}.jar"
+Naether::Bootstrap.bootstrap_local_repo(  
+  File.expand_path( '../../../../target/test-repo', __FILE__ ), 
+  :dep_yaml => File.expand_path( '../../../../jar_dependencies.yml', __FILE__ ) )
+  
 RSpec.configure do |config|
   
 end
+

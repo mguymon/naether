@@ -30,6 +30,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +135,12 @@ public class Project {
 	}
 
 	public String getVersion() {
-		return getMavenModel().getVersion();
+		String version = getMavenModel().getVersion();
+		if ( version == null && getMavenModel().getParent() != null ) {
+			version = getMavenModel().getParent().getVersion();
+		}
+		
+		return version;
 	}
 
 	public void setVersion(String version) {
@@ -346,7 +352,7 @@ public class Project {
 		addDependency( dependency );
 	}
 	
-	public void setDependencies( List<org.sonatype.aether.graph.Dependency> dependencies ) {
+	public void setDependencies( Collection<org.sonatype.aether.graph.Dependency> dependencies ) {
 		for ( org.sonatype.aether.graph.Dependency dep : dependencies ) {
 			addDependency( dep );
 		}

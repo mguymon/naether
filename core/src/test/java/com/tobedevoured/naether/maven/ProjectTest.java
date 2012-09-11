@@ -137,8 +137,8 @@ public class ProjectTest {
 		project.setGroupId("testGroup");
 		project.setVersion("test");
 		project.setType("jar");
-		project.addDependency("org.apache.maven.wagon:wagon-file:jar:1.0");
 		project.addDependency("junit:junit:jar:4.8.2", "test");
+		project.addDependency("org.apache.maven.wagon:wagon-file:jar:1.0");
 		project.addRepository( "http://repo1.maven.org/maven2/" );
 		project.addRepository( "http://repository.jboss.org/nexus/content/groups/public-jboss" );
 		String xml = project.toXml();

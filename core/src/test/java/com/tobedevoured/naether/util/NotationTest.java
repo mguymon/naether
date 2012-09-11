@@ -1,4 +1,4 @@
-package com.tobedevoured.naether;
+package com.tobedevoured.naether.util;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,12 +20,14 @@ package com.tobedevoured.naether;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.Test;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
+import com.tobedevoured.naether.NaetherException;
 import com.tobedevoured.naether.util.Notation;
 
 /**
@@ -56,5 +58,11 @@ public class NotationTest {
 		Artifact artifact = new DefaultArtifact("groupId", "artifactId", "classifier", "extension", "version");
 	
 		assertEquals( "groupId:artifactId:extension:classifier:version", Notation.generate(artifact) );
+	}
+	
+
+	@Test
+	public void getLocalPaths() throws NaetherException {
+		assertTrue( "Path to junit in test repo", Notation.getLocalPaths( "target/test-repo", Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
 	}
 }

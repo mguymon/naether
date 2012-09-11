@@ -14,12 +14,12 @@ ttp://maven.apache.org/maven-v4_0_0.xsd ">
 	      <version>0.9.29</version>
 	  </dependency>
 	  <dependency>
-		<groupId>google</groupId>
-		<artifactId>gdata-spreadsheet</artifactId>
-		<version>3.0</version>
+		<groupId>commons-beanutils</groupId>
+		<artifactId>commons-beanutils</artifactId>
+		<version>1.8.3</version>
 		<type>jar</type>
 		<scope>system</scope>
-		<systemPath>/${project.basedir}/gdata-spreadsheet-3.0.jar</systemPath> <!-- bad systemPath -->
+		<systemPath>/${project.basedir}/commons-beanutils-1.8.3.jar</systemPath> <!-- bad systemPath -->
 	  </dependency>
   </dependencies>
 </project>

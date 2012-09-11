@@ -18,14 +18,25 @@ package com.tobedevoured.naether.util;
  * limitations under the License.
  */
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.graph.Dependency;
+import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManagerFactory;
+import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.LocalRepositoryManager;
+import org.sonatype.aether.repository.NoLocalRepositoryManagerException;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.tobedevoured.naether.Const;
+import com.tobedevoured.naether.NaetherException;
 import com.tobedevoured.naether.maven.Project;
 
 /**
@@ -181,5 +192,30 @@ public final class Notation {
 			.append(artifact.getBaseVersion());
 		
 		return notation.toString();
+	}
+	
+	public static List<String> getLocalPaths( String localRepoPath, List<String> notations ) throws NaetherException {
+		DefaultServiceLocator locator = new DefaultServiceLocator();
+		SimpleLocalRepositoryManagerFactory factory = new SimpleLocalRepositoryManagerFactory();
+		factory.initService( locator );
+		
+		LocalRepository localRepo = new LocalRepository(localRepoPath);
+		LocalRepositoryManager manager = null;
+		try {
+			manager = factory.newInstance( localRepo );
+		} catch (NoLocalRepositoryManagerException e) {
+			throw new NaetherException( "Failed to initial local repository manage", e  );
+		}
+		
+		List<String> localPaths = new ArrayList<String>();
+		
+		for ( String notation : notations ) {
+			Dependency dependency = new Dependency(new DefaultArtifact(notation), "compile");
+			String path = new StringBuilder( localRepo.getBasedir().getAbsolutePath() )
+				.append( File.separator ).append( manager.getPathForLocalArtifact( dependency.getArtifact() ) ).toString();
+			localPaths.add( path );
+		}
+		
+		return localPaths;
 	}
 }

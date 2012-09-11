@@ -5,12 +5,7 @@ require 'src/main/ruby/naether/java'
 describe Naether do
   
     before(:each) do
-        @test_dir = 'target/test-rb'
-        unless File.exists?( @test_dir )
-          Dir.mkdir @test_dir
-        end
-        
-        @naether = Naether.create_from_paths("target/lib", 'target')
+        @naether = Naether.new
         @naether.should_not be_nil
         @naether.local_repo_path = 'target/test-repo'
     end  
@@ -43,7 +38,7 @@ describe Naether do
     end
     
     it "should write pom file" do
-      test_file = "#{@test_dir}/naether_spec_test.xml"
+      test_file = "target/naether_spec_test.xml"
       
       @naether.dependencies = [ {"junit:junit:jar:4.8.2" => 'test'}, "ch.qos.logback:logback-classic:jar:0.9.29" ]
       @naether.resolve_dependencies

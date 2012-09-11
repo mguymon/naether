@@ -28,8 +28,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Exclusion;
@@ -43,7 +45,10 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 // Slackworks Naether
 import com.tobedevoured.naether.Bootstrap;
+import com.tobedevoured.naether.DependencyException;
 import com.tobedevoured.naether.Naether;
+import com.tobedevoured.naether.NaetherException;
+import com.tobedevoured.naether.URLException;
 import com.tobedevoured.naether.deploy.DeployArtifact;
 import com.tobedevoured.naether.maven.Project;
 import com.tobedevoured.naether.maven.ProjectException;
@@ -100,7 +105,7 @@ public class NaetherTest {
             new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
         naether.addDependency(dependency);
         naether.resolveDependencies( false );
-        assertEquals( "junit:junit:jar:4.8.2", naether.getDependenciesNotation().get(0) );
+        assertEquals( "junit:junit:jar:4.8.2", new ArrayList( naether.getDependenciesNotation() ).get(0) );
 	}
 	
 	@Test
@@ -119,11 +124,12 @@ public class NaetherTest {
 	public void addDependenciesFromPom() throws ProjectException, URLException, DependencyException {
 		naether.addDependencies( "src/test/resources/valid_pom.xml" );
 		
-		List<String> dependencies = new ArrayList<String>(Arrays.asList( 
-	        "ch.qos.logback:logback-classic:jar:0.9.29", "ch.qos.logback:logback-core:jar:0.9.29", 
-	        "org.slf4j:slf4j-api:jar:1.6.1", "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", 
-	        "com.google.code.gson:gson:jar:1.7.1", "com.google.code.greaze:greaze-definition:jar:0.5.1" ));
-        naether.resolveDependencies(true);
+		Set<String> dependencies = new HashSet<String>(Arrays.asList( 
+			"ch.qos.logback:logback-core:jar:0.9.29", "junit:junit:jar:4.8.2", 
+			"com.google.code.greaze:greaze-definition:jar:0.5.1", "com.google.code.gson:gson:jar:1.7.1", 
+			"com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", "org.slf4j:slf4j-api:jar:1.6.1", 
+			"ch.qos.logback:logback-classic:jar:0.9.29") );
+		naether.resolveDependencies(true);
 		
 		assertEquals( dependencies, naether.getDependenciesNotation() );
 	}
@@ -131,16 +137,16 @@ public class NaetherTest {
 	@Test
 	public void addDependenciesFromPomWithScopes() throws ProjectException, URLException, DependencyException {
 		List<String> scopes = new ArrayList<String>();
-		List<String> expectedDependencies = new ArrayList<String>();
+		Set<String> expectedDependencies = new HashSet<String>();
 		
 		scopes.add("test");
 		naether.addDependencies( "src/test/resources/valid_pom.xml", scopes );
 		naether.resolveDependencies(false);
 		
-		expectedDependencies.add( "junit:junit:jar:4.8.2" );
-		expectedDependencies.add( "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1");
-		expectedDependencies.add( "com.google.code.gson:gson:jar:1.7.1" ); 
-		expectedDependencies.add( "com.google.code.greaze:greaze-definition:jar:0.5.1" );
+		expectedDependencies.addAll( Arrays.asList( 
+			"junit:junit:jar:4.8.2", "com.google.code.gson:gson:jar:1.7.1", 
+			"com.google.code.greaze:greaze-definition:jar:0.5.1", 
+			"com.google.code.greaze:greaze-client:jar:test-jar:0.5.1" ) );
 		assertEquals( expectedDependencies, naether.getDependenciesNotation() );
 		
 		/* XXX: invalid system scopes are removed from dependencies
@@ -156,8 +162,11 @@ public class NaetherTest {
 		naether.addDependencies( "src/test/resources/valid_pom.xml", scopes );
 		naether.resolveDependencies(false);
 		
-		expectedDependencies.addAll( Arrays.asList( "ch.qos.logback:logback-classic:jar:0.9.29", 
-        	"ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1") );
+		expectedDependencies.addAll( Arrays.asList( 
+			"org.slf4j:slf4j-api:jar:1.6.1", 
+			"com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", 
+			"ch.qos.logback:logback-core:jar:0.9.29",
+			"ch.qos.logback:logback-classic:jar:0.9.29") );
 		assertEquals( expectedDependencies, naether.getDependenciesNotation() );
 	}
 	
@@ -179,9 +188,9 @@ public class NaetherTest {
 		naether.addDependencies( project );
 		naether.resolveDependencies( false );
 		
-		List<String> resolvedDependencies = naether.getDependenciesNotation();
+		Set<String> resolvedDependencies = naether.getDependenciesNotation();
 		
-		List<String> results = new ArrayList<String>();
+		Set<String> results = new HashSet<String>();
 		results.add( "org.apache.tomcat:jasper:jar:6.0.33" );
 		results.add( "org.apache.tomcat:servlet-api:jar:6.0.33" );
 		results.add( "org.apache.tomcat:juli:jar:6.0.33" );
@@ -198,7 +207,7 @@ public class NaetherTest {
 		scopes.add("test");
 		
 		naether.addDependencies( "src/test/resources/valid_pom.xml", scopes );
-		List<String> dependencies = new ArrayList<String>();
+		Set<String> dependencies = new HashSet<String>();
 		dependencies.add( "junit:junit:jar:4.8.2" );
 		dependencies.add( "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1" );
 		assertEquals( dependencies, naether.getDependenciesNotation() );
@@ -207,7 +216,10 @@ public class NaetherTest {
 	@Test
 	public void resolveAPomShouldIncludeParent() throws ProjectException {
 		naether.addDependencies( "src/test/resources/pomWithParent/parentTest/pom.xml" );
-		List<String> dependencies = Arrays.asList( "org.apache.maven:maven-model-v3:jar:2.0", "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" );
+		Set<String> dependencies = new HashSet<String>( Arrays.asList( 
+			"org.apache.maven:maven-model-v3:jar:2.0",
+			"ch.qos.logback:logback-classic:jar:0.9.29", 
+			"junit:junit:jar:4.8.2" ) );
 		assertEquals( dependencies, naether.getDependenciesNotation() );
 	
 		List<String> repos = new ArrayList<String>();
@@ -258,20 +270,13 @@ public class NaetherTest {
         assertFalse( (new File( jarPath ).exists()) );
 	}
 	
-	
 	@Test
 	public void resolveNaetherDependencies() throws Exception {
 		Project mavenProject = new Project("pom.xml");
 		
 		assertEquals( "core", mavenProject.getArtifactId() );
 		
-		for( org.apache.maven.model.Dependency mavenDep : mavenProject.getDependencies() ) {
-			String notation = Notation.generate( mavenDep );
-			
-			Dependency dependency =
-	            new Dependency( new DefaultArtifact( notation ), mavenDep.getScope() );
-			naether.addDependency( dependency );
-		}
+		naether.addDependencies(mavenProject);
 		
 		naether.resolveDependencies();
 		
@@ -282,16 +287,11 @@ public class NaetherTest {
 		
 		List<String> completeDeps = Bootstrap.DEPENDENCIES;
 		
-		// Jars excluded from bootstrap dependencies
-		completeDeps.add( "org.sonatype.sisu:sisu-guice:jar:no_aop:3.0.3");
-		completeDeps.add( "org.jboss.netty:netty:jar:3.2.5.Final");
+		// Test scope deps
 		completeDeps.add( "junit:junit:jar:4.10");
 		completeDeps.add( "org.hamcrest:hamcrest-core:jar:1.1");
-		completeDeps.add( "log4j:log4j:jar:1.2.12");
-		completeDeps.add( "commons-logging:commons-logging-api:jar:1.1");
-		completeDeps.add( "commons-logging:commons-logging:jar:1.1.1");
-		completeDeps.add( "nekohtml:xercesMinimal:jar:1.9.6.2" );
-		completeDeps.add( "nekohtml:nekohtml:jar:1.9.6.2" );
+		
+		assertEquals( completeDeps.size(), naether.getDependenciesNotation().size() );
 		
 		List<String> missingDeps = new ArrayList<String>();
         for( String dep : naether.getDependenciesNotation() ) {
@@ -316,7 +316,7 @@ public class NaetherTest {
 		naether.addDependency(dependency);
         naether.resolveDependencies(false);
         
-        List<String> results = new ArrayList<String>();
+        Set<String> results = new HashSet<String>();
         results.add("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE");
         results.add("org.springframework:org.springframework.beans:jar:3.0.5.RELEASE");
         results.add("org.springframework:org.springframework.asm:jar:3.0.5.RELEASE");
@@ -346,9 +346,9 @@ public class NaetherTest {
 		
         naether.resolveDependencies();	
         
-        assertEquals( Arrays.asList( "buildArtifact:test:jar:0.1", "org.testng:testng:jar:5.14", "junit:junit:jar:3.8.1", 
+        assertEquals( new HashSet<String>(Arrays.asList( "buildArtifact:test:jar:0.1", "org.testng:testng:jar:5.14", "junit:junit:jar:3.8.1", 
         		"org.beanshell:bsh:jar:2.0b4", "com.google.inject:guice:jar:2.0", "aopalliance:aopalliance:jar:1.0", 
-        		"com.beust:jcommander:jar:1.5" ), naether.getDependenciesNotation() );
+        		"com.beust:jcommander:jar:1.5" )), naether.getDependenciesNotation() );
 	}
 		
     @Test
@@ -365,10 +365,10 @@ public class NaetherTest {
 		
         naether.resolveDependencies();	
         
-        assertEquals( Arrays.asList( "valid:pom:jar:3", "ch.qos.logback:logback-classic:jar:0.9.29", 
+        assertEquals( new HashSet<String>(Arrays.asList( "valid:pom:jar:3", "ch.qos.logback:logback-classic:jar:0.9.29", 
         		"ch.qos.logback:logback-core:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1", "org.testng:testng:jar:5.14", 
         		"junit:junit:jar:3.8.1", "org.beanshell:bsh:jar:2.0b4", "com.google.inject:guice:jar:2.0", 
-        		"aopalliance:aopalliance:jar:1.0", "com.beust:jcommander:jar:1.5" ), naether.getDependenciesNotation() );
+        		"aopalliance:aopalliance:jar:1.0", "com.beust:jcommander:jar:1.5" )), naether.getDependenciesNotation() );
 	}
 	
 	@Test
@@ -457,11 +457,6 @@ public class NaetherTest {
         naether.install( "test:test-install:0.4", pom, jar );
         assertTrue( "installed pom should exist", destinationPom.exists() );
         assertTrue( "installed jar should exist", destinationJar.exists() );
-	}
-
-	@Test
-	public void getLocalPaths() throws NaetherException {
-		assertTrue( "Path to junit in test repo", naether.getLocalPaths( Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
 	}
 	
 	@Test
