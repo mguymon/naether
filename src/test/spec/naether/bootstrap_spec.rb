@@ -28,11 +28,16 @@ describe Naether::Bootstrap do
       if File.exists? 'target/test/bootstrap-repo'
         FileUtils.rm_r 'target/test/bootstrap-repo'
       end
-            
-      deps = Naether::Bootstrap.check_local_repo_for_deps('target/test/bootstrap-repo')
-      deps[:missing].should eql( Naether::Bootstrap.dependencies )
-      Naether::Bootstrap.install_dependencies_to_local_repo( 
-        'target/test/bootstrap', :local_repo => 'target/test/bootstrap-repo',
+
+      if File.exists? 'target/test/bootstrap'
+        FileUtils.rm_r 'target/test/bootstrap'
+      end
+      
+      deps = Naether::Bootstrap.download_dependencies( "target/test/bootstrap", :local_repo => 'target/test/bootstrap-repo' )
+      jars = (deps[:exists] + deps[:downloaded]).map {|jar| jar.values.first }
+        
+      Naether::Bootstrap.install_dependencies_to_local_repo( deps[:downloaded], jars,
+        :local_repo => 'target/test/bootstrap-repo',
         :dep_yaml => File.expand_path( '../../../../../jar_dependencies.yml', __FILE__ ) )
       
       deps = Naether::Bootstrap.check_local_repo_for_deps('target/test/bootstrap-repo')
