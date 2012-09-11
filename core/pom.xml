@@ -21,19 +21,9 @@
 		<aetherVersion>1.13.1</aetherVersion>
 		<mavenVersion>3.0.3</mavenVersion>
 		<wagonVersion>1.0</wagonVersion>
-		<org.slf4j.version>1.6.2</org.slf4j.version>
+    <org.slf4j.version>1.6.6</org.slf4j.version>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>0.9.29</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${org.slf4j.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
@@ -43,21 +33,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>log4j-over-slf4j</artifactId>
 			<version>${org.slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-utils</artifactId>
-			<version>3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-model-v3</artifactId>
-			<version>2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-container-default</artifactId>
-			<version>1.5.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.sonatype.aether</groupId>
@@ -83,11 +58,23 @@
 			<groupId>org.sonatype.aether</groupId>
 			<artifactId>aether-connector-asynchttpclient</artifactId>
 			<version>${aetherVersion}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>netty</artifactId>
+					<groupId>org.jboss.netty</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.sonatype.aether</groupId>
 			<artifactId>aether-connector-wagon</artifactId>
 			<version>${aetherVersion}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>sisu-inject-plexus</artifactId>
+					<groupId>org.sonatype.sisu</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
