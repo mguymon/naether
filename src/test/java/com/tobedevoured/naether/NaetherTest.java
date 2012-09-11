@@ -274,7 +274,7 @@ public class NaetherTest {
 	public void resolveNaetherDependencies() throws Exception {
 		Project mavenProject = new Project("pom.xml");
 		
-		assertEquals( "core", mavenProject.getArtifactId() );
+		assertEquals( "naether", mavenProject.getArtifactId() );
 		
 		naether.addDependencies(mavenProject);
 		

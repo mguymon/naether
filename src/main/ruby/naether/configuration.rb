@@ -17,7 +17,7 @@ class Naether
       
       @data = {
         :gem_dir =>     gem_dir,
-        :naether_jar => File.join( gem_dir, "core-#{version}.jar"),
+        :naether_jar => File.join( gem_dir, "naether-#{version}.jar"),
         :platform =>    ($platform || RUBY_PLATFORM[/java/] || 'ruby'),
         :version =>     version
       }

@@ -32,7 +32,8 @@ describe Naether::Bootstrap do
       deps = Naether::Bootstrap.check_local_repo_for_deps('target/test/bootstrap-repo')
       deps[:missing].should eql( Naether::Bootstrap.dependencies )
       Naether::Bootstrap.install_dependencies_to_local_repo( 
-        'target/test/bootstrap', :local_repo => 'target/test/bootstrap-repo' )
+        'target/test/bootstrap', :local_repo => 'target/test/bootstrap-repo',
+        :dep_yaml => File.expand_path( '../../../../../jar_dependencies.yml', __FILE__ ) )
       
       deps = Naether::Bootstrap.check_local_repo_for_deps('target/test/bootstrap-repo')
       deps[:exists].map {|x| x.keys[0] }.should eql( Naether::Bootstrap.dependencies )            
@@ -40,11 +41,13 @@ describe Naether::Bootstrap do
     
     context "check_local_repo_for_deps" do
       it "local repo does not contain jars" do
-        deps = Naether::Bootstrap.check_local_repo_for_deps( 'not-existant-dir' )
+        deps = Naether::Bootstrap.check_local_repo_for_deps( 'not-existant-dir',
+          :dep_yaml => File.expand_path( '../../../../../jar_dependencies.yml', __FILE__ ) )
         
         result = {
           :missing => Naether::Bootstrap.dependencies,
-          :exists => []
+          :exists => [],
+          :downloaded => []
         }
         
         deps.should eql( result )
@@ -53,7 +56,7 @@ describe Naether::Bootstrap do
       it "local repo contains jars" do
         deps = Naether::Bootstrap.check_local_repo_for_deps
         
-        deps[:exists].map {|x| x.keys[0] }.should eql( Naether::Bootstrap.dependencies )
+        ((deps[:downloaded] + deps[:exists]).map {|x| x.keys[0] } + deps[:missing] ).should =~ Naether::Bootstrap.dependencies 
       end
     end
   end

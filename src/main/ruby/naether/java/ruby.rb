@@ -1,18 +1,16 @@
 require "#{File.dirname(__FILE__)}/../configuration"
 
-# :title:Naether::Java
+# :title:Naether::Java::Ruby
 #
-# Handles loading jars. Determines correct platform to use, Naether::Java::JRuby
-# or Naether::Java::Ruby
+# Sngleton that handles Java interactions for Ruby using RJB. Providers helpers for
+# nomalizing accesss.
 #
 # = Authors
 # Michael Guymon
 #
 class Naether
   class Java
-    #
-    # Handle loading jars for Ruby via Rjb
-    #
+
     class Ruby
       include Singleton
       
@@ -56,13 +54,22 @@ class Naether
              types = [types]
           end
         end
-        
+        result = nil
         if params.nil?
-          @class_loader._invoke('execStaticMethod','Ljava.lang.String;Ljava.lang.String;', target_class, target_method )
+          result = @class_loader._invoke('execStaticMethod','Ljava.lang.String;Ljava.lang.String;', target_class, target_method )
         elsif types.nil?
-          @class_loader._invoke('execStaticMethod','Ljava.lang.String;Ljava.lang.String;Ljava.util.List;', target_class, target_method, convert_to_java_list(params) )
+          result = @class_loader._invoke('execStaticMethod','Ljava.lang.String;Ljava.lang.String;Ljava.util.List;', target_class, target_method, convert_to_java_list(params) )
         else
-          @class_loader._invoke('execStaticMethod','Ljava.lang.String;Ljava.lang.String;Ljava.util.List;Ljava.util.List;', target_class, target_method, convert_to_java_list(params), convert_to_java_list(types) )
+          result = @class_loader._invoke('execStaticMethod','Ljava.lang.String;Ljava.lang.String;Ljava.util.List;Ljava.util.List;', target_class, target_method, convert_to_java_list(params), convert_to_java_list(types) )
+        end
+        
+        unless result.nil?
+          # Force toString on java.lang.String otherwise the result will be a Rjb::Proxy
+          if result.getClass().getName() == 'java.lang.String'
+            result.toString()
+          else
+            result
+          end
         end
       end
       

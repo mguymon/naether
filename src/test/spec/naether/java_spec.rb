@@ -20,7 +20,7 @@ describe Naether::Java do
       loaded_paths.should include(File.expand_path('src/test/classes/commons-io'))
       
       file = Naether::Java.create( "java.io.File", "VERSION" )
-      version = Naether::Java.exec_static_method( 'org.apache.commons.io.FileUtils', 'readFileToString',  file ).toString().strip
+      version = Naether::Java.exec_static_method( 'org.apache.commons.io.FileUtils', 'readFileToString',  file ).strip
       version.should eql IO.read("VERSION").strip
     end
     

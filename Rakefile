@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'bundler'
+require "fileutils"
+
 begin
   Bundler.setup(:default, :development)
 rescue Bundler::BundlerError => e
@@ -13,7 +15,6 @@ require 'rake'
 require File.expand_path(File.join(File.dirname(__FILE__), 'src/main/ruby/naether'))
 
 namespace :naether do
-  require "fileutils"
   task :setup_naether_gem_build do
       unless File.exists?( "target" )
         raise "Run `mvn package` to build java first" 
@@ -24,7 +25,7 @@ namespace :naether do
       end
       
       unless File.exists?( "target/gem/lib" )
-        FileUtils.mkdir_p( "target/gem/lib/naether" )
+        FileUtils.mkdir_p( "target/gem/lib/naether/java" )
       end
       
             
@@ -37,9 +38,14 @@ namespace :naether do
       FileUtils.copy( 'README.rdoc', "target/gem/README.rdoc" )
       FileUtils.copy( 'pom.xml', "target/gem/pom.xml" )
       FileUtils.copy( 'VERSION', "target/gem/VERSION" )
+      FileUtils.copy( 'PostInstallRakefile', "target/gem/Rakefile" )
       
       version = IO.read('VERSION').strip
-      FileUtils.copy( "target/core-#{version}.jar", "target/gem/core-#{version}.jar" )
+      if !File.exists? "target/naether-#{version}.jar"
+        raise "target/naether-#{version}.jar does not exist"
+      end
+      
+      FileUtils.copy( "target/naether-#{version}.jar", "target/gem/naether-#{version}.jar" )
       
       # Change dir so relevant files have the correct paths
       Dir.chdir( "target/gem" )      
@@ -87,10 +93,10 @@ Jeweler::Tasks.new do |gem|
   gem.authors = ["Michael Guymon"]
   gem.platform      = $platform || RUBY_PLATFORM[/java/] || 'ruby'
   gem.require_paths = %w[lib]
+  gem.extensions = ["Rakefile"]
   
-  ruby_files = Dir.glob("lib/**/*.rb")
-  gem.files = ruby_files + ['jar_dependencies.yml', 'VERSION', 'LICENSE','README.rdoc','pom.xml', "core-#{IO.read('VERSION').strip}.jar"]
-
+  # all files in target/gem should be included, expect for pkg
+  gem.files = Dir.glob("**/*").select{ |path| !(path =~ /^pkg/) }
   
   # Include your dependencies below. Runtime dependencies are required when using your gem,
   # and development dependencies are only needed for development (ie running rake tasks, tests, etc)

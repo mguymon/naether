@@ -1,0 +1,14 @@
+task :default => :prepare
+
+task :prepare do
+  $:.unshift File.expand_path('../lib', __FILE__)
+  require 'naether/bootstrap'
+  require 'fileutils'
+  
+  puts "Installing Jar Dependencies"
+  Naether::Bootstrap.bootstrap_local_repo
+  
+  puts "Removing temp dir"
+  temp_dir = File.join( Naether::Bootstrap.default_local_repo, ".naether" )
+  FileUtils.rm_rf( temp_dir )
+end
