@@ -190,11 +190,16 @@ class Naether
     end
   end
   
-  # [Array] of mixed dependencies:
-  #  * [String] Artifact notation in the format of groupId:artifactId:version or groupId:artifactId:type:version - 'junit:junit:4.7' 
+  # Set the dependencies
+  # 
+  # The dependencies param takes an [Array] of mixed dependencies:
+  #  * [String] Artifact notation, such as groupId:artifactId:version, e.g. 'junit:junit:4.7' 
   #  * [Hash] of a single artifaction notation => scope - { 'junit:junit:4.7' => 'test' }
   #  * [String] path to a local pom - 'lib/pom.xml'
   #  * [Hash] of a single path to a local pom => scope - { 'lib/pom.xml' => ['compile','test'] }
+  #
+  # @param [Array] dependencies
+  # @see https://github.com/mguymon/naether/wiki/Notations
   def dependencies=(dependencies)
     @resolver.clearDependencies()
     
@@ -384,10 +389,6 @@ class Naether
   # @param [String] jar_path
   def install( notation, pom_path =nil, jar_path = nil )
     @resolver.install(notation, pom_path, jar_path)
-  end
-  
-  def load_pom( file_path )
-    @project_instance = Naether::Java.create("com.tobedevoured.naether.maven.Project", file_path )
   end
   
   # Set Log level for Naether Java logging
