@@ -126,14 +126,11 @@ public class Project {
 		}
 	}
 
-	public String getModelVersion() {
-		return getMavenModel().getModelVersion();
-	}
-
-	public void setModelVersion(String version) {
-		getMavenModel().setModelVersion(version);
-	}
-
+	/**
+	 * Get version of the Project. If null, checks the Parent Project's version.
+	 * 
+	 * @return String
+	 */
 	public String getVersion() {
 		String version = getMavenModel().getVersion();
 		if ( version == null && getMavenModel().getParent() != null ) {
@@ -143,6 +140,11 @@ public class Project {
 		return version;
 	}
 
+	/**
+	 * Set the Version of the Project
+	 * 
+	 * @param version String
+	 */
 	public void setVersion(String version) {
 		getMavenModel().setVersion(version);
 	}
@@ -172,6 +174,12 @@ public class Project {
 	}
 	
 
+	/**
+	 * Add a Repository to the Project
+	 * 
+	 * @param url String
+	 * @throws ProjectException
+	 */
 	public void addRepository(String url) throws ProjectException {
 		List<Repository> repositories = getRepositories();
 		
@@ -189,6 +197,12 @@ public class Project {
 		getMavenModel().setRepositories( repositories );
 	}
 	
+	/**
+	 * Set Repositories
+	 * 
+	 * @param urls List<String>
+	 * @throws ProjectException
+	 */
 	public void setRepositories( List<String> urls ) throws ProjectException {
 		List<Repository> repositories = new ArrayList<Repository>();
 		for ( String url : urls  ) {
@@ -202,10 +216,20 @@ public class Project {
 		getMavenModel().setRepositories( repositories);
 	}
 	
+	/**
+	 * Get Repositories
+	 * 
+	 * @return List<Repository>
+	 */
 	public List<Repository> getRepositories() {
 		return getMavenModel().getRepositories();
 	}
 	
+	/**
+	 * Get List of Repositories as String url
+	 * 
+	 * @return List<String>
+	 */
 	public List<String> getRepositoryUrls() {
 		List<String> urls = new ArrayList<String>();
 		
@@ -238,13 +262,19 @@ public class Project {
 		this.setVersion(notationMap.get("version"));
 	}
 	
+	/**
+	 * Get List of {@link Dependency} for the Maven Project.
+	 * 
+	 * @return List<Dependency>
+	 */
 	public List<Dependency> getDependencies() {
 		return getDependencies(null);
 	}
 	
 	/**
-	 * Get List of {@link Dependency} for the Maven Project.
+	 * Get List of {@link Dependency} for the Maven Project for specific scopes
 	 * 
+	 * @param scopes List<String>
 	 * @return List<Dependency>
 	 */
 	public List<Dependency> getDependencies(List<String> scopes) {
@@ -321,14 +351,30 @@ public class Project {
 		return notations;
 	}
 
+	/**
+	 * Add a {@link Dependency}
+	 * 
+	 * @param dependency {@link Dependency}
+	 */
 	public void addDependency(Dependency dependency) {
 		mavenModel.addDependency(dependency);
 	}
 
+	/**
+	 * Add a Dependency by String notation with default scope of compile
+	 * 
+	 * @param notation String
+	 */
 	public void addDependency(String notation ) {
 		addDependency( notation, "compile" );
 	}
 	
+	/**
+	 * Add a Dependency by String notation
+	 * 
+	 * @param notation String
+	 * @param scope String
+	 */
 	public void addDependency(String notation, String scope ) {
 		Map<String, String> notationMap = Notation.parse(notation);
 		Dependency dependency = new Dependency();
@@ -340,6 +386,10 @@ public class Project {
 		addDependency(dependency);
 	}
 	
+	/**
+	 * Add a Dependency of {@link org.sonatype.aether.graph.Dependency}
+	 * @param aetherDep {@link org.sonatype.aether.graph.Dependency}
+	 */
 	public void addDependency(org.sonatype.aether.graph.Dependency aetherDep) {
 		Artifact artifact = aetherDep.getArtifact();
 		
@@ -352,6 +402,11 @@ public class Project {
 		addDependency( dependency );
 	}
 	
+	/**
+	 * Set Dependencies
+	 * 
+	 * @param dependencies Collection<org.sonatype.aether.graph.Dependency>
+	 */
 	public void setDependencies( Collection<org.sonatype.aether.graph.Dependency> dependencies ) {
 		for ( org.sonatype.aether.graph.Dependency dep : dependencies ) {
 			addDependency( dep );
@@ -411,10 +466,22 @@ public class Project {
 		return null;
 	}
 
+	/**
+	 * Write pom to path
+	 * 
+	 * @param filePath String
+	 * @throws ProjectException
+	 */
 	public void writePom(String filePath) throws ProjectException {
 		writePom( new File( filePath ) );
 	}
 	
+	/**
+	 * Write pom to {@link File}
+	 * 
+	 * @param file {@link File}
+	 * @throws ProjectException
+	 */
 	public void writePom(File file) throws ProjectException {
 		log.debug("Writing pom: {}", file.getPath());
 		
@@ -436,6 +503,12 @@ public class Project {
 		}
 	}
 	
+	/**
+	 * Convert Project to POM XML
+	 * 
+	 * @return String
+	 * @throws ProjectException
+	 */
 	public String toXml() throws ProjectException {
 		log.debug("Writing xml");
 		
@@ -455,6 +528,11 @@ public class Project {
 		return writer.toString();
 	}
 
+	/**
+	 * Get the base path of the Project
+	 * 
+	 * @return String
+	 */
 	public String getBasePath() {
 		return basePath;
 	}

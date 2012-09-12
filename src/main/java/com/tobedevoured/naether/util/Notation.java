@@ -42,7 +42,7 @@ import com.tobedevoured.naether.maven.Project;
 /**
  * Helper for converting the dependency notations:
  * 
- *   groupId:artifactId:type:version or groupId:artifactId:version
+ *   groupId:artifactId:version, groupId:artifactId:type:version, groupId:artifactId:type:classifier:version 
  * 
  * @author Michael Guymon
  * 

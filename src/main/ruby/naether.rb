@@ -1,29 +1,51 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements. See the NOTICE file distributed with this
+# work for additional information regarding copyright ownership. The ASF
+# licenses this file to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+
 require "#{File.dirname(__FILE__)}/naether/configuration"
 require "#{File.dirname(__FILE__)}/naether/bootstrap"
 require "#{File.dirname(__FILE__)}/naether/java"
 
-# :title:Naether
+
+# Java dependency resolver.
 #
-# Java dependency resolver using Maven's Aether. 
-#
-# = Authors
-# Michael Guymon
+# @author Michael Guymon
 #
 class Naether
   
   class << self
     
-    # Java dependencies needed to bootstrap Naether
+    # Helper for Java dependencies needed to bootstrap Naether
+    # 
+    # @param [String] dep_file path
+    # @see {Naether::Bootstrap#dependencies}
     def bootstrap_dependencies( dep_file=nil )
       Naether::Bootstrap.dependencies( dep_file )
     end
     
+    #
+    # Helper for platform detection
+    #
     def platform
       Naether::Configuration.platform
     end
     
-
+    #
     # Loads all jars creates a new instance of Naether
+    #
+    # @param [Array] jars of paths
+    # @return [Naether]
     def create_from_jars( jars )
       Naether::Java.internal_load_paths( jars )
       Naether.new
@@ -31,8 +53,7 @@ class Naether
     
   end
   
-  # Create new instance. Naether.create_from_paths and Naether.create_from_jars should be
-  # used instead of Naether.new to ensure the dependencies for Naether are set into the classpath
+  # Create new instance.
   def initialize
     @resolver = Naether::Java.create('com.tobedevoured.naether.Naether')
   end
@@ -43,6 +64,10 @@ class Naether
   end
   
   # Add remote repository
+  #
+  # @param [String] url of remote repo
+  # @param [String] username optional
+  # @param [String] password optioanl 
   def add_remote_repository( url, username = nil, password = nil )
     if username
       @resolver.addRemoteRepositoryByUrl( url, username, password )
@@ -51,29 +76,50 @@ class Naether
     end
   end
   
-  # Array of remote repositories
+  # Get remote repositories
+  #
+  # @return [Array] of remote repos
   def remote_repositories
     Naether::Java.convert_to_ruby_array(@resolver.getRemoteRepositories())
   end
   
+  # Get remote repositories as urls
+  #
+  # @return [Array] of String urls
   def remote_repository_urls
     Naether::Java.convert_to_ruby_array(@resolver.getRemoteRepositoryUrls(), true)
   end
   
   # Path to local maven repo
+  #
+  # @return [String] path to local repo
   def local_repo_path
     @resolver.getLocalRepoPath()
   end
   
   # Set path to local maven repo
+  #
+  # @param [String] path local repo
   def local_repo_path=( path )
     @resolver.setLocalRepoPath( path )
   end
   
+  #
+  # Add a local Build Artifact, that will be used in the Dependency Resolution
+  #
+  # @param [String] notation 
+  # @param [String] path to artifact
+  # @param [String] pom optional path to pom.xml
+  #
   def add_build_artifact( notation, path, pom = nil )
     @resolver.addBuildArtifact(notation, path, pom )
   end
   
+  #
+  # Set local Build Artifacts, that will be used in the Dependency Resolution
+  #
+  # @param [Array] artifacts of Hashs with { notation => path } or { notation => { :path => path, :pom => pom_path }
+  #
   def build_artifacts=( artifacts )
     @resolver.clearBuildArtifacts()
     
@@ -99,16 +145,28 @@ class Naether
     end
   end
   
+  #
+  # Get Build Artifacts
+  #
+  # @return [Array] of build artifacts
+  #
   def build_artifacts
     Naether::Java.convert_to_ruby_array( @resolver.getBuildArtifacts() )
   end
   
-  # Add a dependency in the notation: groupId:artifactId:type:version
+  # Add a dependency 
+  #
+  # @param [String] notation in the format of groupId:artifactId:version
+  # @param [String] scope valid options are compile,test,runtime
+  # @see {https://github.com/mguymon/naether/wiki/Notations}
   def add_notation_dependency( notation, scope='compile' )
     @resolver.addDependency( notation, scope )
   end
   
   # Add dependencies from a Maven POM
+  #
+  # @param [String] pom_path
+  # @param [Array] scopes valid options are compile,test,runtime
   def add_pom_dependencies( pom_path, scopes=['compile'] )
     if Naether.platform == 'java'
       @resolver.addDependencies( pom_path, scopes )
@@ -118,9 +176,10 @@ class Naether
     end
   end
   
-  # Add a dependency of org.sonatype.aether.graph.Dependency Java object
+  # Add a dependency of org.sonatype.aether.graph.Dependency
+  #
+  # @param [org.sonatype.aether.graph.Dependency] dependency
   def add_dependency( dependency )
-    #@resolver.addDependency( dependency )
     if Naether.platform == 'java'
       @resolver.addDependency( dependency )
     else
@@ -180,22 +239,31 @@ class Naether
   end
   
   # Get array of dependencies
+  #
+  # @return [Array]
   def dependencies
     Naether::Java.convert_to_ruby_array( @resolver.getDependencies() )
   end
   
   # Get array of dependencies as notation
+  #
+  # @return [Array] of notations
+  # @see {https://github.com/mguymon/naether/wiki/Notations}
   def dependencies_notation
     Naether::Java.convert_to_ruby_array(@resolver.getDependenciesNotation(), true)
   end
   alias_method :dependenciesNotation, :dependencies_notation # some javaism snuck in
   
   # Hash of dependency paths
+  #
+  # @return [Array] of { notation => path }
   def dependencies_path
     Naether::Java.convert_to_ruby_hash( @resolver.getDependenciesPath(), true )
   end
   
   # Convert dependencies to Classpath friendly string
+  #
+  # @return [String]
   def dependencies_classpath()
     @resolver.getResolvedClassPath()
   end
@@ -208,7 +276,10 @@ class Naether
     jars
   end
   
-  # Resolve dependencies, finding related additional dependencies
+  # Resolve dependencies
+  #
+  # @return [Array] of notations
+  # @see {https://github.com/mguymon/naether/wiki/Notations}
   def resolve_dependencies( download_artifacts = true, properties = nil )
     
     if properties
@@ -223,6 +294,11 @@ class Naether
     dependenciesNotation
   end
 
+  # Convert notations to local paths of artifacts
+  # 
+  # @param [Array] notations
+  # @return [Array] of paths to artifacts
+  # @see {https://github.com/mguymon/naether/wiki/Notations}
   def to_local_paths( notations ) 
     if Naether.platform == 'java'
       Naether::Java.convert_to_ruby_array( 
@@ -242,6 +318,12 @@ class Naether
     
   end
 
+  #
+  # Download artifact
+  #
+  # @param [Array] notations to download
+  # @return [Array] of paths to downloaded artifacts
+  #
   def download_artifacts( notations )
     if( notations.is_a? String )
       notations = [notations]
@@ -265,6 +347,16 @@ class Naether
   
   
   # Deploy artifact to remote repo url
+  #
+  # @param [String] notation
+  # @param [String] file_path of the artifact
+  # @param [String] url of the remote repo
+  # @param [Hash] opts
+  # @option opts [String] :pom_path path to pom.xml
+  # @option opts [String] :username for optional auth
+  # @option opts [String] :password for optional auth
+  # @option opts [String] :pub_key for optional auth
+  # @option opts [String] :pub_key_passphrase for optional auth
   def deploy_artifact( notation, file_path, url, opts = {} )
     artifact = Naether::Java.create( "com.tobedevoured.naether.deploy.DeployArtifact" )
     
@@ -286,83 +378,17 @@ class Naether
   end
   
   # Install artifact or pom to local repo, must specify pom_path and/or jar_path
+  #
+  # @param [String] notation
+  # @param [String] pom_path
+  # @param [String] jar_path
   def install( notation, pom_path =nil, jar_path = nil )
     @resolver.install(notation, pom_path, jar_path)
   end
-  
-  def load_pom( file_path )
-    @project_instance = Naether::Java.create("com.tobedevoured.naether.maven.Project", file_path )
-  end
-  
-  def pom_dependencies( file_path=nil, scopes = nil)
-    if file_path
-      load_pom( file_path )
-    end
 
-    if Naether.platform == 'java'
-      if scopes.nil?
-        deps = @project_instance.getDependenciesNotation()
-      else
-        deps = @project_instance.getDependenciesNotation( scopes )
-      end
-      
-    else
-      list = nil
-      if scopes
-        list = Naether::Java.convert_to_java_list( scopes )
-        
-        deps = @project_instance._invoke('getDependenciesNotation', 'Ljava.util.List;', list)
-      else
-        deps = @project_instance.getDependenciesNotation()
-      end
-      
-    end
-    
-    Naether::Java.convert_to_ruby_array(@project_instance.getRepositoryUrls()).each do |url|
-      add_remote_repository( url )
-    end
-    
-    Naether::Java.convert_to_ruby_array( deps, true )
-  end
-  
-  # Get the POM version
-  def pom_version( file_path=nil )
-    if file_path
-      load_pom( file_path )
-    end
-    
-    return @project_instance.getVersion()
-  end
-  
-  # Create the XML for a Maven Pom for the notation, groupId:artifactId:type:version
-  #
-  # loads all resolved dependencies into pom
-  def build_pom( notation )
-    @project_instance = Naether::Java.create("com.tobedevoured.naether.maven.Project")
-    @project_instance.setProjectNotation( notation )
-    
-    @project_instance.setRepositories( @resolver.getRemoteRepositoryUrls() )
-      
-    @project_instance.setDependencies( @resolver.getDependencies() )
-    
-    @project_instance.toXml()
-    
-  end
-  
-  # notation of the pom, groupId:artifactId:type:version
-  # filePath to write the pom 
-  #
-  # loads all resolved dependencies into pom
-  def write_pom( notation, file_path )
-    @project_instance = Naether::Java.create("com.tobedevoured.naether.maven.Project")
-    @project_instance.setProjectNotation( notation )
-    
-    @project_instance.setDependencies( @resolver.getDependencies() )
-    
-    @project_instance.writePom( file_path )
-    
-  end
-
+  # Set the Log Level for the Java
+  # 
+  # @param [String] level can be debug, info, warn, or error
   def set_log_level( level )
     Naether::Java.exec_static_method('com.tobedevoured.naether.util.LogUtil', 'changeLevel', ['com.tobedevoured', level] )
   end
