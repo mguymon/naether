@@ -26,7 +26,16 @@ The jar dependencies for Naether will automatically be downloaded when the gem i
       <artifactId>naether</artifactId>
       <version>0.9.0</version>
     </dependency>
-    
+   
+May have to add the Sonatype Repo if the sync to Maven Central is slow.
+
+    <repositories>
+      <repository>
+        <id>oss.sonatype.org</id>
+        <name>Sonatype Repository</name>
+        <url>https://oss.sonatype.org/content/groups/public</url>
+      </repository>
+    </repositories>
 
 ## About
 
@@ -42,7 +51,7 @@ from Ruby. JRuby is natively supported, other Ruby VMs will use [Rjb](http://rjb
 * Download Jars
 * Deploy Jars
 * Load dependencies from a Maven pom.xml
-* Can create a Maven pom.xml
+* Create a Maven pom.xml
 
 ## License
 
