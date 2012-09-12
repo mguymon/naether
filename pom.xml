@@ -3,6 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
   <groupId>com.tobedevoured.naether</groupId>
 	<artifactId>naether</artifactId>
+	<name>Naether</name>
 	<packaging>jar</packaging>
   <version>0.9.0</version>
 	<url>https://github.com/mguymon/naether</url>
@@ -162,6 +163,43 @@
 	        </execution>
 	      </executions>
 	    </plugin>
+	    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 	  </plugins>
 	</build>
 	
