@@ -16,9 +16,9 @@ Supports Ruby 1.8.7, Ruby 1.9.3, and JRuby 1.6.7
 ### Java
 
     <dependency>
-      <groupId>com.tobedevoured</groupId>
+      <groupId>com.tobedevoured.naether</groupId>
       <artifactId>naether</artifactId>
-      <version>0.8.6</version>
+      <version>0.9.0</version>
     </dependency>
 
 ## About

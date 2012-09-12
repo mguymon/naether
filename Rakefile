@@ -35,7 +35,7 @@ namespace :naether do
       
       FileUtils.copy( 'jar_dependencies.yml', "target/gem/jar_dependencies.yml" )
       FileUtils.copy( 'LICENSE', "target/gem/LICENSE" )
-      FileUtils.copy( 'README.rdoc', "target/gem/README.rdoc" )
+      FileUtils.copy( 'README.md', "target/gem/README.md" )
       FileUtils.copy( 'pom.xml', "target/gem/pom.xml" )
       FileUtils.copy( 'VERSION', "target/gem/VERSION" )
       FileUtils.copy( 'PostInstallRakefile', "target/gem/Rakefile" )
@@ -137,13 +137,8 @@ task :default => :test
 
 task :spec => :test_warning
 
-require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
-  
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "naether #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('src/main/ruby/**/*.rb')
+require 'yard'
+YARD::Rake::YardocTask.new do |t|
+  t.files   = ['lib/**/*.rb', 'LICENSE', 'pom.xml', 'jar_dependencies.yml'] 
 end
+Rake::Task["build"].enhance ['yard']
