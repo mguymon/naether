@@ -436,14 +436,19 @@ public class Naether {
 	}
 
 	/**
-	 * Get {@link List} of {@link RemoteRepository}
+	 * Get {@link Set} of {@link RemoteRepository}
 	 * 
-	 * @return {@link List}
+	 * @return {@link Set}
 	 */
 	public Set<RemoteRepository> getRemoteRepositories() {
 		return remoteRepositories;
 	}
 	
+	/**
+	 * Get {@link List} of String urls 
+	 * 
+	 * @return {@link List<String>}
+	 */
 	public List<String> getRemoteRepositoryUrls() {
 		List<String> urls = new ArrayList<String>();
 		for( RemoteRepository repo : getRemoteRepositories() ) {
@@ -466,9 +471,9 @@ public class Naether {
 	}
 
 	/**
-	 * Resolve Dependencies, boolean if artifacts are to be downloaded
+	 * Resolve Dependencies
 	 * 
-	 * @param downloadArtifacts boolean
+	 * @param downloadArtifacts boolean if artifacts are to be downloaded
 	 * @throws URLException
 	 * @throws DependencyException
 	 */
@@ -476,6 +481,14 @@ public class Naether {
 		resolveDependencies( downloadArtifacts, null );
 	}
 	
+	/**
+	 * Resolve Dependencies
+	 * 
+	 * @param downloadArtifacts if artifacts are to be downloaded
+	 * @param properties Map<String,String> of properties
+	 * @throws URLException
+	 * @throws DependencyException
+	 */
 	public void resolveDependencies(boolean downloadArtifacts, Map<String,String> properties) throws URLException, DependencyException {
 		log.debug( "Resolving Dependencies" );
 		
@@ -576,10 +589,8 @@ public class Naether {
 	 * @param String notation String
 	 * @param String pomPath String
 	 * @param String filePath String
-	 * 
 	 * @throws InstallException
 	 */
-	
 	public void install(String notation, String pomPath, String filePath ) throws InstallException {
 		log.debug("installing artifact: {} ", notation);
 		
