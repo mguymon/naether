@@ -9,8 +9,6 @@ that can be used by Ruby or Java.
  
 [JavaDoc](http://mguymon.github.com/naether/apidocs/index.html)
 
-[Wiki](https://github.com/mguymon/naether/wiki)
-
 ## Install
 
 ### Ruby
