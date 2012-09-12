@@ -27,7 +27,7 @@ class Naether
       
       # Create an instance from a POM
       #
-      # @params [String] pom_path
+      # @param [String] pom_path
       # @return [Naether::Maven]
       def create_from_pom( pom_path )
         maven = Maven.new( pom_path )
@@ -35,7 +35,7 @@ class Naether
       
       # Create an instance based on notation
       # 
-      # @params [String] notation
+      # @param [String] notation
       # @return [Naether::Maven]
       # @see https://github.com/mguymon/naether/wiki/Notations
       def create_from_notation( notation )

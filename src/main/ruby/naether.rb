@@ -356,7 +356,7 @@ class Naether
   # @param [String] notation
   # @param [String] file_path to artifact to deploy
   # @param [String] url to deploy to
-  # @opts [Hash] opts
+  # @param [Hash] opts
   # @option opts [String] :pom_path path to pom.xml
   # @option opts [String] :username for optional auth
   # @option opts [String] :password for optional auth
