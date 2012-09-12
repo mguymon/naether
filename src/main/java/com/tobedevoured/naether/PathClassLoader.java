@@ -13,9 +13,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.LoggerFactory;
 
 /**
+ * ClassLoader that allows paths to be added a runtime.
  * 
  * @author Michael Guymon
  *
@@ -24,21 +24,43 @@ public class PathClassLoader extends URLClassLoader {
 
 	private Set<URL> loadedPaths = new HashSet<URL>();
 	
+	/**
+	 * Create new instance using default parent ClassLoader
+	 */
 	public PathClassLoader() {
 		super(new URL[] {});
 	}
 	
+	/**
+	 * Create new instance for parent classLoader
+	 * @param classLoader ClassLoader
+	 */
 	public PathClassLoader(ClassLoader classLoader) {
 		super( new URL[] {}, classLoader );
 	}
 	
-	public PathClassLoader(URL[] urls, ClassLoader classLoader ) {
-		super( urls, classLoader );
-		loadedPaths.addAll( Arrays.asList( urls ) );
-	}
-	
+	/**
+	 * Add a new path to the ClassLoader, such as a Jar or directory of compiled
+	 * classes.
+	 * 
+	 * @param path String
+	 * @return boolean if path is loaded.
+	 * @throws MalformedURLException
+	 */
 	public boolean addPath(String path) throws MalformedURLException {
 		File file = new File(path);
+		return addPath( file );
+	}
+	
+	/**
+	 * Add a new path to the ClassLoader, such as a Jar or directory of compiled
+	 * classes.
+	 * 
+	 * @param file {@link File}
+	 * @return boolean if file is loaded.
+	 * @throws MalformedURLException
+	 */
+	public boolean addPath(File file) throws MalformedURLException {
 		URL url = file.toURI().toURL();
 		if ( !loadedPaths.contains( url ) ) {
 			super.addURL( url );
@@ -49,20 +71,47 @@ public class PathClassLoader extends URLClassLoader {
 		}
 	}
 	
+	/**
+	 * Get paths loaded by ClassLoader
+	 * 
+	 * @return Set<URL>
+	 */
 	public Set<URL> getLoadedPaths() {
 		return loadedPaths;
 	}
 	
+	@Override
 	public Class<?> findClass(String name) throws ClassNotFoundException {
 		return super.findClass( name );
 	}
 	
-	public Object newInstance( String name ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	
+	/**
+	 * Create new instance of Object using the ClassLoader
+	 * 
+	 * @param name String fully qualified class name
+	 * @return Object
+	 * @throws ClassLoaderException
+	 */
+	public Object newInstance( String name ) throws ClassLoaderException {
 		return newInstance( name, null );
 	}
 	
-	public Object newInstance( String name, Object... params ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
-		Class<?> clazz = loadClass(name);
+	/**
+	 * Create new instance of Object with constructor parameters using the ClassLoader
+	 * 
+	 * @param name
+	 * @param params Object parameters for constructor
+	 * @return Object
+	 * @throws ClassLoaderException
+	 */
+	public Object newInstance( String name, Object... params ) throws ClassLoaderException {
+		Class<?> clazz;
+		try {
+			clazz = loadClass(name);
+		} catch (ClassNotFoundException e) {
+			throw new ClassLoaderException(e);
+		}
 		
 		List<Class> types = null;
 		
@@ -74,24 +123,93 @@ public class PathClassLoader extends URLClassLoader {
 		}
 		
 		if ( params != null ) {
-			Constructor<?> constructor = clazz.getConstructor( types.toArray( new Class[types.size()] ) );
-			return constructor.newInstance(params);
+			Constructor<?> constructor;
+			try {
+				constructor = clazz.getConstructor( types.toArray( new Class[types.size()] ) );
+			} catch (SecurityException e) {
+				throw new ClassLoaderException(e);
+			} catch (NoSuchMethodException e) {
+				throw new ClassLoaderException(e);
+			}
+			
+			try {
+				return constructor.newInstance(params);
+			} catch (IllegalArgumentException e) {
+				throw new ClassLoaderException(e);
+			} catch (InstantiationException e) {
+				throw new ClassLoaderException(e);
+			} catch (IllegalAccessException e) {
+				throw new ClassLoaderException(e);
+			} catch (InvocationTargetException e) {
+				throw new ClassLoaderException(e);
+			}
 		} else {
-			Constructor<?> constructor = clazz.getConstructor();
-			return constructor.newInstance();
+			Constructor<?> constructor;
+			try {
+				constructor = clazz.getConstructor();
+			} catch (SecurityException e) {
+				throw new ClassLoaderException(e);
+			} catch (NoSuchMethodException e) {
+				throw new ClassLoaderException(e);
+			}
+			
+			try {
+				return constructor.newInstance();
+			} catch (IllegalArgumentException e) {
+				throw new ClassLoaderException(e);
+			} catch (InstantiationException e) {
+				throw new ClassLoaderException(e);
+			} catch (IllegalAccessException e) {
+				throw new ClassLoaderException(e);
+			} catch (InvocationTargetException e) {
+				throw new ClassLoaderException(e);
+			}
 		}
 	}
 	
-	public Object execStaticMethod( String className, String methodName ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+
+	/**
+	 * Helper for executing static methods on a Class
+	 * 
+	 * @param className String fully qualified class
+	 * @param methodName String method name
+	 * @return Object result
+	 * @throws ClassLoaderException
+	 */
+	public Object execStaticMethod( String className, String methodName ) throws ClassLoaderException {
 		return execStaticMethod( className, methodName, null );
 	}
 	
-	public Object execStaticMethod( String className, String methodName, List params ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+	/**
+	 * Helper for executing static methods on a Class
+	 * 
+	 * @param className String fully qualified class
+	 * @param methodName String method name
+	 * @param params List of method parameters
+	 * @return Object result
+	 * @throws ClassLoaderException
+	 */
+	public Object execStaticMethod( String className, String methodName, List params ) throws ClassLoaderException {
 		return execStaticMethod( className, methodName, params, null );
 	}
 	
-	public Object execStaticMethod( String className, String methodName, List params, List<String> paramTypes ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		Class<?> clazz = loadClass( className );
+	/**
+	 * Helper for executing static methods on a Class
+	 * 
+	 * @param className String fully qualified class
+	 * @param methodName String method name
+	 * @param params List of method parameters
+	 * @param paramTypes List<String> of fully qualified class for each params.
+	 * @return Object result
+	 * @throws ClassLoaderException
+	 */
+	public Object execStaticMethod( String className, String methodName, List params, List<String> paramTypes ) throws ClassLoaderException {
+		Class<?> clazz;
+		try {
+			clazz = loadClass( className );
+		} catch (ClassNotFoundException e) {
+			throw new ClassLoaderException( e );
+		}
 		
 		List<Class> types = null;
 		
@@ -103,17 +221,54 @@ public class PathClassLoader extends URLClassLoader {
 				}
 			} else {
 				for ( String type : paramTypes ) {
-					types.add( loadClass( type ) );
+					try {
+						types.add( loadClass( type ) );
+					} catch (ClassNotFoundException e) {
+						throw new ClassLoaderException( e );
+					}
 				}
 			}
 		}
 		
 		if ( params != null ) {
-			Method method = clazz.getDeclaredMethod(methodName, types.toArray(new Class[types.size()]));
-			return method.invoke( clazz, params.toArray( new Object[params.size()] ) );
+			Method method;
+			try {
+				method = clazz.getDeclaredMethod(methodName, types.toArray(new Class[types.size()]));
+			} catch (SecurityException e) {
+				throw new ClassLoaderException( e );
+			} catch (NoSuchMethodException e) {
+				throw new ClassLoaderException( e );
+			}
+			
+			try {
+				return method.invoke( clazz, params.toArray( new Object[params.size()] ) );
+			} catch (IllegalArgumentException e) {
+				throw new ClassLoaderException( e );
+			} catch (IllegalAccessException e) {
+				throw new ClassLoaderException( e );
+			} catch (InvocationTargetException e) {
+				throw new ClassLoaderException( e );
+			}
 		} else {
-			Method method = clazz.getDeclaredMethod(methodName);
-			return method.invoke( clazz );
+			
+			Method method;
+			try {
+				method = clazz.getDeclaredMethod(methodName);
+			} catch (SecurityException e) {
+				throw new ClassLoaderException( e );
+			} catch (NoSuchMethodException e) {
+				throw new ClassLoaderException( e );
+			}
+			
+			try {
+				return method.invoke( clazz );
+			} catch (IllegalArgumentException e) {
+				throw new ClassLoaderException( e );
+			} catch (IllegalAccessException e) {
+				throw new ClassLoaderException( e );
+			} catch (InvocationTargetException e) {
+				throw new ClassLoaderException( e );
+			}
 		}
 	}
 }

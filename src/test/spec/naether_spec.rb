@@ -41,6 +41,11 @@ describe Naether do
       @naether.remote_repository_urls.should eql(["http://repo1.maven.org/maven2/", "http://test.net:7011"])
     end
     
+    it "should set unique remote repositories from pom file" do
+      @naether.dependencies = 'src/test/resources/valid_pom.xml' 
+      @naether.remote_repository_urls.should eql( ["http://repo1.maven.org/maven2/", "http://repository.jboss.org/nexus/content/groups/public-jboss"] )
+    end
+    
     it "should add a dependency from notation" do
       @naether.dependencies = "junit:junit:jar:4.8.2" 
       @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2"]

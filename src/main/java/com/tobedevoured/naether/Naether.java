@@ -32,7 +32,6 @@ import java.util.Set;
 
 // Apache Maven 
 import org.apache.maven.model.Repository;
-import org.apache.maven.repository.internal.DefaultServiceLocator;
 
 // SLF4J Logger
 import org.slf4j.Logger;
@@ -48,13 +47,9 @@ import org.sonatype.aether.deployment.DeployRequest;
 import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.graph.Exclusion;
-import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManagerFactory;
 import org.sonatype.aether.installation.InstallRequest;
 import org.sonatype.aether.installation.InstallationException;
 import org.sonatype.aether.repository.Authentication;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.LocalRepositoryManager;
-import org.sonatype.aether.repository.NoLocalRepositoryManagerException;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
@@ -80,8 +75,6 @@ import com.tobedevoured.naether.util.RepoBuilder;
 /**
  * Dependency Resolver using Maven's Aether
  * 
- * Based on {@link https://docs.sonatype.org/display/AETHER/Home#Home-AetherinsideMaven}
- * 
  * @author Michael Guymon
  * 
  */
@@ -97,7 +90,7 @@ public class Naether {
 
 	/**
 	 * Create new instance. Default local repository is environment M2_REPO
-	 * setting or user home .m2/repository. The local repository is the destination for
+	 * setting or user home and .m2/repository. The local repository is the destination for
 	 * downloaded metadata and artifacts.
 	 * 
 	 * The default remote repository is http://repo1.maven.org/maven2/
@@ -141,7 +134,10 @@ public class Naether {
 	
 	/**
 	 * Add a local Build Artifact manually by String notation, path to the artifact,
-	 * and path to the POM.
+	 * and path to the POM. 
+	 * 
+	 * The Build Artifact will override matchingdependencies found
+     * when resolving dependencies.
 	 * 
 	 * @param notation String
 	 * @param path String
@@ -166,6 +162,9 @@ public class Naether {
 	/**
 	 * Add a local Build Artifact manually by String notation and path to the artifact.
 	 * The POM for the artifact is created automatically based on the String notation.
+	 * 
+	 * The Build Artifact will override matchingdependencies found
+     * when resolving dependencies.
 	 * 
 	 * @param notation String
 	 * @param path String

@@ -1,37 +1,40 @@
-require  File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper'))
+require  File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 require 'src/main/ruby/naether'
 require 'src/main/ruby/naether/java'
+require 'src/main/ruby/naether/maven'
 
-describe Naether do
+describe Naether::Maven do
   
     before(:each) do
         @naether = Naether.new
         @naether.should_not be_nil
         @naether.local_repo_path = 'target/test-repo'
+        
+        @maven = Naether::Maven.new( 'src/test/resources/valid_pom.xml')
     end  
   
     it "should get version from pom file" do
-      version = IO.read("VERSION")
-      @naether.pom_version( 'pom.xml' ).strip.should eql version.strip
+      @maven.version().should eql "3"
     end
     
-    it "should get dependencies from pom file" do
-      deps = @naether.pom_dependencies( 'src/test/resources/valid_pom.xml' )
-      deps.should eql ["ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1"]
-                        
-      deps = @naether.pom_dependencies( 'src/test/resources/valid_pom.xml', ['test'] )
-      deps.should eql ["junit:junit:jar:4.8.2", "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1"]
+    it "should get dependencies for the project" do
+      @maven.dependencies.should =~ [
+        "ch.qos.logback:logback-classic:jar:0.9.29", 
+        "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", 
+        "junit:junit:jar:4.8.2"]
     end
     
-    it "should set unique remote repositories from pom file" do
-      @naether.pom_dependencies( 'src/test/resources/valid_pom.xml' )
-      @naether.remote_repository_urls.should eql( ["http://repo1.maven.org/maven2/", "http://repository.jboss.org/nexus/content/groups/public-jboss"] )
+    it "should get dependencies for the project by scope" do
+        @maven.dependencies(['test']).should =~ [
+          "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", "junit:junit:jar:4.8.2"]
     end
     
     it "should create pom xml" do
       @naether.dependencies = [ "org.apache.maven.wagon:wagon-file:jar:1.0", {"junit:junit:jar:4.8.2" => 'test'} ]
       @naether.add_remote_repository( 'http://repository.jboss.org/nexus/content/groups/public-jboss' )
-      xml = @naether.build_pom( 'testGroup:testArtifact:jar:test' )
+      maven = Naether::Maven.create_from_notation('testGroup:testArtifact:jar:test')
+      maven.load_naether( @naether )
+      xml = maven.build_pom()
       
       pom = IO.read( "src/test/resources/generated_pom.xml" ) 
       xml.should eql(pom)
@@ -42,7 +45,10 @@ describe Naether do
       
       @naether.dependencies = [ {"junit:junit:jar:4.8.2" => 'test'}, "ch.qos.logback:logback-classic:jar:0.9.29" ]
       @naether.resolve_dependencies
-      @naether.write_pom( 'test-rb:test-rb:jar:100.1', test_file)
+      
+      maven = Naether::Maven.create_from_notation('test-rb:test-rb:jar:100.1')
+      maven.load_naether( @naether )
+      maven.write_pom(test_file)
       
       File.exists?( test_file ).should be_true
       

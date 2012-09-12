@@ -25,7 +25,7 @@ import org.apache.maven.model.Repository;
 import org.sonatype.aether.repository.RemoteRepository;
 
 /**
- * Helper for creating {@link RemoteRepository}
+ * Helper for creating repository objects
  * 
  * @author Michael Guymon
  *

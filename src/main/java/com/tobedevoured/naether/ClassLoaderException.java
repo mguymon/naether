@@ -18,19 +18,15 @@ package com.tobedevoured.naether;
  * limitations under the License.
  */
 
-/**
- * Commonly used constants
- * 
- * @author Michael Guymon
- *
- */
-public final class Const {
-	private Const() { }
+public class ClassLoaderException extends Exception {
 	
-	public static final String TEST_JAR = "test-jar";
-	public static final String POM = "pom";
-	public static final String JAR = "jar";
+	private static final long serialVersionUID = -3555453855808854873L;
+
+	public ClassLoaderException( Throwable throwable ) {
+		super( throwable );
+	}
 	
-	public static final String _TO_ = " to ";
-	public static final String _FROM_ = " from ";
+	public ClassLoaderException( String message, Throwable throwable ) {
+		super( message, throwable );
+	}
 }

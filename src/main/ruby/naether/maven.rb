@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
+require "#{File.dirname(__FILE__)}/java"
+
 class Naether
   
   # Helper for interacting with a Maven POM
@@ -21,30 +23,63 @@ class Naether
   #
   class Maven
     
+    class << self
+      
+      # Create an instance from a POM
+      #
+      # @params [String] pom_path
+      # @return [Naether::Maven]
+      def create_from_pom( pom_path )
+        maven = Maven.new( pom_path )
+      end
+      
+      # Create an instance based on notation
+      # 
+      # @params [String] notation
+      # @return [Naether::Maven]
+      # @see https://github.com/mguymon/naether/wiki/Notations
+      def create_from_notation( notation )
+        maven = Maven.new
+        maven.notation = notation
+        maven
+      end
+    end
+    
     #
     # Create new instance
     #
-    # @param [String] notation_or_file_path
-    def initialize( notation_or_file_path )
-      if notation_or_file_path.count(":") >= 3
-        @project_instance = Naether::Java.create("com.tobedevoured.naether.maven.Project" )
-        @project_instance.setProjectNotation( notation_or_file_path )
+    def initialize(pom_path = nil)
+      if pom_path
+        @project = Naether::Java.create("com.tobedevoured.naether.maven.Project", pom_path )
       else
-        @project_instance = Naether::Java.create("com.tobedevoured.naether.maven.Project", notation_or_file_path )
-      end      
+        @project = Naether::Java.create("com.tobedevoured.naether.maven.Project" )
+      end
+      
+    end
+    
+    # Set the Notation for this Project
+    #
+    # @param [String] notation
+    # @see https://github.com/mguymon/naether/wiki/Notations
+    def notation=(notation)
+      @project.setProjectNotation( notation )
     end
     
     # Get dependences for Project as notations
     # 
-    # @param [Array] scopes valid options are compile,test,runtime
-    # @see https://github.com/mguymon/naether/wiki/Notations
+    # @param [Array<String>] scopes valid options are compile,test,runtime
     def dependencies( scopes = nil)
-  
+      if scopes
+        unless scopes.is_a? Array
+           scopes = [scopes]
+        end
+      end
+          
       if Naether.platform == 'java'
         if scopes.nil?
-          deps = @project_instance.getDependenciesNotation()
+          deps = @project.getDependenciesNotation()
         else
-          deps = @project_instance.getDependenciesNotation( scopes )
+          deps = @project.getDependenciesNotation( scopes )
         end
         
       else
@@ -52,15 +87,11 @@ class Naether
         if scopes
           list = Naether::Java.convert_to_java_list( scopes )
           
-          deps = @project_instance._invoke('getDependenciesNotation', 'Ljava.util.List;', list)
+          deps = @project._invoke('getDependenciesNotation', 'Ljava.util.List;', list)
         else
-          deps = @project_instance.getDependenciesNotation()
+          deps = @project.getDependenciesNotation()
         end
         
-      end
-      
-      Naether::Java.convert_to_ruby_array(@project_instance.getRepositoryUrls()).each do |url|
-        add_remote_repository( url )
       end
       
       Naether::Java.convert_to_ruby_array( deps, true )
@@ -70,28 +101,34 @@ class Naether
     #
     # @param [Array] dependencies
     def dependencies=(dependencies)
-      @project_instance.setDependencies( dependencies )
+      @project.setDependencies( dependencies )
     end
     
     # Set repositories
     #
     # @param [Array] repositories of urls
     def repositories=( repositories )
-      @project_instance.setRepositories( repositories )
+      @project.setRepositories( repositories )
     end
   
     # Get the version
     #
     # return [String] version
     def version()
-      return @project_instance.getVersion()
+      return @project.getVersion()
+    end
+    
+    # Load dependencies and remote repo from a {Naether} instance
+    def load_naether( naether )
+      self.dependencies= naether.dependencies
+      self.repositories= naether.remote_repository_urls
     end
     
     # Create the XML for a Maven Pom
     #
     # @return [String] pom xml
     def build_pom()
-      @project_instance.toXml()
+      @project.toXml()
     end
     
   
@@ -99,7 +136,7 @@ class Naether
     #
     # @param [String] file_path
     def write_pom( file_path )
-      @project_instance.writePom( file_path )
+      @project.writePom( file_path )
     end
   end
 end

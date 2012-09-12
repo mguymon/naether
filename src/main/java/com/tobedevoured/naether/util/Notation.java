@@ -194,6 +194,14 @@ public final class Notation {
 		return notation.toString();
 	}
 	
+	/**
+	 * Get local paths for notations
+	 * 
+	 * @param localRepoPath String path
+	 * @param notations List<String> of notations
+	 * @return List<String> of paths
+	 * @throws NaetherException
+	 */
 	public static List<String> getLocalPaths( String localRepoPath, List<String> notations ) throws NaetherException {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		SimpleLocalRepositoryManagerFactory factory = new SimpleLocalRepositoryManagerFactory();

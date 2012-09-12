@@ -29,7 +29,7 @@ public class ClassLoaderTest {
 	}
 	
 	@Test
-	public void newIntance() throws MalformedURLException, SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public void newIntance() throws Exception {
 		classLoader.addPath( "src/test/resources/commons-beanutils-1.8.3.jar" );
 		
 		Object instance = classLoader.newInstance("org.apache.commons.collections.ArrayStack");
@@ -37,7 +37,7 @@ public class ClassLoaderTest {
 	}
 	
 	@Test
-	public void newInstanceWithParams() throws SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public void newInstanceWithParams() throws Exception {
 		File file = (File)classLoader.newInstance("java.io.File", "Gemfile" );
 		assertEquals( "java.io.File", file.getClass().getName() );
 		
@@ -45,7 +45,7 @@ public class ClassLoaderTest {
 	}
 	
 	@Test
-	public void createNaether() throws ProjectException, URLException, DependencyException, MalformedURLException, SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	public void createNaether() throws Exception {
 		Naether naether = new Naether();
 		naether.setLocalRepoPath( "target/test-repo" );
 		naether.addDependencies( "pom.xml" );
@@ -64,13 +64,13 @@ public class ClassLoaderTest {
 	}
 	
 	@Test
-	public void execStaticMethod() throws SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+	public void execStaticMethod() throws Exception {
 		Object result = classLoader.execStaticMethod("org.apache.commons.io.FileUtils", "getTempDirectoryPath" );
 		assertNotNull( result );
 	}
 	
 	@Test
-	public void execStaticMethodWithParams() throws SecurityException, IllegalArgumentException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+	public void execStaticMethodWithParams() throws Exception {
 		File file = new File( "target/classloader.test");
 		if ( file.exists() ) {
 			file.delete();
