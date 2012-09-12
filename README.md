@@ -5,9 +5,7 @@ that can be used by Ruby or Java.
 
 <https://github.com/mguymon/naether>
 
-[RDoc](http://rubydoc.info/gems/naether/frames)
- 
-[JavaDoc](http://mguymon.github.com/naether/apidocs/index.html)
+[RDoc](http://rubydoc.info/gems/naether/frames) | [JavaDoc](http://mguymon.github.com/naether/apidocs/index.html) | [Wiki](https://github.com/mguymon/naether/wiki)
 
 ## Install
 
