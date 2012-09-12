@@ -9,11 +9,13 @@ that can be used by Ruby or Java.
  
 [JavaDoc](http://mguymon.github.com/naether/apidocs/index.html)
 
+[Wiki](https://github.com/mguymon/naether/wiki)
+
 ## Install
 
 ### Ruby
 
-Supports Ruby 1.8.7, Ruby 1.9.3, and JRuby 1.6.7
+JRuby 1.6.7 is natively supported. Ruby 1.8.7 and 1.9.3 use [Rjb](http://rjb.rubyforge.org) to proxy over JNI.
 
     gem install naether
     
@@ -37,21 +39,58 @@ May have to add the Sonatype Repo if the sync to Maven Central is slow.
       </repository>
     </repositories>
 
-## About
+## Usage
 
-[Naether](https://github.com/mguymon/naether/blob/master/src/main/java/com/slackworks/naether/Naether.java) 
-is a wrapper for [Aether](https://github.com/sonatype/sonatype-aether), the Maven dependency resolution framework. 
-[Naether.rb](https://github.com/mguymon/naether/blob/master/src/main/ruby/naether.rb) provides access to Aether 
-from Ruby. JRuby is natively supported, other Ruby VMs will use [Rjb](http://rjb.rubyforge.org) to proxy over JNI.
+### Ruby
 
-## Features
+All of the Naether dependencies are loaded via a Custom ClassLoader.
 
-* Transitive resolution of Jars
-* Override resolution with local Jars
-* Download Jars
-* Deploy Jars
-* Load dependencies from a Maven pom.xml
-* Create a Maven pom.xml
+#### Bootstraping
+
+Naether [jar dependences](https://github.com/mguymon/naether/blob/master/jar_dependencies.yml) 
+must be loaded for Naether to work. This is easily done with the [bootstrap helper](http://rdoc.info/gems/naether/Naether/Bootstrap)
+
+    Naether::Bootstrap.bootstrap_local_repo
+
+#### Resolving Dependencies
+
+    require 'rubygems
+    require 'naether'
+    
+    Naether::Bootstrap.bootstrap_local_repo
+    naether = Naether.new
+    naether.dependencies = [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" ]
+    naether.resolve_dependencies().
+    
+    puts naether.dependences_notation
+    
+Will output
+
+    ["ch.qos.logback:logback-core:jar:0.9.29",
+     "ch.qos.logback:logback-classic:jar:0.9.29",
+     "junit:junit:jar:4.8.2",
+     "org.slf4j:slf4j-api:jar:1.6.1" ]
+
+[Additional documentation on Resolving Dependencies](https://github.com/mguymon/naether/wiki/Ruby-Resolving-Dependencies)
+
+### Java
+
+#### Resolving Dependencies
+
+    Naether naether = new Naether();
+    naether.addDependency( "ch.qos.logback:logback-classic:jar:0.9.29" );
+    naether.addDependency( "junit:junit:jar:4.8.2" );
+    naether.resolveDependencies();
+    System.out.println( naether.getDependenciesNotation().toString() );
+
+Will output:
+   
+    ["ch.qos.logback:logback-core:jar:0.9.29",
+     "ch.qos.logback:logback-classic:jar:0.9.29",
+     "junit:junit:jar:4.8.2",
+     "org.slf4j:slf4j-api:jar:1.6.1" ]
+
+[Additional documentation on Resolving Dependencies](https://github.com/mguymon/naether/wiki/Java-Resolving-Dependencies)
 
 ## License
 
