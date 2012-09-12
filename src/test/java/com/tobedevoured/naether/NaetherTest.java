@@ -121,6 +121,14 @@ public class NaetherTest {
 	}
 	
 	@Test
+	public void addDependecyFromNotation() throws URLException, DependencyException {
+		naether.addDependency( "ch.qos.logback:logback-classic:jar:0.9.29" );
+		assertEquals( new HashSet<String>(Arrays.asList( 
+				"ch.qos.logback:logback-classic:jar:0.9.29" ) ), 
+				naether.getDependenciesNotation() );
+	}
+	
+	@Test
 	public void addDependenciesFromPom() throws ProjectException, URLException, DependencyException {
 		naether.addDependencies( "src/test/resources/valid_pom.xml" );
 		
