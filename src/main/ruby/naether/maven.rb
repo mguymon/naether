@@ -13,7 +13,7 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-module Naether
+class Naether
   
   # Helper for interacting with a Maven POM
   #
@@ -37,7 +37,7 @@ module Naether
     # Get dependences for Project as notations
     # 
     # @param [Array] scopes valid options are compile,test,runtime
-    # @see {https://github.com/mguymon/naether/wiki/Notations}
+    # @see https://github.com/mguymon/naether/wiki/Notations
     def dependencies( scopes = nil)
   
       if Naether.platform == 'java'
