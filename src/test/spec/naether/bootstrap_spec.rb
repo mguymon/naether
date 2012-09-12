@@ -2,6 +2,8 @@ require  File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 require 'src/main/ruby/naether'
 require 'fileutils'
 
+Naether::Configuration.dependencies_yml = File.expand_path(File.join(File.dirname(__FILE__), '../../../../jar_dependencies.yml'))
+
 describe Naether::Bootstrap do
   context "Class" do
     it "should write jar dependencies yml" do

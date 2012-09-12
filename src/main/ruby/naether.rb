@@ -24,6 +24,8 @@ require "#{File.dirname(__FILE__)}/naether/java"
 #
 class Naether
   
+  attr_reader :resolver
+  
   class << self
     
     # Helper for Java dependencies needed to bootstrap Naether
@@ -253,7 +255,6 @@ class Naether
   def dependencies_notation
     Naether::Java.convert_to_ruby_array(@resolver.getDependenciesNotation(), true)
   end
-  alias_method :dependenciesNotation, :dependencies_notation # some javaism snuck in
   
   # Hash of dependency paths
   #
@@ -292,7 +293,7 @@ class Naether
     end
     
     @resolver.resolveDependencies( download_artifacts, map );
-    dependenciesNotation
+    dependencies_notation
   end
 
   # Convert notations to local paths of artifacts

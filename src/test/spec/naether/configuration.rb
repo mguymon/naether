@@ -6,4 +6,8 @@ describe Naether::Configuration do
     it "should have naether jar" do
       Naether::Config.naether_jar.should match /naether-#{Naether::VERSION}.jar/
     end
+    
+    it "should have jar_dependencies.yml" do
+      Naether::Config.dependencies_yml.should match /jar_dependencies\.yml/
+    end
 end

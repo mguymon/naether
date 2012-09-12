@@ -15,11 +15,14 @@ class Naether
         version = IO.read(File.expand_path("VERSION")).strip
       end
       
+      
+      
       @data = {
         :gem_dir =>     gem_dir,
         :naether_jar => File.join( gem_dir, "naether-#{version}.jar"),
         :platform =>    ($platform || RUBY_PLATFORM[/java/] || 'ruby'),
-        :version =>     version
+        :version =>     version,
+        :depenencies_yml => File.expand_path("#{File.dirname( __FILE__ )}/../../jar_dependencies.yml")
       }
       
       update!(data)

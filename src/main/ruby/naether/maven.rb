@@ -120,8 +120,8 @@ class Naether
     
     # Load dependencies and remote repo from a {Naether} instance
     def load_naether( naether )
-      self.dependencies= naether.dependencies
-      self.repositories= naether.remote_repository_urls
+      self.dependencies= naether.resolver.getDependencies()
+      self.repositories= naether.resolver.getRemoteRepositoryUrls()
     end
     
     # Create the XML for a Maven Pom

@@ -45,7 +45,7 @@ class Naether
         end
         
         if dep_file.nil?
-          dep_file = File.expand_path("#{File.dirname( __FILE__ )}/../../jar_dependencies.yml")
+          dep_file = Naether::Configuration.dependencies_yml
         end
         
         dep = YAML.load_file( dep_file )  
