@@ -3,7 +3,11 @@
 Naether is a Java Dependency Resolver using Maven's [Aether](https://github.com/sonatype/sonatype-aether) 
 that can be used by Ruby or Java.
 
-https://github.com/mguymon/naether
+<https://github.com/mguymon/naether>
+
+[RDoc](http://rubydoc.info/gems/naether/frames)
+ 
+[JavaDoc](http://mguymon.github.com/naether/apidocs/index.html)
 
 ## Install
 
@@ -12,6 +16,8 @@ https://github.com/mguymon/naether
 Supports Ruby 1.8.7, Ruby 1.9.3, and JRuby 1.6.7
 
     gem install naether
+    
+The jar dependencies for Naether will automatically be downloaded when the gem installs.
 
 ### Java
 
@@ -20,6 +26,7 @@ Supports Ruby 1.8.7, Ruby 1.9.3, and JRuby 1.6.7
       <artifactId>naether</artifactId>
       <version>0.9.0</version>
     </dependency>
+    
 
 ## About
 
@@ -28,10 +35,16 @@ is a wrapper for [Aether](https://github.com/sonatype/sonatype-aether), the Mave
 [Naether.rb](https://github.com/mguymon/naether/blob/master/src/main/ruby/naether.rb) provides access to Aether 
 from Ruby. JRuby is natively supported, other Ruby VMs will use [Rjb](http://rjb.rubyforge.org) to proxy over JNI.
 
-Beyond dependency resolution, provides support to install and deploy artifacts to a Maven repository.
+## Features
 
+* Transitive resolution of Jars
+* Override resolution with local Jars
+* Download Jars
+* Deploy Jars
+* Load dependencies from a Maven pom.xml
+* Can create a Maven pom.xml
 
-== License
+## License
 
 Licensed to the Apache Software Foundation (ASF) under one or more
 contributor license agreements.  See the NOTICE file distributed with this
