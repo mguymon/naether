@@ -22,7 +22,7 @@ class Naether
         :naether_jar => File.join( gem_dir, "naether-#{version}.jar"),
         :platform =>    ($platform || RUBY_PLATFORM[/java/] || 'ruby'),
         :version =>     version,
-        :depenencies_yml => File.expand_path("#{File.dirname( __FILE__ )}/../../jar_dependencies.yml")
+        :dependencies_yml => File.expand_path("#{File.dirname( __FILE__ )}/../../jar_dependencies.yml")
       }
       
       update!(data)
