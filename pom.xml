@@ -5,7 +5,7 @@
 	<artifactId>naether</artifactId>
 	<name>Naether</name>
 	<packaging>jar</packaging>
-  <version>0.9.0</version>
+  <version>0.9.1</version>
 	<url>https://github.com/mguymon/naether</url>
 	<description>
         A Java Dependency Resolver using Maven’s Aether.
