@@ -97,6 +97,16 @@ class Naether
       Naether::Java.convert_to_ruby_array( deps, true )
     end
     
+    # Add dependency by scope
+    #
+    # @param [String] notation
+    # @param [String] scope
+    #
+    def add_dependency( notation, scope = nil )
+      @project.addDependency( notation, scope )
+    end
+      
+    
     # Set dependencies
     #
     # @param [Array] dependencies

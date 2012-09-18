@@ -24,9 +24,19 @@ describe Naether::Maven do
         "junit:junit:jar:4.8.2"]
     end
     
-    it "should get dependencies for the project by scope" do
+    it "should add a dependency" do
+      @maven.add_dependency("org.apache.maven.wagon:wagon-file:jar:1.0")
+      @maven.dependencies.should include "org.apache.maven.wagon:wagon-file:jar:1.0"
+    end
+    
+    it "should get dependencies by scope" do
         @maven.dependencies(['test']).should =~ [
           "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", "junit:junit:jar:4.8.2"]
+    end
+    
+    it "should add a dependency by scope" do
+       @maven.add_dependency("org.apache.maven.wagon:wagon-file:jar:1.0", "runtime")
+       @maven.dependencies('runtime').should =~ ["org.apache.maven.wagon:wagon-file:jar:1.0"]
     end
     
     it "should create pom xml" do
