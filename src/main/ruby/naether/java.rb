@@ -24,10 +24,10 @@ class Naether
       
       if Naether::Configuration.platform == 'java'
         require "#{File.dirname(__FILE__)}/java/jruby"
-        @java = Naether::Java::JRuby.instance
+        @java = Naether::Java::JRuby.new
       else
         require "#{File.dirname(__FILE__)}/java/ruby"
-        @java = Naether::Java::Ruby.instance
+        @java = Naether::Java::Ruby.new
       end
     end
     

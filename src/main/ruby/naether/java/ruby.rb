@@ -12,7 +12,6 @@ class Naether
   class Java
 
     class Ruby
-      include Singleton
       
       attr_reader :loaded_paths, :class_loader
       

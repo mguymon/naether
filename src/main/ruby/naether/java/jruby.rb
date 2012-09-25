@@ -12,7 +12,6 @@ class Naether
   class Java
 
     class JRuby
-      include Singleton
       
       attr_reader :loaded_paths, :class_loader
       
@@ -33,14 +32,14 @@ class Naether
       end
       
       #
-      # Create a Java Object
+      # Create a Java Object from the Naether Class Loader
       #
       def create( target_class, *args )
         @class_loader.newInstance(target_class, *args )
       end
       
       #
-      # Execute a Staic method on a Java class
+      # Execute a Staic method on a Java class from the Naether Class Loader
       #
       def exec_static_method( target_class, target_method, params, types = nil ) 
         unless params.is_a? Array
