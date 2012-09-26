@@ -1,12 +1,10 @@
 require "#{File.dirname(__FILE__)}/../configuration"
 
-# :title:Naether::Java::JRuby
-#
-# Singletn that handles Java interactions for JRuby. Providers helpers for 
+
+# Handles Java interactions for JRuby. Providers helpers for 
 # nomalizing accesss.
 
-# = Authors
-# Michael Guymon
+# @author Michael Guymon
 #
 class Naether
   class Java
@@ -16,7 +14,7 @@ class Naether
       attr_reader :loaded_paths, :class_loader
       
       #
-      # Creates new instance by loading the Naether jar to the global ClassLoader
+      # Creates new instance by loading the Naether jar to the parent ClassLoader
       # and creating the internal Naether ClassLoader
       #
       def initialize
@@ -34,6 +32,8 @@ class Naether
       #
       # Create a Java Object from the Naether Class Loader
       #
+      # @param [String] target_class to create
+      # @param [Array] args Array of constructor arguments
       def create( target_class, *args )
         @class_loader.newInstance(target_class, *args )
       end
@@ -41,6 +41,11 @@ class Naether
       #
       # Execute a Staic method on a Java class from the Naether Class Loader
       #
+      # @param [String] target_class
+      # @param [String] target_method
+      # @param [Array] params Array of method parameters
+      # @param [Array] types if defined, a Array of String classes of params type that lines up with params one to one.
+      # @return [Object]
       def exec_static_method( target_class, target_method, params, types = nil ) 
         unless params.is_a? Array
           params = [params]
@@ -57,6 +62,8 @@ class Naether
       
       #
       # Load a path into the internal Naether ClassLoader
+      #
+      # @param [Array] paths as an Array of String paths or a String path
       #
       def internal_load_paths(paths)
         load_paths = []
@@ -77,7 +84,9 @@ class Naether
       end
       
       #
-      # Load a path onto the Global ClassLoader
+      # Load a path onto the parent ClassLoader
+      #
+      # @param [Array] paths as an Array of String paths or a String path
       #
       def load_paths(paths)
         load_paths = []
@@ -98,7 +107,10 @@ class Naether
       end
       
       #
-      # Convert a Ruby Array to a Java ArrayList
+      # Convert a Ruby Array to a java.util.ArrayList
+      # 
+      # @param [Array] ruby_array Array to convert to Java.util.ArrayList
+      # @return [java.util.ArrayList]
       #
       def convert_to_java_list( ruby_array ) 
         list = java.util.ArrayList.new
@@ -110,14 +122,22 @@ class Naether
       end
       
       #
-      # Convert a Java List to a Ruby Array
+      # Convert a java,util.List to a Ruby Array
+      #
+      # @param [java.util.ArrayList] java_array
+      # @param [Boolean] to_string has no affect on conversion.
+      # @return [Array]
       #
       def convert_to_ruby_array( java_array, to_string = false )
         java_array.to_a
       end
       
       #
-      # Convert a Java Map to a Ruby Hash
+      # Convert a java.util.Map to a Ruby Hash
+      #
+      # @param [java.util.Map] java_hash
+      # @param [Boolean] to_string has no affect on conversion
+      # @return [Hash]
       #
       def convert_to_ruby_hash( java_hash, to_string = false )
         java_hash.to_hash

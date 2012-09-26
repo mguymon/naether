@@ -80,8 +80,8 @@ describe Naether do
       
       it "should handle poms in a list of dependencies" do
          @naether.dependencies = [  "pom.xml", "does.not:exist:jar:0.1" ]  
-         @naether.dependencies_notation.should eql [
-           "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0", 
+           
+         [ "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0", 
            "org.sonatype.aether:aether-api:jar:1.13.1", 
            "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13.1", 
            "org.apache.maven.wagon:wagon-file:jar:1.0", 
@@ -92,7 +92,10 @@ describe Naether do
            "org.apache.maven:maven-aether-provider:jar:3.0.3", 
            "org.slf4j:log4j-over-slf4j:jar:1.6.6", 
            "org.sonatype.aether:aether-connector-wagon:jar:1.13.1", 
-           "org.sonatype.aether:aether-connector-file:jar:1.13.1" ]
+           "org.sonatype.aether:aether-connector-file:jar:1.13.1" ].each do |notation|
+            
+            @naether.dependencies_notation.should include(notation)
+         end
       end
       
       it "should handle scopes" do
