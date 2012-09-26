@@ -3,7 +3,7 @@ require 'src/main/ruby/naether/configuration'
 
 describe Naether::Configuration do
     it "should have naether jar" do
-      Naether::Configuration.naether_jar.should match /naether-#{Naether::Configuration.version}.jar/
+      Naether::Configuration.naether_jar.should match /core-#{Naether::Configuration.version}.jar/
     end
     
     it "should have jar_dependencies.yml" do
