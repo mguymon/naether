@@ -133,9 +133,8 @@ public class NaetherTest {
 		naether.addDependencies( "src/test/resources/valid_pom.xml" );
 		
 		Set<String> dependencies = new HashSet<String>(Arrays.asList( 
-			"ch.qos.logback:logback-core:jar:0.9.29", "junit:junit:jar:4.8.2", 
-			"com.google.code.greaze:greaze-definition:jar:0.5.1", "com.google.code.gson:gson:jar:1.7.1", 
-			"com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", "org.slf4j:slf4j-api:jar:1.6.1", 
+			"ch.qos.logback:logback-core:jar:0.9.29",
+			"org.slf4j:slf4j-api:jar:1.6.1", 
 			"ch.qos.logback:logback-classic:jar:0.9.29") );
 		naether.resolveDependencies(true);
 		
@@ -226,8 +225,7 @@ public class NaetherTest {
 		naether.addDependencies( "src/test/resources/pomWithParent/parentTest/pom.xml" );
 		Set<String> dependencies = new HashSet<String>( Arrays.asList( 
 			"org.apache.maven:maven-model-v3:jar:2.0",
-			"ch.qos.logback:logback-classic:jar:0.9.29", 
-			"junit:junit:jar:4.8.2" ) );
+			"ch.qos.logback:logback-classic:jar:0.9.29") );
 		assertEquals( dependencies, naether.getDependenciesNotation() );
 	
 		List<String> repos = new ArrayList<String>();
@@ -294,10 +292,6 @@ public class NaetherTest {
 		}
 		
 		List<String> completeDeps = Bootstrap.DEPENDENCIES;
-		
-		// Test scope deps
-		completeDeps.add( "junit:junit:jar:4.10");
-		completeDeps.add( "org.hamcrest:hamcrest-core:jar:1.1");
 		
 		assertEquals( completeDeps.size(), naether.getDependenciesNotation().size() );
 		

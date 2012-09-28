@@ -94,7 +94,7 @@ public class PathClassLoader extends URLClassLoader {
 	 * @throws ClassLoaderException
 	 */
 	public Object newInstance( String name ) throws ClassLoaderException {
-		return newInstance( name, null );
+		return newInstance( name, (Object[])null );
 	}
 	
 	/**
@@ -106,6 +106,19 @@ public class PathClassLoader extends URLClassLoader {
 	 * @throws ClassLoaderException
 	 */
 	public Object newInstance( String name, Object... params ) throws ClassLoaderException {
+		return newInstance( name, params, null );
+	}
+	
+	/**
+	 * Create new instance of Object with constructor parameters using the ClassLoader
+	 * 
+	 * @param name
+	 * @param params Object[] parameters for constructor
+	 * @param types String[] Class type for each parameter
+	 * @return Object
+	 * @throws ClassLoaderException
+	 */
+	public Object newInstance( String name, Object[] params, String[] types ) throws ClassLoaderException {
 		Class<?> clazz;
 		try {
 			clazz = loadClass(name);
@@ -113,19 +126,26 @@ public class PathClassLoader extends URLClassLoader {
 			throw new ClassLoaderException(e);
 		}
 		
-		List<Class> types = null;
+		List<Class> paramTypes = new ArrayList<Class>();
 		
-		if ( params != null ) {
-			types = new ArrayList<Class>();
-			for ( Object param: params ) {
-				types.add( param.getClass() );
+		if ( types != null ) {
+			for( String type: types ) {
+				try {
+					paramTypes.add( loadClass(type) );
+				} catch (ClassNotFoundException e) {
+					throw new ClassLoaderException(e);
+				}
 			}
-		}
+		} else if ( params != null ) {
+			for ( Object param: params ) {
+				paramTypes.add( param.getClass() );
+			}
+		} 
 		
 		if ( params != null ) {
 			Constructor<?> constructor;
 			try {
-				constructor = clazz.getConstructor( types.toArray( new Class[types.size()] ) );
+				constructor = clazz.getConstructor( paramTypes.toArray( new Class[paramTypes.size()] ) );
 			} catch (SecurityException e) {
 				throw new ClassLoaderException(e);
 			} catch (NoSuchMethodException e) {

@@ -30,6 +30,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -263,7 +264,8 @@ public class Project {
 	}
 	
 	/**
-	 * Get List of {@link Dependency} for the Maven Project.
+	 * Get List of {@link Dependency} for the Maven Project for scopes compile
+	 * and runtime
 	 * 
 	 * @return List<Dependency>
 	 */
@@ -304,21 +306,23 @@ public class Project {
 		}
 
 		
-		if ( scopes != null ) {
-			for ( Iterator<Dependency> iterator = dependencies.iterator(); iterator.hasNext(); ) {
-				Dependency dependency = iterator.next();
-				
-				String scope = dependency.getScope();
-				
-				// Default scope for dependencies is compile
-				if ( scope == null ) {
-					scope = "compile";
-				}
-				
-				if ( !scopes.contains( scope ) ) {
-					log.debug( "Removing {} with scope {}", dependency, dependency.getScope() );
-					iterator.remove();
-				}
+		if ( scopes == null ) {
+			scopes = Arrays.asList( "compile", "runtime" );
+		}
+		
+		for ( Iterator<Dependency> iterator = dependencies.iterator(); iterator.hasNext(); ) {
+			Dependency dependency = iterator.next();
+			
+			String scope = dependency.getScope();
+			
+			// Default scope for dependencies is compile
+			if ( scope == null ) {
+				scope = "compile";
+			}
+			
+			if ( !scopes.contains( scope ) ) {
+				log.debug( "Removing {} with scope {}", dependency, dependency.getScope() );
+				iterator.remove();
 			}
 		}
 

@@ -105,8 +105,6 @@ public class ProjectTest {
 		Project mavenProject = new Project("src/test/resources/valid_pom.xml");
 		List<String> notations = new ArrayList<String>();
 		notations.add("ch.qos.logback:logback-classic:jar:0.9.29");
-		notations.add("junit:junit:jar:4.8.2");
-		notations.add("com.google.code.greaze:greaze-client:jar:test-jar:0.5.1");
 				
 		assertEquals( notations, mavenProject.getDependenciesNotation() );
 
