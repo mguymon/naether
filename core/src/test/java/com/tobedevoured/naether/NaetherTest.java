@@ -46,17 +46,18 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 // Slackworks Naether
 import com.tobedevoured.naether.Bootstrap;
 import com.tobedevoured.naether.DependencyException;
-import com.tobedevoured.naether.Naether;
 import com.tobedevoured.naether.NaetherException;
 import com.tobedevoured.naether.URLException;
+import com.tobedevoured.naether.api.Naether;
 import com.tobedevoured.naether.deploy.DeployArtifact;
+import com.tobedevoured.naether.impl.NaetherImpl;
 import com.tobedevoured.naether.maven.Project;
 import com.tobedevoured.naether.maven.ProjectException;
 import com.tobedevoured.naether.util.Notation;
 
 
 /**
- * Test for {@link Naether}
+ * Test for {@link NaetherImpl}
  * 
  * @author Michael Guymon
  *
@@ -64,11 +65,11 @@ import com.tobedevoured.naether.util.Notation;
 public class NaetherTest {
 	
 	private static Logger log = LoggerFactory.getLogger(NaetherTest.class);
-	private Naether naether;
+	private NaetherImpl naether;
 	
 	@Before
 	public void createNaether() {
-		naether = new Naether();
+		naether = new NaetherImpl();
 		naether.setLocalRepoPath( "target/test-repo" );
 		
 		File dir = new File("target/test-repo");

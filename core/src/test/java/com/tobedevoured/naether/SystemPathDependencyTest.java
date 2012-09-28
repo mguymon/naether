@@ -21,11 +21,9 @@ package com.tobedevoured.naether;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,7 +32,9 @@ import org.junit.Test;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
+import com.tobedevoured.naether.api.Naether;
 import com.tobedevoured.naether.deploy.InstallException;
+import com.tobedevoured.naether.impl.NaetherImpl;
 
 /**
  * SystemPathDependency test
@@ -47,7 +47,7 @@ public class SystemPathDependencyTest {
 	
 	@Before
 	public void createNaether() throws URLException, DependencyException, InstallException {
-		naether = new Naether();
+		naether = new NaetherImpl();
 		naether.setLocalRepoPath( "target/test-repo" );
 		
 		// Use Naether to get a jar to deploy

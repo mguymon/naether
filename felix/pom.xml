@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.tobedevoured.naether</groupId>
-    <artifactId>osgi</artifactId>
+    <artifactId>felix</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
@@ -14,25 +14,15 @@
     </properties>
 
     <dependencies>
-        <!-- Naether -->
-        <dependency>
-          <groupId>com.tobedevoured.naether</groupId>
-          <artifactId>core</artifactId>
-          <version>0.9.2</version>
-        </dependency>
-        
-        <!-- OSGi -->
         <dependency>
 				  <groupId>org.apache.felix</groupId>
 				  <artifactId>org.apache.felix.framework</artifactId>
 				  <version>4.0.3</version>
-          <scope>provided</scope>
 				</dependency>
 				<dependency>
           <groupId>org.apache.felix</groupId>
           <artifactId>org.apache.felix.main</artifactId>
           <version>4.0.3</version>
-          <scope>provided</scope>
         </dependency>
 				<dependency>
             <groupId>org.apache.felix</groupId>
@@ -52,12 +42,6 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>com.tobedevoured.naether.osgi.Activator</Bundle-Activator>
-                        <Export-Package>com.tobedevoured.naether.api</Export-Package>
-                        <!-- XXX: why does the import package have weird stuff? andriod.dalvik?? set everything to optional -->
-						            <Import-Package>*;resolution:=optional</Import-Package>
-						            <Private-Package>com.tobedevoured.naether.*</Private-Package>
-						            <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						            <Embed-Transitive>true</Embed-Transitive>
                     </instructions>
                 </configuration>
             </plugin>

@@ -1,4 +1,4 @@
-package com.tobedevoured.naether;
+package com.tobedevoured.naether.osgi;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -14,4 +14,3 @@ public class Activator implements BundleActivator {
     }
 
 }
-

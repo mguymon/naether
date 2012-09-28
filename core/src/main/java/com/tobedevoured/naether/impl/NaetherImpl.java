@@ -1,4 +1,4 @@
-package com.tobedevoured.naether;
+package com.tobedevoured.naether.impl;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -63,6 +63,12 @@ import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 
 // Naether
+import com.tobedevoured.naether.Const;
+import com.tobedevoured.naether.DependencyException;
+import com.tobedevoured.naether.NaetherException;
+import com.tobedevoured.naether.ResolveException;
+import com.tobedevoured.naether.URLException;
+import com.tobedevoured.naether.api.Naether;
 import com.tobedevoured.naether.deploy.DeployArtifact;
 import com.tobedevoured.naether.deploy.DeployException;
 import com.tobedevoured.naether.deploy.InstallException;
@@ -78,9 +84,9 @@ import com.tobedevoured.naether.util.RepoBuilder;
  * @author Michael Guymon
  * 
  */
-public class Naether {
+public class NaetherImpl implements Naether {
 	
-	private static Logger log = LoggerFactory.getLogger(Naether.class);
+	private static Logger log = LoggerFactory.getLogger(NaetherImpl.class);
 
 	private String localRepoPath;
 	private Set<Dependency> dependencies;
@@ -95,7 +101,7 @@ public class Naether {
 	 * 
 	 * The default remote repository is http://repo1.maven.org/maven2/
 	 */
-	public Naether() {
+	public NaetherImpl() {
 		
 		// Set the initial ArrayList
 		this.dependencies = new HashSet<Dependency>();
@@ -118,30 +124,22 @@ public class Naether {
 		}
 	}
 
-	/**
-	 * Clear dependencies
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#clearDependencies()
 	 */
 	public void clearDependencies() {
 		setDependencies(new HashSet<Dependency>());
 	}
 	
-	/**
-	 * Clear local BuildArtifacts
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#clearBuildArtifacts()
 	 */
 	public void clearBuildArtifacts() {
 		setBuildArtifacts(new ArrayList<Artifact>());
 	}
 	
-	/**
-	 * Add a local Build Artifact manually by String notation, path to the artifact,
-	 * and path to the POM. 
-	 * 
-	 * The Build Artifact will override matchingdependencies found
-     * when resolving dependencies.
-	 * 
-	 * @param notation String
-	 * @param path String
-	 * @param pom String
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addBuildArtifact(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void addBuildArtifact(String notation, String path, String pom) {
 		Artifact artifact = new DefaultArtifact(notation);
@@ -159,16 +157,8 @@ public class Naether {
 		this.buildArtifacts.add( artifact );
 	}
 	
-	/**
-	 * Add a local Build Artifact manually by String notation and path to the artifact.
-	 * The POM for the artifact is created automatically based on the String notation.
-	 * 
-	 * The Build Artifact will override matchingdependencies found
-     * when resolving dependencies.
-	 * 
-	 * @param notation String
-	 * @param path String
-	 * @throws NaetherException if failed to create a POM
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addBuildArtifact(java.lang.String, java.lang.String)
 	 */
 	public void addBuildArtifact(String notation, String path) throws NaetherException {
 		Artifact artifact = new DefaultArtifact(notation);
@@ -205,24 +195,15 @@ public class Naether {
 		this.buildArtifacts.add( artifact );
 	}
 
-	/**
-	 * Add dependency by String notation with default compile scope
-	 * 
-	 * groupId:artifactId:type:version
-	 * 
-	 * @param notation String
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addDependency(java.lang.String)
 	 */
 	public void addDependency(String notation) {
 		addDependency(notation, "compile");
 	}
 
-	/**
-	 * Add dependency by String notation and Maven scope
-	 * 
-	 * groupId:artifactId:type:version
-	 * 
-	 * @param notation String
-	 * @param scope String
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addDependency(java.lang.String, java.lang.String)
 	 */
 	public void addDependency(String notation, String scope) {
 		log.debug("Add dep {} {}", notation, scope);
@@ -240,10 +221,8 @@ public class Naether {
 		addDependency(dependency);
 	}
 
-	/**
-	 * Add {@link Dependency}
-	 * 
-	 * @param dependency {@link Dependency}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addDependency(org.sonatype.aether.graph.Dependency)
 	 */
 	public void addDependency(Dependency dependency) {
 		Dependency newDep = null;
@@ -262,8 +241,8 @@ public class Naether {
 		dependencies.add(newDep);
 	}
 	
-	/**
-	 * Add {@link org.apache.maven.model.Dependency}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addDependency(org.apache.maven.model.Dependency)
 	 */
 	public void addDependency(org.apache.maven.model.Dependency projectDependency) {
 		log.debug( "Adding dependency: {}", projectDependency );
@@ -294,46 +273,29 @@ public class Naether {
 		dependencies.add( dependency );
 	}
 	
-	/**
-	 * Add dependences from a Maven POM
-	 * 
-	 * @param pomPath String path to POM
-	 * @throws ProjectException
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addDependencies(java.lang.String)
 	 */
 	public void addDependencies( String pomPath ) throws ProjectException {
 		addDependencies( new Project( pomPath), (List<String>)null );
 	}
 	
-	/**
-	 * Add dependencies from a Maven POM, limited to a {@link List<String>} of scopes.
-	 * 
-	 * @param pomPath String path to POM
-	 * @param scopes Link<String> of scopes
-	 * @throws ProjectException
-	 * @see {{@link #addDependencies(Project, List)}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addDependencies(java.lang.String, java.util.List)
 	 */
 	public void addDependencies( String pomPath, List<String> scopes ) throws ProjectException {
 		addDependencies( new Project( pomPath), scopes );
 	}
 	
-	/**
-	 * Add dependencies from a Maven POM
-	 * 
-	 * @param project {@link Model}
-	 * @throws ProjectException 
-	 * @see {{@link #addDependencies(Project, List)}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addDependencies(com.tobedevoured.naether.maven.Project)
 	 */
 	public void addDependencies( Project project ) throws ProjectException {
 		addDependencies( project, (List<String>)null );		
 	}
 	
-	/**
-	 * Add dependencies from a Maven POM, limited to a {@link List<String>} of scopes. Adds
-	 * all Repositories from the Maven Pom.
-	 * 
-	 * @param project {@link Project}
-	 * @param scopes List<String> of dependency scopes
-	 * @throws ProjectException 
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addDependencies(com.tobedevoured.naether.maven.Project, java.util.List)
 	 */
 	public void addDependencies( Project project, List<String> scopes ) throws ProjectException {
 		for ( org.apache.maven.model.Dependency dependency : project.getDependencies(scopes) ) {
@@ -362,19 +324,15 @@ public class Naether {
 		}
 	}
 
-	/**
-	 * Remove all {@link RemoteRepository}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#clearRemoteRepositories()
 	 */
 	public void clearRemoteRepositories() {
 		setRemoteRepositories(new LinkedHashSet<RemoteRepository>());
 	}
 
-	/**
-	 * Add a {@link RemoteRepository} by String url
-	 * 
-	 * @param url String
-	 * @throws URLException
-	 * @throws MalformedURLException
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addRemoteRepositoryByUrl(java.lang.String)
 	 */
 	public void addRemoteRepositoryByUrl(String url) throws NaetherException {
 		try {
@@ -385,15 +343,8 @@ public class Naether {
 		}
 	}
 
-	/**
-	 * Add a {@link RemoteRepository} by String url with String username and
-	 * password for authentication.
-	 * 
-	 * @param url String
-	 * @param username String
-	 * @param password String
-	 * @throws URLException
-	 * @throws MalformedURLException
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addRemoteRepositoryByUrl(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void addRemoteRepositoryByUrl(String url, String username, String password) throws URLException {
 		RemoteRepository remoteRepo;
@@ -406,48 +357,36 @@ public class Naether {
 		addRemoteRepository(remoteRepo);
 	}
 
-	/**
-	 * Add a {@link RemoteRepository}
-	 * 
-	 * @param id String
-	 * @param type String
-	 * @param url String
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addRemoteRepository(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public final void addRemoteRepository(String id, String type, String url) {
 		getRemoteRepositories().add(new RemoteRepository(id, type, url));
 	}
 
-	/**
-	 * Add {@link RemoteRepository}
-	 * 
-	 * @param remoteRepository {@link RemoteRepository}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#addRemoteRepository(org.sonatype.aether.repository.RemoteRepository)
 	 */
 	public void addRemoteRepository(RemoteRepository remoteRepository) {
 		getRemoteRepositories().add(remoteRepository);
 	}
 
-	/**
-	 * Set {@link List} of {@link RemoteRepository}
-	 * 
-	 * @param remoteRepositories {@link List}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#setRemoteRepositories(java.util.Set)
 	 */
 	public void setRemoteRepositories(Set<RemoteRepository> remoteRepositories) {
 		this.remoteRepositories = remoteRepositories;
 	}
 
-	/**
-	 * Get {@link Set} of {@link RemoteRepository}
-	 * 
-	 * @return {@link Set}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#getRemoteRepositories()
 	 */
 	public Set<RemoteRepository> getRemoteRepositories() {
 		return remoteRepositories;
 	}
 	
-	/**
-	 * Get {@link List} of String urls 
-	 * 
-	 * @return {@link List<String>}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#getRemoteRepositoryUrls()
 	 */
 	public List<String> getRemoteRepositoryUrls() {
 		List<String> urls = new ArrayList<String>();
@@ -458,36 +397,22 @@ public class Naether {
 		return urls;
 	}
 
-	/**
-	 * Resolve dependencies and download artifacts
-	 * 
-	 * @throws DependencyException
-	 * @throws URLException
-	 * 
-	 * @throws Exception
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#resolveDependencies()
 	 */
 	public void resolveDependencies() throws URLException, DependencyException {
 		resolveDependencies(true, null);
 	}
 
-	/**
-	 * Resolve Dependencies
-	 * 
-	 * @param downloadArtifacts boolean if artifacts are to be downloaded
-	 * @throws URLException
-	 * @throws DependencyException
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#resolveDependencies(boolean)
 	 */
 	public void resolveDependencies(boolean downloadArtifacts) throws URLException, DependencyException {
 		resolveDependencies( downloadArtifacts, null );
 	}
 	
-	/**
-	 * Resolve Dependencies
-	 * 
-	 * @param downloadArtifacts if artifacts are to be downloaded
-	 * @param properties Map<String,String> of properties
-	 * @throws URLException
-	 * @throws DependencyException
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#resolveDependencies(boolean, java.util.Map)
 	 */
 	public void resolveDependencies(boolean downloadArtifacts, Map<String,String> properties) throws URLException, DependencyException {
 		log.debug( "Resolving Dependencies" );
@@ -553,11 +478,8 @@ public class Naether {
 		log.debug("Setting resolved dependencies: {}", this.getDependencies());
 	}
 
-	/**
-	 * Deploy an Artifact
-	 * 
-	 * @param deployArtifact {@link DeployArtifact}
-	 * @throws DeploymentException
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#deployArtifact(com.tobedevoured.naether.deploy.DeployArtifact)
 	 */
 	public void deployArtifact(DeployArtifact deployArtifact) throws DeployException {
 		log.debug("deploy artifact: {} ", deployArtifact.getNotation());
@@ -580,16 +502,8 @@ public class Naether {
 		}
 	}
 
-	/**
-	 * Install Artifact to local repo. 
-	 * 
-	 * If installing a POM, filePath can be null. If install a Jar without a POM, pomPath
-	 * can be null.
-	 * 
-	 * @param String notation String
-	 * @param String pomPath String
-	 * @param String filePath String
-	 * @throws InstallException
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#install(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void install(String notation, String pomPath, String filePath ) throws InstallException {
 		log.debug("installing artifact: {} ", notation);
@@ -627,10 +541,8 @@ public class Naether {
 		}
 	}
 
-	/**
-	 * Classpath from resolved artifacts
-	 * 
-	 * @return String
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#getResolvedClassPath()
 	 */
 	public String getResolvedClassPath() {
 		if ( preorderedNodeList != null ) {
@@ -640,10 +552,8 @@ public class Naether {
 		}
 	}
 
-	/**
-	 * {@link List<String>} of {@link Dependency} converted to String notation
-	 * 
-	 * @return {@link List<String>}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#getDependenciesNotation()
 	 */
 	public Set<String> getDependenciesNotation() {
 		Set<String> notations = new HashSet<String>();
@@ -654,10 +564,8 @@ public class Naether {
 		return notations;
 	}
 	
-	/**
-	 * {@link Map} of String notation and the corresponding String file path 
-	 * 
-	 * @return {@link Map<String,String>}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#getDependenciesPath()
 	 */
 	public Map<String,String> getDependenciesPath() {
 		Map<String,String> dependenciesMap = new HashMap<String,String>();
@@ -672,72 +580,50 @@ public class Naether {
 	
 
 
-	/**
-	 * Set local repository path. This is the destination for downloaded
-	 * metadata and artifacts.
-	 * 
-	 * @param repoPath
-	 *            String
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#setLocalRepoPath(java.lang.String)
 	 */
 	public void setLocalRepoPath(String repoPath) {
 		this.localRepoPath = repoPath;
 	}
 
-	/**
-	 * Get local repository path. This is the destination for downloaded
-	 * metadata and artifacts.
-	 * 
-	 * @return String
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#getLocalRepoPath()
 	 */
 	public String getLocalRepoPath() {
 		return localRepoPath;
 	}
 
-	/**
-	 * Set the {@link List} of {@link Dependency}
-	 * 
-	 * @param dependencies
-	 *            {@link List}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#setDependencies(java.util.Set)
 	 */
 	public void setDependencies(Set<Dependency> dependencies) {
 		this.dependencies = dependencies;
 	}
 
-	/**
-	 * {@link List} of {@link Dependency}
-	 * 
-	 * @return {@link List}
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#getDependencies()
 	 */
 	public Set<Dependency> getDependencies() {
 		return dependencies;
 	}
 
-	/**
-	 * Get List<Artifact> of local artifacts that are used in dependency
-	 * resolution.
-	 * 
-	 * @return List<Artifact>
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#getBuildArtifacts()
 	 */
 	public List<Artifact> getBuildArtifacts() {
 		return buildArtifacts;
 	}
 
-	/**
-	 * Set List<Artifact> for local artifacts that are used in depdency resolution.
-	 * 
-	 * @param buildArtifacts List<Artifact>
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#setBuildArtifacts(java.util.List)
 	 */
 	public void setBuildArtifacts(List<Artifact> buildArtifacts) {
 		this.buildArtifacts = buildArtifacts;
 	}
 	
-	/**
-	 * Download to the local repository a List of {@link Artifact} or String
-	 * notations.
-	 * 
-	 * @param artifactsOrNotations @{link List} of {@link Artifact} or String notation
-	 * @return List<File>
-	 * @throws NaetherException
+	/* (non-Javadoc)
+	 * @see com.tobedevoured.naether.Naetherer#downloadArtifacts(java.util.List)
 	 */
 	@SuppressWarnings("rawtypes")
 	public List<File> downloadArtifacts( List artifactsOrNotations ) throws NaetherException {

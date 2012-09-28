@@ -11,6 +11,8 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.tobedevoured.naether.api.Naether;
+import com.tobedevoured.naether.impl.NaetherImpl;
 import com.tobedevoured.naether.maven.ProjectException;
 
 public class ClassLoaderTest {
@@ -46,7 +48,7 @@ public class ClassLoaderTest {
 	
 	@Test
 	public void createNaether() throws Exception {
-		Naether naether = new Naether();
+		Naether naether = new NaetherImpl();
 		naether.setLocalRepoPath( "target/test-repo" );
 		naether.addDependencies( "pom.xml" );
 		naether.resolveDependencies();
@@ -58,9 +60,9 @@ public class ClassLoaderTest {
 			classLoader.addPath( entry.getValue() );
 		}
 		
-		Object instance = classLoader.newInstance( Naether.class.getName() );
-		assertEquals( Naether.class.getName(), instance.getClass().getName() );
-		assertTrue( Naether.class.equals( instance.getClass() ) );
+		Object instance = classLoader.newInstance( NaetherImpl.class.getName() );
+		assertEquals( NaetherImpl.class.getName(), instance.getClass().getName() );
+		assertTrue( NaetherImpl.class.equals( instance.getClass() ) );
 	}
 	
 	@Test
