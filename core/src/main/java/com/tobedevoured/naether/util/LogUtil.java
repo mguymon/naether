@@ -80,6 +80,8 @@ public final class LogUtil {
 			logLevel = Level.WARN;
 		} else if ( "error".equalsIgnoreCase( level ) ) {
 			logLevel = Level.ERROR;
+		} else if ( "trace".equalsIgnoreCase( level ) ) {
+			logLevel = Level.TRACE;
 		} else {
 			logLevel = Level.INFO;
 		}

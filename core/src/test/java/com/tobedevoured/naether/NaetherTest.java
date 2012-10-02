@@ -26,8 +26,11 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +51,6 @@ import com.tobedevoured.naether.Bootstrap;
 import com.tobedevoured.naether.DependencyException;
 import com.tobedevoured.naether.NaetherException;
 import com.tobedevoured.naether.URLException;
-import com.tobedevoured.naether.api.Naether;
 import com.tobedevoured.naether.deploy.DeployArtifact;
 import com.tobedevoured.naether.impl.NaetherImpl;
 import com.tobedevoured.naether.maven.Project;
@@ -80,17 +82,59 @@ public class NaetherTest {
 	}
 
 	@Test
-	public void addRemoteRepository() throws NaetherException {
+	public void defaultLocalRepo() {
+		naether = new NaetherImpl();
+		assertEquals(  System.getProperty("user.home") + File.separator + ".m2" + File.separator +  "repository", naether.getLocalRepoPath() );
+	
+		Map env = new HashMap(System.getenv());
+		env.put( "M2_REPO", "/m2_repo_test" );
+		setEnv( env );
+		
+		naether = new NaetherImpl();
+		assertEquals( "/m2_repo_test", naether.getLocalRepoPath() );
+	
+	}
+	
+	@Test
+	public void addRemoteRepositoryByUrl() throws NaetherException {
 		List<RemoteRepository> repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
 		assertEquals( "central", repos.get(0).getId() );
 		
 		naether.addRemoteRepositoryByUrl( "http://test.net/hamster:7011" );
 		repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
 		assertEquals( "test.net-hamster-7011", repos.get(1).getId() );
+	}
+	
+	@Test
+	public void addRemoteRepositoryByUrlWithAuth() throws NaetherException {
+		List<RemoteRepository> repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
+		assertEquals( "central", repos.get(0).getId() );
+		
+		naether.addRemoteRepositoryByUrl( "http://test.net/hamster:7011", "test", "test" );
+		repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
+		assertEquals( "test.net-hamster-7011", repos.get(1).getId() );
+	}
+	
+	@Test(expected=NaetherException.class)
+	public void addRemoteRepositoryByUrlThatIsMalformed() throws NaetherException {
+		naether.addRemoteRepositoryByUrl( "a bad url" );
+	}
+	
+	@Test
+	public void addRemoteRepository() throws NaetherException {
+		List<RemoteRepository> repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
+		assertEquals( "central", repos.get(0).getId() );
 		
 		naether.addRemoteRepository( "test-id", "test-type", "http://test.net" );
 		repos = new ArrayList<RemoteRepository>( naether.getRemoteRepositories() );
-		assertEquals( "test-id", repos.get(2).getId() );
+		assertEquals( "test-id", repos.get(1).getId() );
+	}
+	
+	@Test
+	public void clearRemoteRepositories() throws NaetherException {
+		naether.addRemoteRepositoryByUrl( "http://test.net/hamster:7011" );
+		naether.clearRemoteRepositories();
+		assertEquals( new HashSet(), naether.getRemoteRepositories() );
 	}
 	
 	@Test
@@ -123,10 +167,13 @@ public class NaetherTest {
 	
 	@Test
 	public void addDependecyFromNotation() throws URLException, DependencyException {
-		naether.addDependency( "ch.qos.logback:logback-classic:jar:0.9.29" );
+		naether.addDependency( "group:artifact1:jar:1" );
+		naether.addDependency( "group:artifact2:jar:test:1" );
+		naether.addDependency( "group:artifact3:jar:test-jar:1" );
 		assertEquals( new HashSet<String>(Arrays.asList( 
-				"ch.qos.logback:logback-classic:jar:0.9.29" ) ), 
-				naether.getDependenciesNotation() );
+			"group:artifact2:jar:test-jar:1", "group:artifact1:jar:1", 
+			"group:artifact3:jar:test-jar:1" ) ), 
+			naether.getDependenciesNotation() );
 	}
 	
 	@Test
@@ -504,5 +551,39 @@ public class NaetherTest {
 		
 		assertTrue( "Jar1 downloaded", jar1.exists() );
 		assertTrue( "Jar2 downloaded", jar2.exists() );
+	}
+	
+	// http://stackoverflow.com/a/7201825/1272477
+	private static void setEnv(Map<String, String> newenv) {
+	  try {
+	        Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
+	        Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
+	        theEnvironmentField.setAccessible(true);
+	        Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
+	        env.putAll(newenv);
+	        Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
+	        theCaseInsensitiveEnvironmentField.setAccessible(true);
+	        Map<String, String> cienv = (Map<String, String>)     theCaseInsensitiveEnvironmentField.get(null);
+	        cienv.putAll(newenv);
+	    } catch (NoSuchFieldException e) {
+	      try {
+	        Class[] classes = Collections.class.getDeclaredClasses();
+	        Map<String, String> env = System.getenv();
+	        for(Class cl : classes) {
+	            if("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
+	                Field field = cl.getDeclaredField("m");
+	                field.setAccessible(true);
+	                Object obj = field.get(env);
+	                Map<String, String> map = (Map<String, String>) obj;
+	                map.clear();
+	                map.putAll(newenv);
+	            }
+	        }
+	      } catch (Exception e2) {
+	        e2.printStackTrace();
+	      }
+	    } catch (Exception e1) {
+	        e1.printStackTrace();
+	    } 
 	}
 }

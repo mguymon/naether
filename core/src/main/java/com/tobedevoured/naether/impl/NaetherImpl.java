@@ -210,7 +210,7 @@ public class NaetherImpl implements Naether {
 		
 		DefaultArtifact artifact = new DefaultArtifact( notation );
 		
-		if ( "test".equals( artifact.getClassifier() ) || Const.TEST_JAR.equals( artifact.getClassifier() ) ) {
+		if ( Const.TEST.equals( artifact.getClassifier() ) || Const.TEST_JAR.equals( artifact.getClassifier() ) ) {
 			
 			ArtifactType artifactType = new DefaultArtifactType( Const.TEST_JAR, Const.JAR, Const.TEST_JAR, null );
 			
@@ -227,7 +227,7 @@ public class NaetherImpl implements Naether {
 	public void addDependency(Dependency dependency) {
 		Dependency newDep = null;
 		String classifier = dependency.getArtifact().getClassifier();
-		if ( "test".equals( classifier ) || Const.TEST_JAR.equals( classifier ) ) {
+		if ( Const.TEST.equals( classifier ) || Const.TEST_JAR.equals( classifier ) ) {
 			ArtifactType artifactType = new DefaultArtifactType( Const.TEST_JAR, Const.JAR, Const.TEST_JAR, null );
 			
 			Artifact artifact = dependency.getArtifact();
@@ -249,7 +249,7 @@ public class NaetherImpl implements Naether {
 		
 		DefaultArtifact artifact = null;
 		
-		if ( "test".equals( projectDependency.getType() ) || Const.TEST_JAR.equals( projectDependency.getType() ) ) {
+		if ( Const.TEST.equals( projectDependency.getType() ) || Const.TEST_JAR.equals( projectDependency.getType() ) ) {
 			
 			ArtifactType artifactType = new DefaultArtifactType( Const.TEST_JAR, Const.JAR, Const.TEST_JAR, null );
 			

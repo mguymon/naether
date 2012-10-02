@@ -62,6 +62,20 @@ public class ProjectTest {
 		
 		assertNotNull(mavenProject.getMavenModel());
 		assertEquals( "3", mavenProject.getVersion());
+		assertEquals( "valid:pom:jar:3", mavenProject.getProjectNotation() );
+	}
+	
+	@Test(expected=ProjectException.class)
+	public void createInstanceWithPomPathWithException() throws Exception {
+		new Project("src/test/resources/does_not_exist_pom.xml");
+	}
+	
+	public void setProjectNotation() {
+		Project project = new Project();
+		project.setProjectNotation("project:test:10");
+		assertEquals( "project", project.getArtifactId() );
+		assertEquals( "test", project.getGroupId() );
+		assertEquals( "10", project.getVersion() );
 	}
 	
 	@Test
@@ -126,6 +140,14 @@ public class ProjectTest {
 				assertEquals( (new File( "src/test/resources")).getAbsolutePath(), dependency.getSystemPath() );
 			}
 		}
+	}
+	
+	@Test
+	public void hasParentPom() throws ProjectException {
+		Project coreProject = new Project("pom.xml");
+		Project parentProject = new Project("../pom.xml" );
+		
+		assertEquals( coreProject.getVersion(), parentProject.getVersion() );
 	}
 	
 	@Test
