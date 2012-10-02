@@ -3,7 +3,7 @@
 Naether is a Java Dependency Resolver using Maven's [Aether](https://github.com/sonatype/sonatype-aether) 
 that can be used by Ruby or Java.
 
-See [Naether Core]<https://github.com/mguymon/naether/tree/master/core> for more details on using Naether.
+See [Naether Core](https://github.com/mguymon/naether/tree/master/core) for more details on using Naether.
 
 _Restructuring the Project to support OSGI bundles_
 
