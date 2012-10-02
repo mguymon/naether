@@ -17,21 +17,18 @@ describe Naether::Maven do
       @maven.version().should eql "3"
     end
     
-    it "should get dependencies for the project" do
-      @maven.dependencies.should =~ [
-        "ch.qos.logback:logback-classic:jar:0.9.29", 
-        "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", 
-        "junit:junit:jar:4.8.2"]
+    it "should get runtime & compile dependencies for the project" do
+      @maven.dependencies.should =~ ["ch.qos.logback:logback-classic:jar:0.9.29"]
     end
-    
-    it "should add a dependency" do
-      @maven.add_dependency("org.apache.maven.wagon:wagon-file:jar:1.0")
-      @maven.dependencies.should include "org.apache.maven.wagon:wagon-file:jar:1.0"
-    end
-    
+
     it "should get dependencies by scope" do
         @maven.dependencies(['test']).should =~ [
           "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", "junit:junit:jar:4.8.2"]
+    end
+  
+    it "should add a dependency" do
+      @maven.add_dependency("org.apache.maven.wagon:wagon-file:jar:1.0")
+      @maven.dependencies.should include "org.apache.maven.wagon:wagon-file:jar:1.0"
     end
     
     it "should add a dependency by scope" do

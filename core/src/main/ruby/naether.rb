@@ -57,7 +57,7 @@ class Naether
   
   # Create new instance.
   def initialize
-    @resolver = Naether::Java.create('com.tobedevoured.naether.Naether')
+    @resolver = Naether::Java.create('com.tobedevoured.naether.impl.NaetherImpl')
   end
   
   # Clear all remote repositories
