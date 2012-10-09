@@ -106,7 +106,7 @@ public class Project {
 	 * Load Maven pom
 	 * 
 	 * @param pomPath String path
-	 * @throws ProjectException 
+	 * @throws ProjectException if fails to open, read, or parse the POM
 	 */
 	public static Model loadPOM(String pomPath) throws ProjectException {
 		log.debug("Loading pom {}", pomPath);
@@ -115,15 +115,15 @@ public class Project {
 			return reader.read(new BufferedReader(new FileReader(new File(pomPath))));
 		} catch (FileNotFoundException e) {
 			log.error( "Failed to access pom", e);
-			throw new ProjectException( "Failed to access pom", e );
+			throw new ProjectException( "Pom not found " + pomPath, e );
 			
 		} catch (IOException e) {
 			log.error( "Failed to read pom", e);
-			throw new ProjectException("Failed to read pom", e );
+			throw new ProjectException("Failed to read pom " + pomPath, e );
 			
 		} catch (XmlPullParserException e) {
 			log.error( "Failed to parse pom", e);
-			throw new ProjectException( "Failed to parse pom", e );
+			throw new ProjectException( "Failed to parse pom " + pomPath, e );
 		}
 	}
 
