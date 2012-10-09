@@ -41,11 +41,11 @@ namespace :naether do
       FileUtils.copy( 'PostInstallRakefile', "target/gem/Rakefile" )
       
       version = IO.read('VERSION').strip
-      if !File.exists? "target/naether-#{version}.jar"
-        raise "target/naether-#{version}.jar does not exist"
+      if !File.exists? "target/core-#{version}.jar"
+        raise "target/core-#{version}.jar does not exist"
       end
       
-      FileUtils.copy( "target/naether-#{version}.jar", "target/gem/naether-#{version}.jar" )
+      FileUtils.copy( "target/core-#{version}.jar", "target/gem/core-#{version}.jar" )
       
       # Change dir so relevant files have the correct paths
       Dir.chdir( "target/gem" )      
