@@ -187,9 +187,13 @@ public final class Notation {
 		StringBuilder notation = new StringBuilder()
 			.append(artifact.getGroupId()).append(":")
 			.append(artifact.getArtifactId()).append(":")
-			.append(artifact.getExtension()).append(":")
-			.append(artifact.getClassifier()).append(":")
-			.append(artifact.getBaseVersion());
+			.append(artifact.getExtension()).append(":");
+		
+		if ( artifact.getClassifier() != null && artifact.getClassifier().length() > 0 ) {
+			notation.append(artifact.getClassifier()).append(":");
+		}
+		
+		notation.append(artifact.getBaseVersion());
 		
 		return notation.toString();
 	}

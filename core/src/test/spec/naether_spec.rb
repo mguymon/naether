@@ -62,10 +62,34 @@ describe Naether do
       paths.first.should match /test-repo\/junit\/junit\/4.8.2\/junit-4.8.2.jar/
     end
     
+    it "should get dependency graph" do
+      @naether.dependencies = "org.springframework:org.springframework.orm:3.0.5.RELEASE"
+      @naether.add_remote_repository( "http://repository.springsource.com/maven/bundles/release" );
+      @naether.add_remote_repository( "http://repository.springsource.com/maven/bundles/external" );
+          
+      @naether.resolve_dependencies(false)
+      @naether.dependencies_graph.should eql({
+        "org.springframework:org.springframework.orm:jar:3.0.5.RELEASE"=>{
+          "org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE"=>{}, 
+          "org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE"=>{
+            "org.springframework:org.springframework.context:jar:3.0.5.RELEASE"=>{
+              "org.springframework:org.springframework.expression:jar:3.0.5.RELEASE"=>{}
+            }, 
+            "org.springframework:org.springframework.aop:jar:3.0.5.RELEASE"=>{}, 
+            "org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0"=>{}
+          }, 
+          "org.springframework:org.springframework.core:jar:3.0.5.RELEASE"=>{}, 
+          "org.springframework:org.springframework.beans:jar:3.0.5.RELEASE"=>{
+            "org.springframework:org.springframework.asm:jar:3.0.5.RELEASE"=>{}
+          }
+        }
+      })
+    end
+    
     it "should set build artifacts" do
       @naether.build_artifacts = { "build_artifact:test:0.1" => 'target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar' }
       @naether.dependencies = [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" ]
-      @naether.resolve_dependencies().should eql [
+      @naether.resolve_dependencies().should =~ [
         "ch.qos.logback:logback-core:jar:0.9.29",
         "ch.qos.logback:logback-classic:jar:0.9.29",
         "junit:junit:jar:4.8.2",
@@ -98,12 +122,12 @@ describe Naether do
          end
       end
       
-      it "should handle scopes" do
+      it "should handle pom with scopes" do
         @naether.dependencies = [ {"src/test/resources/valid_pom.xml" => ["test"]}, {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]  
         @naether.dependencies_notation.should eql [
           "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", 
           "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2"]
-        @naether.resolve_dependencies().should eql [
+        @naether.resolve_dependencies().should =~ [
           "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1", 
           "com.google.code.gson:gson:jar:1.7.1", 
           "ch.qos.logback:logback-core:jar:0.9.29", 
@@ -119,6 +143,11 @@ describe Naether do
         "ch.qos.logback:logback-core:jar:0.9.29", 
         "ch.qos.logback:logback-classic:jar:0.9.29", 
         "org.slf4j:slf4j-api:jar:1.6.1"]
+        
+      @naether.dependencies_notation.should =~ [
+        "ch.qos.logback:logback-core:jar:0.9.29", 
+        "ch.qos.logback:logback-classic:jar:0.9.29", 
+        "org.slf4j:slf4j-api:jar:1.6.1"]
     end
     
 
@@ -128,6 +157,10 @@ describe Naether do
         ["commons-beanutils:commons-beanutils:jar:1.8.3", 
          "ch.qos.logback:logback-core:jar:0.9.29", "pom:with-system-path:jar:2", 
          "ch.qos.logback:logback-classic:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"] )
+      @naether.dependencies_notation.should =~
+        ["commons-beanutils:commons-beanutils:jar:1.8.3", 
+         "ch.qos.logback:logback-core:jar:0.9.29", "pom:with-system-path:jar:2", 
+         "ch.qos.logback:logback-classic:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"] 
     end
 
     it "should download artifacts" do

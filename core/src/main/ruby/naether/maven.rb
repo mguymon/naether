@@ -130,7 +130,7 @@ class Naether
     
     # Load dependencies and remote repo from a {Naether} instance
     def load_naether( naether )
-      self.dependencies= naether.resolver.getDependencies()
+      self.dependencies= naether.resolver.currentDependencies()
       self.repositories= naether.resolver.getRemoteRepositoryUrls()
     end
     

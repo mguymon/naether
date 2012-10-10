@@ -250,7 +250,7 @@ class Naether
   #
   # @return [Array]
   def dependencies
-    Naether::Java.convert_to_ruby_array( @resolver.getDependencies() )
+    Naether::Java.convert_to_ruby_array( @resolver.currentDependencies() )
   end
   
   # Get array of dependencies as notation
@@ -271,8 +271,12 @@ class Naether
   # Convert dependencies to Classpath friendly string
   #
   # @return [String]
-  def dependencies_classpath()
+  def dependencies_classpath
     @resolver.getResolvedClassPath()
+  end
+  
+  def dependencies_graph
+    @resolver.getDependenciesGraph()
   end
   
   # Load dependencies to Classpath

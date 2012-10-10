@@ -1,6 +1,7 @@
 package com.tobedevoured.naether.api;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,8 +43,7 @@ public interface Naether {
 	 * @param path String
 	 * @param pom String
 	 */
-	void addBuildArtifact(String notation, String path,
-			String pom);
+	void addBuildArtifact(String notation, String path, String pom);
 
 	/**
 	 * Add a local Build Artifact manually by String notation and path to the artifact.
@@ -56,8 +56,7 @@ public interface Naether {
 	 * @param path String
 	 * @throws NaetherException if failed to create a POM
 	 */
-	void addBuildArtifact(String notation, String path)
-			throws NaetherException;
+	void addBuildArtifact(String notation, String path) throws NaetherException;
 
 	/**
 	 * Add dependency by String notation with default compile scope
@@ -88,8 +87,7 @@ public interface Naether {
 	/**
 	 * Add {@link org.apache.maven.model.Dependency}
 	 */
-	void addDependency(
-			org.apache.maven.model.Dependency projectDependency);
+	void addDependency( org.apache.maven.model.Dependency projectDependency);
 
 	/**
 	 * Add dependences from a Maven POM
@@ -251,9 +249,16 @@ public interface Naether {
 	 * @param String filePath String
 	 * @throws InstallException
 	 */
-	void install(String notation, String pomPath,
-			String filePath) throws InstallException;
+	void install(String notation, String pomPath, String filePath) throws InstallException;
 
+	/**
+	 * Get the current dependencies. Returns Collection of resolved Dependencies
+	 * if {@link #resolveDependencies()} has been called, other returns {@link #getDependencies()}
+	 * 
+	 * @return Collection<Dependency>
+	 */
+	Collection<Dependency> currentDependencies();
+	
 	/**
 	 * Classpath from resolved artifacts
 	 * 
@@ -275,6 +280,13 @@ public interface Naether {
 	 */
 	Map<String, String> getDependenciesPath();
 
+	/**
+	 * Graph of Dependencies with their transitive Dependencies as children. 
+	 * 
+	 * @return Map<String,Map>
+	 */
+	Map<String,Map> getDependenciesGraph();
+	
 	/**
 	 * Set local repository path. This is the destination for downloaded
 	 * metadata and artifacts.

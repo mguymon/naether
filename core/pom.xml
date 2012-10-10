@@ -129,7 +129,7 @@
 			<artifactId>wagon-file</artifactId>
 			<version>${wagonVersion}</version>
 		</dependency>
-		
+
 	</dependencies>
 
 </project>

@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +52,7 @@ import com.tobedevoured.naether.Bootstrap;
 import com.tobedevoured.naether.DependencyException;
 import com.tobedevoured.naether.NaetherException;
 import com.tobedevoured.naether.URLException;
+import com.tobedevoured.naether.api.Naether;
 import com.tobedevoured.naether.deploy.DeployArtifact;
 import com.tobedevoured.naether.impl.NaetherImpl;
 import com.tobedevoured.naether.maven.Project;
@@ -67,7 +69,7 @@ import com.tobedevoured.naether.util.Notation;
 public class NaetherTest {
 	
 	private static Logger log = LoggerFactory.getLogger(NaetherTest.class);
-	private NaetherImpl naether;
+	private Naether naether;
 	
 	@Before
 	public void createNaether() {
@@ -163,6 +165,76 @@ public class NaetherTest {
         Map<String, String> match =  naether.getDependenciesPath();
         assertTrue( "Has notation key", match.containsKey("junit:junit:jar:4.8.2") );
         assertTrue( "Has path", match.get("junit:junit:jar:4.8.2").contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
+	}
+	
+	@Test
+	public void getDependencyGraph() throws NaetherException {
+		Dependency dependency =
+            new Dependency( new DefaultArtifact( "org.springframework:org.springframework.orm:3.0.5.RELEASE" ), "compile" );
+		naether.addRemoteRepositoryByUrl( "http://repository.springsource.com/maven/bundles/release" );
+		naether.addRemoteRepositoryByUrl( "http://repository.springsource.com/maven/bundles/external" );
+		naether.addDependency(dependency);
+        naether.resolveDependencies(false);
+        
+        /*
+         * This is the expected out:
+         *  
+	        org.springframework:org.springframework.orm:jar:3.0.5.RELEASE={
+	            org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE={}, 
+	            org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE={
+	               org.springframework:org.springframework.context:jar:3.0.5.RELEASE={
+	                   org.springframework:org.springframework.expression:jar:3.0.5.RELEASE={}
+	               }, 
+	               org.springframework:org.springframework.aop:jar:3.0.5.RELEASE={}, 
+	               org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0={}
+	            }, 
+	            org.springframework:org.springframework.core:jar:3.0.5.RELEASE={},    
+	            org.springframework:org.springframework.beans:jar:3.0.5.RELEASE={
+	               org.springframework:org.springframework.asm:jar:3.0.5.RELEASE={}
+	            }
+	       }
+       */
+        Map<String,Map> ormDeps = new LinkedHashMap<String,Map>();
+        ormDeps.put("org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE", new HashMap() );
+        
+        Map<String,Map> expressionDeps = new HashMap<String,Map>();
+        expressionDeps.put( "org.springframework:org.springframework.expression:jar:3.0.5.RELEASE", new HashMap() );
+        
+        Map<String,Map> transactionDeps = new LinkedHashMap<String,Map>();
+        transactionDeps.put("org.springframework:org.springframework.context:jar:3.0.5.RELEASE", expressionDeps);
+        transactionDeps.put("org.springframework:org.springframework.aop:jar:3.0.5.RELEASE", new HashMap() );
+        transactionDeps.put("org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0", new HashMap() );
+        
+        ormDeps.put("org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE", transactionDeps );
+        ormDeps.put("org.springframework:org.springframework.core:jar:3.0.5.RELEASE", new HashMap() );
+
+        Map<String,Map> beansDeps = new HashMap<String,Map>();
+        beansDeps.put("org.springframework:org.springframework.asm:jar:3.0.5.RELEASE", new HashMap() );
+        
+        ormDeps.put( "org.springframework:org.springframework.beans:jar:3.0.5.RELEASE", beansDeps );
+        
+        Map<String,Map> results = new HashMap<String,Map>();
+        results.put("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE", ormDeps);
+        
+        Map<String,Map> graph = naether.getDependenciesGraph();
+        
+        // XXX: Map equality wont place nice (even with Map instead of LinkedHashMap). 
+        assertEquals( results.toString(), graph.toString() );
+        
+        Set<String> resolvedDependencies = naether.getDependenciesNotation();
+		
+		Set<String> dependencies = new HashSet<String>();
+        dependencies.add("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:org.springframework.beans:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:org.springframework.asm:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:org.springframework.core:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE");
+        dependencies.add("org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0");
+        dependencies.add("org.springframework:org.springframework.aop:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:org.springframework.context:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:org.springframework.expression:jar:3.0.5.RELEASE");
+		assertEquals( dependencies, resolvedDependencies );
 	}
 	
 	@Test
@@ -287,12 +359,14 @@ public class NaetherTest {
 	@Test
 	public void resolveDepedenciesAndDownloadArtifacts() throws Exception {
 		Dependency dependency =
-            new Dependency( new DefaultArtifact( "junit:junit:jar:4.8.2" ), "compile" );
+            new Dependency( new DefaultArtifact( "junit:junit:jar:4.10" ), "compile" );
         naether.addDependency(dependency);
         naether.resolveDependencies();
-        String classpath = (new File( "target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar")).getAbsolutePath();
-        assertEquals( classpath, naether.getResolvedClassPath() );
-        assertTrue( (new File( classpath ).exists()) );
+        String junit = (new File( "target/test-repo/junit/junit/4.10/junit-4.10.jar")).getAbsolutePath();
+        String hamcrest = (new File( "target/test-repo/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar")).getAbsolutePath();
+        assertEquals( junit + ":" + hamcrest, naether.getResolvedClassPath() );
+        assertTrue( (new File( junit ).exists()) );
+        assertTrue( (new File( hamcrest ).exists()) );
 	}
 	
 
