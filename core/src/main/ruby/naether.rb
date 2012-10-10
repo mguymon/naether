@@ -17,10 +17,11 @@ require "#{File.dirname(__FILE__)}/naether/configuration"
 require "#{File.dirname(__FILE__)}/naether/bootstrap"
 require "#{File.dirname(__FILE__)}/naether/java"
 
-
-# Java dependency resolver.
+#
+# Java dependency resolver
 #
 # @author Michael Guymon
+# @see https://github.com/mguymon/naether/tree/master/core
 #
 class Naether
   
@@ -28,7 +29,7 @@ class Naether
   
   class << self
     
-    # Helper for Java dependencies needed to bootstrap Naether
+    # List of Java dependencies needed to bootstrap Naether
     # 
     # @param [String] dep_file path
     # @see {Naether::Bootstrap#dependencies}
@@ -275,11 +276,16 @@ class Naether
     @resolver.getResolvedClassPath()
   end
   
+  # Dependencies as a Graph of nested Hashes
+  #
+  # @return [Hash]
   def dependencies_graph
     @resolver.getDependenciesGraph()
   end
   
   # Load dependencies to Classpath
+  #
+  # @return [Array] of loaded jars
   def load_dependencies_to_classpath
     jars = dependencies_classpath.split(":")
     Naether::Java.load_jars(jars)

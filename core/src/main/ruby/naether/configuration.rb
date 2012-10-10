@@ -1,5 +1,9 @@
 
 class Naether
+  
+  #
+  # Naether runtime configuration
+  #
   class Configurator
     def initialize(data={})
       gem_dir = File.expand_path("#{File.dirname(__FILE__)}/../../")

@@ -36,7 +36,7 @@ class Naether
     #
     # Paths loaded
     #
-    # @result [Array] of String paths
+    # @return [Array] of String paths
     #
     def self.loaded_paths
       instance.java.loaded_paths
@@ -76,7 +76,7 @@ class Naether
     # @param [String] target_method
     # @param [Array] params Array of method parameters
     # @param [Array] types if defined, a Array of String classes of params type that lines up with params one to one.
-    # @result [Object]
+    # @return [Object]
     def self.exec_static_method( target_class, target_method, params, types = nil ) 
       instance.java.exec_static_method( target_class, target_method, params, types )
     end
@@ -84,7 +84,7 @@ class Naether
     #
     # Convert a Ruby Array to a java.util.ArrayList
     # 
-    # @param [Array] to convert to Java.util.ArrayList
+    # @param [Array] ruby_array to convert to Java.util.ArrayList
     # @return [java.util.ArrayList]
     #    
     def self.convert_to_java_list( ruby_array )

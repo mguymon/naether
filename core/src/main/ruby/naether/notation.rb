@@ -1,4 +1,11 @@
 class Naether
+  
+  #
+  # Helper for handling Maven notations, supports notations:
+  #  * artifactId:groupId:version
+  #  * artifactId:groupId:type:version 
+  #  * artifactId:groupId:type:classifier:version 
+  #
   class Notation
     attr_reader :group, :artifact, :version, :classifier, :type
     

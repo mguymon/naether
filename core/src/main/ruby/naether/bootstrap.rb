@@ -5,12 +5,11 @@ require 'open-uri'
 require 'fileutils'
         
 class Naether
-  # :title:Naether::Bootstrap
+  
   #
   # Helper for bootstrapping Naether
   #
-  # = Authors
-  # Michael Guymon
+  # @author Michael Guymon
   #
   class Bootstrap
     
@@ -18,11 +17,14 @@ class Naether
     
     class << self
       
+      # Default local repo of ENV['M2_REPO'] or ~/.m2/repository
+      #
+      # @return [String]
       def default_local_repo
         ENV['M2_REPO'] || File.expand_path('~/.m2/repository')
       end
       
-      # write bootstrap dependencies to yaml file
+      # Write bootstrap dependencies to yaml file
       def write_dependencies( dest = 'jar_dependencies.yml' )
         deps = {};
         if Naether::Configuration.platform == 'java'
@@ -37,7 +39,11 @@ class Naether
         end
       end
       
-      # List of Java dependencies for Naether
+      # List of Java dependencies for Naether from yaml dependency file. Caches
+      # result after first run.
+      # 
+      # @param [String] dep_file path, defaults to Naether::Configuration.dependencies_yml
+      # @return [List]
       def dependencies( dep_file=nil )
         
         if @@dependencies
@@ -53,6 +59,11 @@ class Naether
       end
       
 
+      #
+      # Bootstrap the local repo by downloading Naether's dependencies
+      # @param [String] local_repo defaults to #default_local_repo
+      # @param [hash] opts
+      #
       def bootstrap_local_repo(local_repo = nil, opts = {} )
         local_repo = local_repo || default_local_repo
         
@@ -75,6 +86,12 @@ class Naether
         
       end
       
+      #
+      # Download Naether dependencies
+      #
+      # @param [String] dest to download dependencies t
+      # @param [Hash] opts
+      # @return [Hash] with status of missing, downloaded, exists dependencies
       def download_dependencies( dest, opts = {} )
          
         if !File.exists? dest
@@ -121,6 +138,12 @@ class Naether
         deps
       end
       
+      #
+      # Check local_repo for Naether dependencies
+      # 
+      # @param [String] local_repo
+      # @param [Hash] opts
+      # @return [Hash] with status of missing, downloaded, exists dependencies
       def check_local_repo_for_deps(local_repo = nil, opts = {} )
         
         local_repo = local_repo || default_local_repo
@@ -151,6 +174,14 @@ class Naether
         deps
       end
       
+      #
+      # Install Naether Dependencies to local_repo
+      # 
+      # @param [Array<String>] install_jars 
+      # @param [Array<String>] naether_jars to bootstrap Naether. These may overlap with install_jars.
+      # @param [Hash] opts
+      # @return [Naether]
+      #
       def install_dependencies_to_local_repo( install_jars, naether_jars, opts = {}  )
           
         require "#{File.dirname(__FILE__)}/../naether"
