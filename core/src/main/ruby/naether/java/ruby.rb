@@ -173,17 +173,27 @@ class Naether
       def convert_to_ruby_hash( java_hash, to_string = false )
         
         hash = {}
-        keys = java_hash.keySet()
-        iterator = keys.iterator()
-        if to_string
-          while iterator.hasNext()
-            key = iterator.next().toString()
-            hash[key] = java_hash.get( key ).toString()
+        unless java_hash.is_a? Hash
+          keys = java_hash.keySet()
+          iterator = keys.iterator()
+          if to_string
+            while iterator.hasNext()
+              key = iterator.next().toString()
+              hash[key] = java_hash.get( key ).toString()
+            end
+          else
+            while iterator.hasNext()
+              key = iterator.next()
+              hash[key] = java_hash.get( key )              
+            end
           end
         else
-          while iterator.hasNext()
-            key = iterator.next()
-            hash[key] = java_hash.get( key )              
+          if to_string
+            java_hash.each do |k,v|
+              hash[k.toString()] = v.toString()
+            end
+          else
+            hash = java_hash
           end
         end
         

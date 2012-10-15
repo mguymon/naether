@@ -140,7 +140,13 @@ class Naether
       # @return [Hash]
       #
       def convert_to_ruby_hash( java_hash, to_string = false )
-        java_hash.to_hash
+        hash = java_hash.to_hash
+        
+        hash.each do |k,v|
+          if v.is_a? java.util.Map
+            hash[k] = convert_to_ruby_hash(v, to_string )
+          end
+        end
       end
     
     end    

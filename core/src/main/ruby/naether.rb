@@ -279,8 +279,25 @@ class Naether
   # Dependencies as a Graph of nested Hashes
   #
   # @return [Hash]
-  def dependencies_graph
-    @resolver.getDependenciesGraph()
+  def dependencies_graph(nodes=nil)
+    nodes = @resolver.getDependenciesGraph() unless nodes
+    
+    graph = {}
+    if Naether.platform == 'java'
+      nodes.each do |k,v|
+        deps = dependencies_graph(v)
+        graph[k] = Naether::Java.convert_to_ruby_hash( deps )
+      end
+    else
+      iterator = nodes.entrySet().iterator();
+      while iterator.hasNext()
+          entry = iterator.next()
+          deps = dependencies_graph(entry.getValue())
+          graph[entry.getKey().toString()] = Naether::Java.convert_to_ruby_hash( deps )
+      end
+    end
+    
+    graph
   end
   
   # Load dependencies to Classpath
