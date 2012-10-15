@@ -15,6 +15,13 @@ describe Naether do
   context "Instance" do
     
     before(:each) do
+      # XXX: in 1.8.7, the classpath is not being set in the spec_helper
+      Naether::Configuration.naether_jar = "target/core-#{Naether::Configuration.version}.jar"
+      Naether::Bootstrap.bootstrap_local_repo(  
+        File.expand_path( '../../../../target/test-repo', __FILE__ ), 
+        :dep_yaml => File.expand_path( '../../../../jar_dependencies.yml', __FILE__ ) )
+       
+      
       @test_dir = 'target/test-rb'
       unless File.exists?( @test_dir )
         Dir.mkdir @test_dir

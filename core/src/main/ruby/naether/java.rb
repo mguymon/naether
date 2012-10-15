@@ -51,6 +51,10 @@ class Naether
       instance.java.load_paths(paths)
     end
     
+    def self.internal_loaded_paths
+      convert_to_ruby_array( instance.java.class_loader.getLoadedPaths, true )
+    end
+    
     #
     # Load a path into the internal Naether ClassLoader
     #

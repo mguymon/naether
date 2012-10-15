@@ -11,7 +11,7 @@ that can be used by Ruby or Java.
 
 ### Ruby
 
-JRuby 1.6.7 is natively supported. Ruby 1.8.7 and 1.9.3 use [Rjb](http://rjb.rubyforge.org) to proxy over JNI.
+JRuby 1.6.8 is natively supported. Ruby 1.8.7 and 1.9.3 use [Rjb](http://rjb.rubyforge.org) to proxy over JNI.
 
     gem install naether
     

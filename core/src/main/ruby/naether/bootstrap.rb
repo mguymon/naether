@@ -82,7 +82,7 @@ class Naether
           install_dependencies_to_local_repo( deps[:downloaded], jars, opts )
         end
         
-        #raise Naether::Java.instance.java.class_loader.getLoadedPaths().map { |x| x.toString() }.sort.inspect
+        #raise Naether::Java.internal_loaded_paths.inspect
         
       end
       
