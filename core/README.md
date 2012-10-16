@@ -56,7 +56,7 @@ must be loaded for Naether to work. This is easily done with the [bootstrap help
     Naether::Bootstrap.bootstrap_local_repo
     naether = Naether.new
     naether.dependencies = [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" ]
-    naether.resolve_dependencies().
+    naether.resolve_dependencies()
     
     puts naether.dependences_notation
     
