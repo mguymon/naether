@@ -1,6 +1,8 @@
 com.tobedevoured.naether
 com.tobedevoured.naether.aether
+com.tobedevoured.naether.api
 com.tobedevoured.naether.deploy
+com.tobedevoured.naether.impl
 com.tobedevoured.naether.maven
 com.tobedevoured.naether.repo
 com.tobedevoured.naether.util
