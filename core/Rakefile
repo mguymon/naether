@@ -39,6 +39,8 @@ namespace :naether do
       FileUtils.copy( 'pom.xml', "target/gem/pom.xml" )
       FileUtils.copy( 'VERSION', "target/gem/VERSION" )
       FileUtils.copy( 'PostInstallRakefile', "target/gem/Rakefile" )
+      FileUtils.copy( 'Gemfile', "target/gem/Gemfile" )
+      FileUtils.copy( 'Gemfile.lock', "target/gem/Gemfile.lock" )
       
       version = IO.read('VERSION').strip
       if !File.exists? "target/core-#{version}.jar"
@@ -98,10 +100,15 @@ Jeweler::Tasks.new do |gem|
   # all files in target/gem should be included, expect for pkg
   gem.files = Dir.glob("**/*").select{ |path| !(path =~ /^pkg/) }
   
-  # Include your dependencies below. Runtime dependencies are required when using your gem,
-  # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
-  #  gem.add_runtime_dependency 'jabber4r', '> 0.1'
-  #  gem.add_development_dependency 'rspec', '> 1.2.3'
+  # Jeweler stopped loading Bundler deps automatically ><
+  bundler = Bundler.load
+  bundler.dependencies_for(:default, :runtime).each do |dependency|
+    gem.add_dependency dependency.name, *dependency.requirement.as_list
+  end
+  bundler.dependencies_for(:development).each do |dependency|
+    gem.add_development_dependency dependency.name, *dependency.requirement.as_list
+  end
+    
 end
 Jeweler::RubygemsDotOrgTasks.new
 
