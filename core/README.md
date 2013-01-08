@@ -50,7 +50,7 @@ must be loaded for Naether to work. This is easily done with the [bootstrap help
 
 #### Resolving Dependencies
 
-    require 'rubygems
+    require 'rubygems'
     require 'naether'
     
     Naether::Bootstrap.bootstrap_local_repo
@@ -58,7 +58,7 @@ must be loaded for Naether to work. This is easily done with the [bootstrap help
     naether.dependencies = [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" ]
     naether.resolve_dependencies()
     
-    puts naether.dependences_notation
+    puts naether.dependencies_notation
     
 Will output
 
