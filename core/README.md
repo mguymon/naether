@@ -72,8 +72,10 @@ Will output
 ### Java
 
 #### Resolving Dependencies
+    import com.tobedevoured.naether.api.Naether;
+    import com.tobedevoured.naether.impl.NaetherImpl;
 
-    Naether naether = new Naether();
+    Naether naether = new NaetherImpl();
     naether.addDependency( "ch.qos.logback:logback-classic:jar:0.9.29" );
     naether.addDependency( "junit:junit:jar:4.8.2" );
     naether.resolveDependencies();
