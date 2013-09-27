@@ -10,9 +10,6 @@ doc
 # jeweler generated
 pkg
 
-# Has to be ignored, since JRuby and Ruby have different platform deps
-Gemfile.lock
-
 *.gemspec
 target
 *.gem
