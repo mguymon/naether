@@ -69,12 +69,13 @@ public class ProjectTest {
 	public void createInstanceWithPomPathWithException() throws Exception {
 		new Project("src/test/resources/does_not_exist_pom.xml");
 	}
-	
+
+    @Test
 	public void setProjectNotation() {
 		Project project = new Project();
 		project.setProjectNotation("project:test:10");
-		assertEquals( "project", project.getArtifactId() );
-		assertEquals( "test", project.getGroupId() );
+        assertEquals( "project", project.getGroupId() );
+		assertEquals( "test", project.getArtifactId() );
 		assertEquals( "10", project.getVersion() );
 	}
 	
@@ -141,7 +142,9 @@ public class ProjectTest {
 			}
 		}
 	}
-	
+
+    /*
+     * XXX: Naether pom no longer has a parent
 	@Test
 	public void hasParentPom() throws ProjectException {
 		Project coreProject = new Project("pom.xml");
@@ -149,6 +152,7 @@ public class ProjectTest {
 		
 		assertEquals( coreProject.getVersion(), parentProject.getVersion() );
 	}
+	*/
 	
 	@Test
 	public void toXml() throws ProjectException, FileNotFoundException, IOException {
