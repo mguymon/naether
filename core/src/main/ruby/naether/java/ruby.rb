@@ -5,7 +5,7 @@ require "#{File.dirname(__FILE__)}/../configuration"
 #
 # @author Michael Guymon
 #
-class Naether
+module Naether
   class Java
 
     class Ruby

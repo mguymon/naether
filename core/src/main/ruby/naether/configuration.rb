@@ -1,5 +1,5 @@
 
-class Naether
+module Naether
   
   #
   # Naether runtime configuration
@@ -22,6 +22,7 @@ class Naether
       
       
       @data = {
+        :version => version,
         :gem_dir =>     gem_dir,
         :naether_jar => File.join( gem_dir, "core-#{version}.jar"),
         :platform =>    ($platform || RUBY_PLATFORM[/java/] || 'ruby'),

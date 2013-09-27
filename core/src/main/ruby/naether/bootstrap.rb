@@ -3,8 +3,8 @@ require "#{File.dirname(__FILE__)}/configuration"
 require 'yaml'
 require 'open-uri'
 require 'fileutils'
-        
-class Naether
+
+module Naether
   
   #
   # Helper for bootstrapping Naether

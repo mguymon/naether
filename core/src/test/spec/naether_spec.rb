@@ -1,6 +1,7 @@
 require  File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper'))
 require 'src/main/ruby/naether'
 require 'src/main/ruby/naether/java'
+require 'src/main/ruby/naether/bootstrap'
 
 describe Naether do
   
@@ -27,7 +28,7 @@ describe Naether do
         Dir.mkdir @test_dir
       end
       
-      @naether = Naether.new
+      @naether = Naether.create
       @naether.local_repo_path = 'target/test-repo'
     end
     

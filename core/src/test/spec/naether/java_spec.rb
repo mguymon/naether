@@ -1,5 +1,6 @@
 require  File.expand_path(File.join(File.dirname(__FILE__), '../spec_helper'))
 require 'src/main/ruby/naether'
+require 'src/main/ruby/naether/java'
 
 describe Naether::Java do
   context "Class" do
@@ -10,7 +11,7 @@ describe Naether::Java do
     end
     
     it "should create an instance of com.tobedevoured.naether.maven.Project" do
-      @naether = Naether.new
+      @naether = Naether.create
       instance = Naether::Java.create("com.tobedevoured.naether.maven.Project")
       instance.getClass().getName().should eql "com.tobedevoured.naether.maven.Project" 
     end

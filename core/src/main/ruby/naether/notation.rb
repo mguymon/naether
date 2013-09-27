@@ -1,4 +1,4 @@
-class Naether
+module Naether
   
   #
   # Helper for handling Maven notations, supports notations:

@@ -6,7 +6,7 @@ require 'src/main/ruby/naether/maven'
 describe Naether::Maven do
   
     before(:each) do
-        @naether = Naether.new
+        @naether = Naether.create
         @naether.should_not be_nil
         @naether.local_repo_path = 'target/test-repo'
         

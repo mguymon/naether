@@ -15,7 +15,7 @@
 
 require "#{File.dirname(__FILE__)}/java"
 
-class Naether
+module Naether
   
   # Helper for interacting with a Maven POM
   #
