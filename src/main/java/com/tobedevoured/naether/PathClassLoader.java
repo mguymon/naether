@@ -14,7 +14,7 @@ import java.util.Set;
 
 
 /**
- * ClassLoader that allows paths to be added a runtime.
+ * ClassLoader that allows paths to be added at runtime.
  * 
  * @author Michael Guymon
  *
@@ -146,42 +146,42 @@ public class PathClassLoader extends URLClassLoader {
 			try {
 				constructor = clazz.getConstructor( paramTypes.toArray( new Class[paramTypes.size()] ) );
 			} catch (SecurityException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to access constructor for " + clazz.getSimpleName(), e);
 			} catch (NoSuchMethodException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to access constructor for " + clazz.getSimpleName(), e);
 			}
 			
 			try {
 				return constructor.newInstance(params);
 			} catch (IllegalArgumentException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
 			} catch (InstantiationException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
 			} catch (IllegalAccessException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
 			} catch (InvocationTargetException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
 			}
 		} else {
 			Constructor<?> constructor;
 			try {
 				constructor = clazz.getConstructor();
 			} catch (SecurityException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to access constructor for " + clazz.getSimpleName(),e);
 			} catch (NoSuchMethodException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to access constructor for " + clazz.getSimpleName(),e);
 			}
 			
 			try {
 				return constructor.newInstance();
 			} catch (IllegalArgumentException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
 			} catch (InstantiationException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
 			} catch (IllegalAccessException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
 			} catch (InvocationTargetException e) {
-				throw new ClassLoaderException(e);
+				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
 			}
 		}
 	}
