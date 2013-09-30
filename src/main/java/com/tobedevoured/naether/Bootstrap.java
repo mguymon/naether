@@ -42,6 +42,7 @@ public final class Bootstrap {
 		deps.add("com.jcraft:jsch:jar:0.1.44-1");
 		deps.add("com.ning:async-http-client:jar:1.6.5");
 		deps.add("commons-io:commons-io:jar:2.0.1");
+        deps.add("org.apache.maven.shared:maven-invoker:jar:2.1.1");
 		deps.add("org.apache.maven:maven-aether-provider:jar:3.0.3");
 		deps.add("org.apache.maven:maven-model:jar:3.0.3");
 		deps.add("org.apache.maven:maven-model-builder:jar:3.0.3");
@@ -56,7 +57,7 @@ public final class Bootstrap {
 		deps.add("org.codehaus.plexus:plexus-component-annotations:jar:1.5.5");
 		deps.add("org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-6");
 		deps.add("org.codehaus.plexus:plexus-interpolation:jar:1.14");
-		deps.add("org.codehaus.plexus:plexus-utils:jar:2.0.7");
+		deps.add("org.codehaus.plexus:plexus-utils:jar:3.0.8");
 		deps.add("org.jsoup:jsoup:jar:1.6.1");
 		deps.add("org.slf4j:slf4j-api:jar:1.6.6");
 		deps.add("org.slf4j:jcl-over-slf4j:jar:1.6.6");

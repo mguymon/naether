@@ -1,0 +1,24 @@
+package com.tobedevoured.naether.maven;
+
+import com.tobedevoured.naether.NaetherException;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+public class InvokerTest {
+
+    @Test
+    public void execute() throws NaetherException {
+        String mavenHome = System.getProperty("maven.home");
+        if (mavenHome == null) {
+            // Default home for Ubuntu maven deb.
+            mavenHome = "/usr/share/maven";
+        }
+
+        Invoker invoker = new Invoker("target/test-repo", mavenHome);
+        InvocationResult result = invoker.execute("pom.xml", "compile");
+        assertThat( "Exit code should be zero", result.getExitCode(), is(0) );
+    }
+}
