@@ -1,3 +1,4 @@
+require "#{File.dirname(__FILE__)}/../naether"
 require "#{File.dirname(__FILE__)}/java"
 require "#{File.dirname(__FILE__)}/configuration"
 require 'yaml'
