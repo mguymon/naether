@@ -23,7 +23,15 @@ module Naether
               
         # Call Rjb::load with an empty classpath, incase Rjb::load has already been called
         java_opts = (ENV['JAVA_OPTS'] || ENV['JAVA_OPTIONS']).to_s.split
-        Rjb::load("", java_opts)
+
+        begin
+          Rjb::load("", java_opts)
+        rescue StandardError => e
+          if e.message == "can't create Java VM"
+            puts "RJB was unable to find JVM, try setting JAVA_HOME env"
+          end
+          raise e
+        end
         
         @loaded_paths = []
         load_paths( naether_jar )
