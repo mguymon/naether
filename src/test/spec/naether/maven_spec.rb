@@ -66,5 +66,11 @@ describe Naether::Maven do
       xml.should match /.+org.slf4j<\/groupId>\s+<artifactId>slf4j-api<\/artifactId>\s+<version>1.6.1.+/
       
     end
-    
+
+
+    it "should compile project" do
+      maven = Naether::Maven.create_from_pom('pom.xml')
+      result = maven.invoke('compile')
+      result.getExitCode().should eql 0
+    end
 end

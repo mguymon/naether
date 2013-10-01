@@ -1,5 +1,7 @@
 # Naether
 
+[![Build Status](https://travis-ci.org/mguymon/naether.png?branch=master)](https://travis-ci.org/mguymon/naether)
+
 Naether is a Java Dependency Resolver using Maven's [Aether](https://github.com/sonatype/sonatype-aether) 
 that can be used by Ruby or Java.
 

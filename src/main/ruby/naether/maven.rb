@@ -82,17 +82,14 @@ module Naether
           deps = @project.getDependenciesNotation( scopes )
         end
         
+      elsif scopes
+        list = Naether::Java.convert_to_java_list( scopes )
+
+        deps = @project._invoke('getDependenciesNotation', 'Ljava.util.List;', list)
       else
-        list = nil
-        if scopes
-          list = Naether::Java.convert_to_java_list( scopes )
-          
-          deps = @project._invoke('getDependenciesNotation', 'Ljava.util.List;', list)
-        else
-          deps = @project.getDependenciesNotation()
-        end
-        
+        deps = @project.getDependenciesNotation()
       end
+
       
       Naether::Java.convert_to_ruby_array( deps, true )
     end
@@ -147,6 +144,24 @@ module Naether
     # @param [String] file_path
     def write_pom( file_path )
       @project.writePom( file_path )
+    end
+
+    def invoke( *opts )
+      #defaults
+      config = {
+        :maven_home => ENV['maven.home'] || '/usr/share/maven',
+        :local_repo => File.expand_path('~/.m2/repository')
+      }
+
+      if opts.last.is_a? Hash
+        config = defaults.merge( opts.pop )
+      end
+      goals = opts
+
+      pom = @project.getPomFile().getAbsolutePath()
+
+      invoker = Naether::Java.create("com.tobedevoured.naether.maven.Invoker", config[:local_repo], config[:maven_home] )
+      invoker.execute( pom, Naether::Java.convert_to_java_list(goals) )
     end
   end
 end

@@ -93,7 +93,7 @@ public class Project {
 	 */
 	public Project(String pomPath) throws ProjectException {
 		this.mavenModel = loadPOM(pomPath);
-		
+         this.mavenModel.setPomFile( new File(pomPath) );
 		File parent = (new File(pomPath)).getParentFile();
 		if ( parent != null ) {
 			setBasePath( (new File(pomPath)).getParentFile() );
@@ -469,6 +469,14 @@ public class Project {
 		
 		return null;
 	}
+
+    /**
+     * Get Pom {@link File}
+     * @return {@link File}
+     */
+    public File getPomFile() {
+        return this.mavenModel.getPomFile();
+    }
 
 	/**
 	 * Write pom to path
