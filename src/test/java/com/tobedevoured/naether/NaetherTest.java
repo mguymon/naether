@@ -418,8 +418,8 @@ public class NaetherTest {
 		assertEquals( completeDeps.size(), naether.getDependenciesNotation().size() );
 		
 		List<String> missingDeps = new ArrayList<String>();
-        for( String dep : naether.getDependenciesNotation() ) {
-        	if ( completeDeps.indexOf( dep ) == -1 ) {
+        for( String dep : completeDeps ) {
+        	if ( !naether.getDependenciesNotation().contains( dep ) ) {
         		missingDeps.add( dep );
         	}
         }

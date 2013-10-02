@@ -84,7 +84,7 @@ public class ProjectTest {
 		Project mavenProject = new Project("src/test/resources/valid_pom.xml");
 		List<String> repositories = mavenProject.getRepositoryUrls();
 		
-		assertEquals( Arrays.asList( "http://repository.jboss.org/nexus/content/groups/public-jboss" ), repositories );
+		assertEquals( Arrays.asList( "http://repository.jboss.org/nexus/content/groups/public-jboss", "http://repo1.maven.org/maven2" ), repositories );
 	}
 
 	@Test
@@ -189,4 +189,16 @@ public class ProjectTest {
 		assertEquals( project.getVersion(), testProject.getVersion() );
 		assertEquals( project.getType(), testProject.getType() );
 	}
+
+    @Test
+    public void finalName() {
+        Project mavenProject = null;
+        try {
+            mavenProject = new Project("pom.xml");
+        } catch (ProjectException e) {
+            fail("failed to read pom: " + e.toString());
+        }
+
+        assertEquals( "core-" + mavenProject.getVersion(), mavenProject.getFinalName() );
+    }
 }

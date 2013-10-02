@@ -95,6 +95,11 @@
         </dependency>
         <dependency>
             <groupId>org.sonatype.aether</groupId>
+            <artifactId>aether-spi</artifactId>
+            <version>${aetherVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.aether</groupId>
             <artifactId>aether-connector-file</artifactId>
             <version>${aetherVersion}</version>
         </dependency>

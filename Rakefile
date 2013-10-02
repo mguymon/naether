@@ -133,19 +133,9 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = 'src/test/spec/**/*_spec.rb'
 end
 
-task :test_warning do
-  puts " #########################################################"
-  puts "  Make sure you run mvn package to have an update to date "
-  puts "  naether jar for specs "
-  puts " #########################################################"
-  puts ""
-end
-
 task :test => :spec
 
 task :default => :test
-
-task :spec => :test_warning
 
 require 'yard'
 YARD::Rake::YardocTask.new do |t|

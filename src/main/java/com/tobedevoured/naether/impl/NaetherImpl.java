@@ -94,6 +94,7 @@ public class NaetherImpl implements Naether {
 	private Set<Dependency> dependencies;
 	private List<Artifact> buildArtifacts;
 	private Set<RemoteRepository> remoteRepositories;
+    private Set<String> repositoryIds;
 	private PreorderNodeListGenerator preorderedNodeList;
 
 	/**
@@ -113,6 +114,9 @@ public class NaetherImpl implements Naether {
 		
 		// Set the initial LinkedHashSet
 		this.remoteRepositories = new LinkedHashSet<RemoteRepository>();
+
+        // Set the initial HashSet
+        this.repositoryIds = new HashSet<String>();
 		
 		addRemoteRepository("central", "default", "http://repo1.maven.org/maven2/");
 
@@ -363,14 +367,18 @@ public class NaetherImpl implements Naether {
 	 * @see com.tobedevoured.naether.api.Naether#addRemoteRepository(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public final void addRemoteRepository(String id, String type, String url) {
-		getRemoteRepositories().add(new RemoteRepository(id, type, url));
+        if (this.repositoryIds.add(id) ) {
+		    getRemoteRepositories().add(new RemoteRepository(id, type, url));
+        }
 	}
 
 	/* (non-Javadoc)
 	 * @see com.tobedevoured.naether.api.Naether#addRemoteRepository(org.sonatype.aether.repository.RemoteRepository)
 	 */
 	public void addRemoteRepository(RemoteRepository remoteRepository) {
-		getRemoteRepositories().add(remoteRepository);
+        if (this.repositoryIds.add(remoteRepository.getId()) ) {
+		    getRemoteRepositories().add(remoteRepository);
+        }
 	}
 
 	/* (non-Javadoc)

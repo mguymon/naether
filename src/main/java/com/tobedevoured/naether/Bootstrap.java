@@ -50,7 +50,7 @@ public final class Bootstrap {
 		deps.add("org.apache.maven.wagon:wagon-file:jar:1.0");
 		deps.add("org.apache.maven.wagon:wagon-http-lightweight:jar:1.0");
 		deps.add("org.apache.maven.wagon:wagon-http-shared:jar:1.0");
-		deps.add("org.apache.maven.wagon:wagon-provider-api:jar:1.0-beta-6");
+		deps.add("org.apache.maven.wagon:wagon-provider-api:jar:1.0");
 		deps.add("org.apache.maven.wagon:wagon-ssh:jar:1.0");
 		deps.add("org.apache.maven.wagon:wagon-ssh-common:jar:1.0");
 		deps.add("org.codehaus.plexus:plexus-classworlds:jar:2.4");

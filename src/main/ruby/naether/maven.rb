@@ -146,6 +146,9 @@ module Naether
       @project.writePom( file_path )
     end
 
+    # Invoke a Maven goal
+    #
+    # @params [Array] Goals names
     def invoke( *opts )
       #defaults
       config = {
@@ -162,6 +165,10 @@ module Naether
 
       invoker = Naether::Java.create("com.tobedevoured.naether.maven.Invoker", config[:local_repo], config[:maven_home] )
       invoker.execute( pom, Naether::Java.convert_to_java_list(goals) )
+    end
+
+    def final_name
+      @project.getFinalName()
     end
   end
 end

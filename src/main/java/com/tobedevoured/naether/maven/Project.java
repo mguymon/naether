@@ -19,15 +19,7 @@ package com.tobedevoured.naether.maven;
  */
 
 // Java SE
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,13 +31,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // Apache Maven
+import com.tobedevoured.naether.repo.RepositoryClient;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.building.*;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 
 // Codehause Plexus
+import org.apache.maven.model.profile.DefaultProfileSelector;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 // SLF4J
@@ -92,8 +87,9 @@ public class Project {
 	 * @throws XmlPullParserException
 	 */
 	public Project(String pomPath) throws ProjectException {
-		this.mavenModel = loadPOM(pomPath);
-         this.mavenModel.setPomFile( new File(pomPath) );
+		this.mavenModel = loadPOM(pomPath, null);
+        this.mavenModel.setPomFile( new File(pomPath) );
+
 		File parent = (new File(pomPath)).getParentFile();
 		if ( parent != null ) {
 			setBasePath( (new File(pomPath)).getParentFile() );
@@ -108,23 +104,27 @@ public class Project {
 	 * @param pomPath String path
 	 * @throws ProjectException if fails to open, read, or parse the POM
 	 */
-	public static Model loadPOM(String pomPath) throws ProjectException {
-		log.debug("Loading pom {}", pomPath);
-		MavenXpp3Reader reader = new MavenXpp3Reader();
-		try {
-			return reader.read(new BufferedReader(new FileReader(new File(pomPath))));
-		} catch (FileNotFoundException e) {
-			log.error( "Failed to access pom", e);
-			throw new ProjectException( "Pom not found " + pomPath, e );
-			
-		} catch (IOException e) {
-			log.error( "Failed to read pom", e);
-			throw new ProjectException("Failed to read pom " + pomPath, e );
-			
-		} catch (XmlPullParserException e) {
-			log.error( "Failed to parse pom", e);
-			throw new ProjectException( "Failed to parse pom " + pomPath, e );
-		}
+	public static Model loadPOM(String pomPath, String localRepo) throws ProjectException {
+        if ( localRepo == null ) {
+            String userHome = System.getProperty("user.home");
+            localRepo = userHome + File.separator + ".m2" + File.separator + "repository";
+        }
+        RepositoryClient repoClient = new RepositoryClient(localRepo);
+        NaetherModelResolver resolver = new NaetherModelResolver(repoClient, null);
+
+        ModelBuildingRequest req = new DefaultModelBuildingRequest();
+        req.setProcessPlugins( false );
+        req.setPomFile( new File(pomPath) );
+        req.setModelResolver( resolver );
+        req.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+
+        DefaultModelBuilder builder = (new DefaultModelBuilderFactory()).newInstance();
+        try
+        {
+            return builder.build( req ).getEffectiveModel();
+        } catch ( ModelBuildingException e ) {
+            throw new ProjectException("Failed to build project from pom", e);
+        }
 	}
 
 	/**
@@ -558,4 +558,16 @@ public class Project {
 		this.basePath = basePath.getAbsolutePath();
 		this.addProperty( "project.basedir", this.basePath);
 	}
+
+    /**
+     * Get the final name of the build artifact for this project
+     * @return String
+     */
+    public String getFinalName() {
+        if ( this.mavenModel.getBuild() != null ) {
+            return this.mavenModel.getBuild().getFinalName();
+        } else {
+            return null;
+        }
+    }
 }

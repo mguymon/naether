@@ -67,10 +67,14 @@ describe Naether::Maven do
       
     end
 
-
     it "should compile project" do
       maven = Naether::Maven.create_from_pom('pom.xml')
       result = maven.invoke('compile')
       result.getExitCode().should eql 0
+    end
+
+    it "should get final name" do
+      maven = Naether::Maven.create_from_pom('pom.xml')
+      expect( maven.final_name).to eql "core-#{maven.version}"
     end
 end

@@ -6,7 +6,7 @@ ttp://maven.apache.org/maven-v4_0_0.xsd ">
   <groupId>naether</groupId>
   <artifactId>parent</artifactId>
   <version>3</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <repositories>
 	  <repository>
 	    <id>org.jboss.repository</id>
