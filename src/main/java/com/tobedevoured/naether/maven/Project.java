@@ -36,11 +36,9 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.*;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 
 // Codehause Plexus
-import org.apache.maven.model.profile.DefaultProfileSelector;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 // SLF4J
