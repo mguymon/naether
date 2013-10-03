@@ -152,12 +152,13 @@ module Naether
     def invoke( *opts )
       #defaults
       config = {
-        :maven_home => ENV['maven.home'] || '/usr/share/maven',
+        # Checks ENV for maven home, otherwise defaults /usr/share/maven
+        :maven_home => ENV['maven.home'] || ENV['MAVEN_HOME'] || '/usr/share/maven',
         :local_repo => File.expand_path('~/.m2/repository')
       }
 
       if opts.last.is_a? Hash
-        config = defaults.merge( opts.pop )
+        config = config.merge( opts.pop )
       end
       goals = opts
 
