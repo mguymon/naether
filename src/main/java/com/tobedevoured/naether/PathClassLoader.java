@@ -146,10 +146,12 @@ public class PathClassLoader extends URLClassLoader {
 			try {
 				constructor = clazz.getConstructor( paramTypes.toArray( new Class[paramTypes.size()] ) );
 			} catch (SecurityException e) {
-				throw new ClassLoaderException("Attempted to access constructor for " + clazz.getSimpleName(), e);
+				throw new ClassLoaderException("Private constructor for " + clazz.getSimpleName(), e);
 			} catch (NoSuchMethodException e) {
-				throw new ClassLoaderException("Attempted to access constructor for " + clazz.getSimpleName(), e);
-			}
+				throw new ClassLoaderException("No such constructor for " + clazz.getSimpleName(), e);
+			} catch (Exception e) {
+                throw new ClassLoaderException("Attempted to access constructor for " + clazz.getSimpleName(), e);
+            }
 			
 			try {
 				return constructor.newInstance(params);
@@ -161,16 +163,21 @@ public class PathClassLoader extends URLClassLoader {
 				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
 			} catch (InvocationTargetException e) {
 				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
-			}
+			} catch (Exception e) {
+                throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
+            }
+
 		} else {
 			Constructor<?> constructor;
 			try {
 				constructor = clazz.getConstructor();
 			} catch (SecurityException e) {
-				throw new ClassLoaderException("Attempted to access constructor for " + clazz.getSimpleName(),e);
+				throw new ClassLoaderException("Private constructor for " + clazz.getSimpleName(),e);
 			} catch (NoSuchMethodException e) {
-				throw new ClassLoaderException("Attempted to access constructor for " + clazz.getSimpleName(),e);
-			}
+				throw new ClassLoaderException("No such constructor for " + clazz.getSimpleName(),e);
+			} catch (Exception e) {
+                throw new ClassLoaderException("Attempted to access constructor for " + clazz.getSimpleName(), e);
+            }
 			
 			try {
 				return constructor.newInstance();
@@ -182,7 +189,9 @@ public class PathClassLoader extends URLClassLoader {
 				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
 			} catch (InvocationTargetException e) {
 				throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
-			}
+			} catch (Exception e) {
+                throw new ClassLoaderException("Attempted to created new instance of " + clazz.getSimpleName(),e);
+            }
 		}
 	}
 	
