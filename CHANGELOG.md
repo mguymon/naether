@@ -1,5 +1,10 @@
 ## Naether Changelog
 
+### 0.13.0 (January 20, 2014)
+
+* Fix check that `Naether::Configruation` is initialized [(#9)](https://github.com/mguymon/naether/issues/9)
+* Updated Jeweler dep
+
 ### 0.12.0 (October 1, 2013)
 
 * Add support for executing Maven goals from Naether
