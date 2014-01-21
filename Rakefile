@@ -102,16 +102,7 @@ Jeweler::Tasks.new do |gem|
   
   # all files in target/gem should be included, expect for pkg
   gem.files = Dir.glob("**/*").select{ |path| !(path =~ /^pkg/) }
-  
-  # Jeweler stopped loading Bundler deps automatically ><
-  bundler = Bundler.load
-  bundler.dependencies_for(:default, :runtime).each do |dependency|
-    gem.add_dependency dependency.name, *dependency.requirement.as_list
-  end
-  bundler.dependencies_for(:development).each do |dependency|
-    gem.add_development_dependency dependency.name, *dependency.requirement.as_list
-  end
-    
+
 end
 Jeweler::RubygemsDotOrgTasks.new
 
