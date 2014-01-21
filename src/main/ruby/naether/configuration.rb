@@ -60,7 +60,7 @@ module Naether
     end
   end
   
-  unless defined?(Naether::Configuration)
+  unless Naether.const_defined?('Configuration', false)
     Naether::Configuration = Naether::Configurator.new
   end
 end

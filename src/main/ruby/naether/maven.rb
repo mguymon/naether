@@ -153,6 +153,7 @@ module Naether
       #defaults
       config = {
         # Checks ENV for maven home, otherwise defaults /usr/share/maven
+        # XXX: Reuse Eng.getMavenHome?
         :maven_home => ENV['maven.home'] || ENV['MAVEN_HOME'] || '/usr/share/maven',
         :local_repo => File.expand_path('~/.m2/repository')
       }
@@ -165,7 +166,13 @@ module Naether
       pom = @project.getPomFile().getAbsolutePath()
 
       invoker = Naether::Java.create("com.tobedevoured.naether.maven.Invoker", config[:local_repo], config[:maven_home] )
-      invoker.execute( pom, Naether::Java.convert_to_java_list(goals) )
+
+      java_list = Naether::Java.convert_to_java_list(goals)
+      if Naether.platform == 'java'
+        invoker.execute( pom, java_list )
+      else
+        invoker._invoke('execute', 'Ljava.lang.String;Ljava.util.List;', pom, java_list)
+      end
     end
 
     def final_name
