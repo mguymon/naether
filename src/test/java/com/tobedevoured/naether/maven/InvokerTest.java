@@ -12,6 +12,11 @@ public class InvokerTest {
 
     @Test
     public void execute() throws NaetherException {
+        String mavenHome = System.getProperty("maven.home");
+        if (mavenHome == null) {
+            // Default home for Ubuntu maven deb.
+            mavenHome = "/usr/share/maven";
+        }
         Invoker invoker = new Invoker("target/test-repo", Env.getMavenHome());
         InvocationResult result = invoker.execute("pom.xml", "compile");
         assertThat( "Exit code should be zero", result.getExitCode(), is(0) );
