@@ -1,5 +1,2 @@
 language: java
 install: mvn install -DskipTests=true -Dgpg.skip=true
-before_install:
- - sudo apt-get update -qq
- - sudo apt-get install -qq maven2
