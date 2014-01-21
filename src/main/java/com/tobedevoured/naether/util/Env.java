@@ -18,4 +18,9 @@ public class Env {
 
         return mavenHome;
     }
+
+    public static String get(String name ){
+        Map<String, String> env = System.getenv();
+        return env.get(name);
+    }
 }

@@ -1,2 +1,3 @@
+env: TRAVIS=yes
 language: java
 install: mvn install -DskipTests=true -Dgpg.skip=true
