@@ -83,7 +83,7 @@ public class ClassLoaderTest {
 	public void createNaether() throws Exception {
 		Naether naether = new NaetherImpl();
 		naether.setLocalRepoPath( "target/test-repo" );
-		naether.addDependencies( "pom.xml" );
+		naether.addDependencies( "pom.xml", Arrays.asList( "runtime", "compile" ) );
 		naether.resolveDependencies();
 		
 		Map<String,String> paths = naether.getDependenciesPath();

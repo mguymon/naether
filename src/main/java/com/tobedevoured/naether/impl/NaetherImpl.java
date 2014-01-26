@@ -35,34 +35,35 @@ import java.util.Set;
 import org.apache.maven.model.Repository;
 
 // SLF4J Logger
+import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // Sonatype Aether
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.artifact.ArtifactType;
-import org.sonatype.aether.collection.CollectRequest;
-import org.sonatype.aether.collection.CollectResult;
-import org.sonatype.aether.collection.DependencyCollectionException;
-import org.sonatype.aether.deployment.DeployRequest;
-import org.sonatype.aether.deployment.DeploymentException;
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.graph.Exclusion;
-import org.sonatype.aether.installation.InstallRequest;
-import org.sonatype.aether.installation.InstallationException;
-import org.sonatype.aether.repository.Authentication;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.resolution.DependencyRequest;
-import org.sonatype.aether.resolution.DependencyResolutionException;
-import org.sonatype.aether.resolution.DependencyResult;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.util.artifact.DefaultArtifactType;
-import org.sonatype.aether.util.artifact.SubArtifact;
-import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.deployment.DeployRequest;
+import org.eclipse.aether.deployment.DeploymentException;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.Exclusion;
+import org.eclipse.aether.installation.InstallRequest;
+import org.eclipse.aether.installation.InstallationException;
+import org.eclipse.aether.repository.Authentication;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.resolution.DependencyResult;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.DefaultArtifactType;
+import org.eclipse.aether.util.artifact.SubArtifact;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 // Naether
 import com.tobedevoured.naether.Const;
@@ -118,7 +119,7 @@ public class NaetherImpl implements Naether {
         // Set the initial HashSet
         this.repositoryIds = new HashSet<String>();
 		
-		addRemoteRepository("central", "default", "http://repo1.maven.org/maven2/");
+		addRemoteRepository("central", "default", "http://repo.maven.apache.org/maven2/");
 
 		Map<String, String> env = System.getenv();
 		String m2Repo = env.get("M2_REPO");
@@ -218,7 +219,7 @@ public class NaetherImpl implements Naether {
 		
 		if ( Const.TEST.equals( artifact.getClassifier() ) || Const.TEST_JAR.equals( artifact.getClassifier() ) ) {
 			
-			ArtifactType artifactType = new DefaultArtifactType( Const.TEST_JAR, Const.JAR, Const.TEST_JAR, null );
+			ArtifactType artifactType = new DefaultArtifactType( Const.TEST_JAR, Const.JAR, Const.TEST_JAR, (Map)null );
 			
 			artifact = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(),
 					null, Const.JAR, artifact.getBaseVersion(), artifactType );
@@ -228,13 +229,13 @@ public class NaetherImpl implements Naether {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.tobedevoured.naether.api.Naether#addDependency(org.sonatype.aether.graph.Dependency)
+	 * @see com.tobedevoured.naether.api.Naether#addDependency(org.eclipse.aether.graph.Dependency)
 	 */
 	public void addDependency(Dependency dependency) {
 		Dependency newDep = null;
 		String classifier = dependency.getArtifact().getClassifier();
 		if ( Const.TEST.equals( classifier ) || Const.TEST_JAR.equals( classifier ) ) {
-			ArtifactType artifactType = new DefaultArtifactType( Const.TEST_JAR, Const.JAR, Const.TEST_JAR, null );
+			ArtifactType artifactType = new DefaultArtifactType( Const.TEST_JAR, Const.JAR, Const.TEST_JAR, (Map)null );
 			
 			Artifact artifact = dependency.getArtifact();
 			
@@ -257,7 +258,7 @@ public class NaetherImpl implements Naether {
 		
 		if ( Const.TEST.equals( projectDependency.getType() ) || Const.TEST_JAR.equals( projectDependency.getType() ) ) {
 			
-			ArtifactType artifactType = new DefaultArtifactType( Const.TEST_JAR, Const.JAR, Const.TEST_JAR, null );
+			ArtifactType artifactType = new DefaultArtifactType( Const.TEST_JAR, Const.JAR, Const.TEST_JAR, (Map)null );
 			
 			artifact = new DefaultArtifact( projectDependency.getGroupId(), projectDependency.getArtifactId(),
 					null, Const.JAR, projectDependency.getVersion(), artifactType );
@@ -355,12 +356,14 @@ public class NaetherImpl implements Naether {
 	public void addRemoteRepositoryByUrl(String url, String username, String password) throws URLException {
 		RemoteRepository remoteRepo;
 		try {
-			remoteRepo = RepoBuilder.remoteRepositoryFromUrl(url);
+			remoteRepo = RepoBuilder.remoteRepositoryFromUrl(url, username, password);
 		} catch (MalformedURLException e) {
 			throw new URLException(e);
 		}
-		remoteRepo = remoteRepo.setAuthentication(new Authentication(username, password));
-		addRemoteRepository(remoteRepo);
+
+        if (this.repositoryIds.add(remoteRepo.getId()) ) {
+		    addRemoteRepository(remoteRepo);
+        }
 	}
 
 	/* (non-Javadoc)
@@ -368,12 +371,12 @@ public class NaetherImpl implements Naether {
 	 */
 	public final void addRemoteRepository(String id, String type, String url) {
         if (this.repositoryIds.add(id) ) {
-		    getRemoteRepositories().add(new RemoteRepository(id, type, url));
+		    getRemoteRepositories().add((new RemoteRepository.Builder(id, type, url).build()));
         }
 	}
 
 	/* (non-Javadoc)
-	 * @see com.tobedevoured.naether.api.Naether#addRemoteRepository(org.sonatype.aether.repository.RemoteRepository)
+	 * @see com.tobedevoured.naether.api.Naether#addRemoteRepository(org.eclipse.aether.repository.RemoteRepository)
 	 */
 	public void addRemoteRepository(RemoteRepository remoteRepository) {
         if (this.repositoryIds.add(remoteRepository.getId()) ) {
@@ -449,12 +452,14 @@ public class NaetherImpl implements Naether {
 		
 		CollectRequest collectRequest = new CollectRequest();
 		collectRequest.setDependencies( new ArrayList<Dependency>(getDependencies()));
-		
+
+        /*
 		try {
 			collectRequest.addRepository(RepoBuilder.remoteRepositoryFromUrl("file:" + this.getLocalRepoPath()));
 		} catch (MalformedURLException e) {
 			throw new URLException("Failed to add local repo to request", e);
 		}
+       */
 
 		for (RemoteRepository repo : getRemoteRepositories()) {
 			collectRequest.addRepository(repo);
@@ -538,7 +543,7 @@ public class NaetherImpl implements Naether {
 			Map<String,String> notationMap = Notation.parse( notation );
 			notationMap.put( "type", Const.POM );
 			
-			org.sonatype.aether.spi.connector.ArtifactDownload at;
+			org.eclipse.aether.spi.connector.ArtifactDownload at;
 			
 			DefaultArtifact pomArtifact = new DefaultArtifact( Notation.generate(notationMap) );
 			pomArtifact = (DefaultArtifact)pomArtifact.setFile( new File(pomPath ) );

@@ -26,14 +26,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.repository.internal.DefaultServiceLocator;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManagerFactory;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.LocalRepositoryManager;
-import org.sonatype.aether.repository.NoLocalRepositoryManagerException;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.impl.DefaultServiceLocator;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
+import org.eclipse.aether.artifact.DefaultArtifact;
 
 import com.tobedevoured.naether.Const;
 import com.tobedevoured.naether.NaetherException;
@@ -100,13 +101,13 @@ public final class Notation {
 	}
 	
 	/**
-	 * Convert a {@link org.sonatype.aether.graph.Dependency} to String notation of
+	 * Convert a {@link org.eclipse.aether.graph.Dependency} to String notation of
 	 * groupId:artifactId:extension:version or groupId:artifactId::type:classifier:version
 	 * 
 	 * @param dependency
 	 * @return String notation
 	 */
-	public static String generate(org.sonatype.aether.graph.Dependency dependency) {
+	public static String generate(org.eclipse.aether.graph.Dependency dependency) {
 		return dependency.getArtifact().toString();		
 	}
 	
@@ -180,7 +181,7 @@ public final class Notation {
 	 * Convert a {@link Artifact} to String notation of
 	 * groupId:artifactId::type:classifier:version
 	 * 
-	 * @param dependency
+	 * @param artifact {@link Artifact}
 	 * @return String notation
 	 */
 	public static String generate(Artifact artifact) {
@@ -200,30 +201,23 @@ public final class Notation {
 	
 	/**
 	 * Get local paths for notations
-	 * 
-	 * @param localRepoPath String path
+	 *
 	 * @param notations List<String> of notations
 	 * @return List<String> of paths
 	 * @throws NaetherException
 	 */
-	public static List<String> getLocalPaths( String localRepoPath, List<String> notations ) throws NaetherException {
+	public static List<String> getLocalPaths( RepositorySystemSession repoSession, List<String> notations ) throws NaetherException {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		SimpleLocalRepositoryManagerFactory factory = new SimpleLocalRepositoryManagerFactory();
 		factory.initService( locator );
-		
-		LocalRepository localRepo = new LocalRepository(localRepoPath);
-		LocalRepositoryManager manager = null;
-		try {
-			manager = factory.newInstance( localRepo );
-		} catch (NoLocalRepositoryManagerException e) {
-			throw new NaetherException( "Failed to initial local repository manage", e  );
-		}
+
+		LocalRepositoryManager manager = repoSession.getLocalRepositoryManager();
 		
 		List<String> localPaths = new ArrayList<String>();
 		
 		for ( String notation : notations ) {
 			Dependency dependency = new Dependency(new DefaultArtifact(notation), "compile");
-			String path = new StringBuilder( localRepo.getBasedir().getAbsolutePath() )
+			String path = new StringBuilder( repoSession.getLocalRepository().getBasedir().getAbsolutePath() )
 				.append( File.separator ).append( manager.getPathForLocalArtifact( dependency.getArtifact() ) ).toString();
 			localPaths.add( path );
 		}

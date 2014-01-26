@@ -23,9 +23,10 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.tobedevoured.naether.repo.RepositoryClient;
 import org.junit.Test;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 
 import com.tobedevoured.naether.NaetherException;
 import com.tobedevoured.naether.util.Notation;
@@ -63,6 +64,9 @@ public class NotationTest {
 
 	@Test
 	public void getLocalPaths() throws NaetherException {
-		assertTrue( "Path to junit in test repo", Notation.getLocalPaths( "target/test-repo", Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
+        RepositoryClient client = new RepositoryClient("target/test-repo");
+        client.newRepositorySystem();
+
+		assertTrue( "Path to junit in test repo", Notation.getLocalPaths( client.getSystemSession(), Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
 	}
 }

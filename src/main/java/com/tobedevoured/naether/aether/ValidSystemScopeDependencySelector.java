@@ -20,9 +20,9 @@ package com.tobedevoured.naether.aether;
 
 import java.io.File;
 
-import org.sonatype.aether.collection.DependencyCollectionContext;
-import org.sonatype.aether.collection.DependencySelector;
-import org.sonatype.aether.graph.Dependency;
+import org.eclipse.aether.collection.DependencyCollectionContext;
+import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.graph.Dependency;
 
 /**
  * {@link DependencySelector} that checks the existence of system scoped 

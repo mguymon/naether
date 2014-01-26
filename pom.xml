@@ -40,11 +40,25 @@
         </repository>
     </distributionManagement>
 
+    <repositories>
+        <repository>
+            <id>JBoss Repo</id>
+            <url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <name>JBoss Repo</name>
+        </repository>
+        <repository>
+            <id>JBoss Deprecated Repo</id>
+            <url>https://repository.jboss.org/nexus/content/repositories/deprecated/</url>
+            <name>JBoss Dep Repo</name>
+        </repository>
+    </repositories>
+
+
     <properties>
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <aetherVersion>1.13.1</aetherVersion>
-        <mavenVersion>3.0.3</mavenVersion>
+        <aetherVersion>0.9.0.M4</aetherVersion>
+        <mavenVersion>3.1.0</mavenVersion>
         <wagonVersion>1.0</wagonVersion>
         <org.slf4j.version>1.6.6</org.slf4j.version>
         <maven.compiler.source>1.5</maven.compiler.source>
@@ -79,51 +93,39 @@
 
         <!-- Aeth -->
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
+            <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-api</artifactId>
             <version>${aetherVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
+            <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-util</artifactId>
             <version>${aetherVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
+            <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-impl</artifactId>
             <version>${aetherVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-spi</artifactId>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-connector-basic</artifactId>
             <version>${aetherVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-connector-file</artifactId>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-file</artifactId>
             <version>${aetherVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-connector-asynchttpclient</artifactId>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-http</artifactId>
             <version>${aetherVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>netty</artifactId>
-                    <groupId>org.jboss.netty</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-connector-wagon</artifactId>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-wagon</artifactId>
             <version>${aetherVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>sisu-inject-plexus</artifactId>
-                    <groupId>org.sonatype.sisu</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>

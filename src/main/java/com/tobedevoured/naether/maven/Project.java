@@ -44,7 +44,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 // SLF4J
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
 
 import com.tobedevoured.naether.util.Notation;
 import com.tobedevoured.naether.util.RepoBuilder;
@@ -389,10 +389,10 @@ public class Project {
 	}
 	
 	/**
-	 * Add a Dependency of {@link org.sonatype.aether.graph.Dependency}
-	 * @param aetherDep {@link org.sonatype.aether.graph.Dependency}
+	 * Add a Dependency of {@link org.eclipse.aether.graph.Dependency}
+	 * @param aetherDep {@link org.eclipse.aether.graph.Dependency}
 	 */
-	public void addDependency(org.sonatype.aether.graph.Dependency aetherDep) {
+	public void addDependency(org.eclipse.aether.graph.Dependency aetherDep) {
 		Artifact artifact = aetherDep.getArtifact();
 		
 		Dependency dependency = new Dependency();
@@ -407,10 +407,10 @@ public class Project {
 	/**
 	 * Set Dependencies
 	 * 
-	 * @param dependencies Collection<org.sonatype.aether.graph.Dependency>
+	 * @param dependencies Collection<org.eclipse.aether.graph.Dependency>
 	 */
-	public void setDependencies( Collection<org.sonatype.aether.graph.Dependency> dependencies ) {
-		for ( org.sonatype.aether.graph.Dependency dep : dependencies ) {
+	public void setDependencies( Collection<org.eclipse.aether.graph.Dependency> dependencies ) {
+		for ( org.eclipse.aether.graph.Dependency dep : dependencies ) {
 			addDependency( dep );
 		}
 	}

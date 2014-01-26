@@ -22,7 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.maven.model.Repository;
-import org.sonatype.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.util.repository.AuthenticationBuilder;
 
 /**
  * Helper for creating repository objects
@@ -33,15 +34,28 @@ import org.sonatype.aether.repository.RemoteRepository;
 public final class RepoBuilder {
 
 	private RepoBuilder() { }
-	
-	/**
-	 * Create a {@link RemoteRepository} from a String url
-	 * 
-	 * @param url
-	 * @return {@link RemoteRepository}
-	 * @throws MalformedURLException
-	 */
-	public static RemoteRepository remoteRepositoryFromUrl(String url) throws MalformedURLException {
+
+    /**
+     * Create a {@link RemoteRepository} from a String url
+     *
+     * @param url
+     * @return {@link RemoteRepository}
+     * @throws MalformedURLException
+     */
+    public static RemoteRepository remoteRepositoryFromUrl(String url) throws MalformedURLException {
+        return remoteRepositoryFromUrl( url, null, null );
+    }
+
+        /**
+         * Create a {@link RemoteRepository} from a String url, username, and password
+         *
+         * @param url
+         * @param username
+         * @param password
+         * @return {@link RemoteRepository}
+         * @throws MalformedURLException
+         */
+	public static RemoteRepository remoteRepositoryFromUrl(String url, String username, String password) throws MalformedURLException {
 		URL parsedUrl = new URL(url);
 
 		StringBuffer id = new StringBuffer(parsedUrl.getHost());
@@ -57,7 +71,16 @@ public final class RepoBuilder {
 			id.append(parsedUrl.getPort());
 		}
 
-		return new RemoteRepository(id.toString(), "default", url);
+        RemoteRepository.Builder repoBuilder = new RemoteRepository.Builder(id.toString(), "default", url);
+
+        if ( username != null || password != null ) {
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.addUsername(username);
+            authBuilder.addPassword(password);
+            repoBuilder.setAuthentication( authBuilder.build() );
+        }
+
+        return repoBuilder.build();
 	}
 	
 	/**
@@ -87,7 +110,7 @@ public final class RepoBuilder {
 		repo.setId( id.toString() );
 		repo.setName( parsedUrl.getHost() );
 		repo.setUrl( url );
-		
+
 		return repo;
 	}
 }

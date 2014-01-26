@@ -29,8 +29,8 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.artifact.DefaultArtifact;
 
 import com.tobedevoured.naether.api.Naether;
 import com.tobedevoured.naether.deploy.InstallException;

@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.deployment.DeploymentException;
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.repository.RemoteRepository;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.deployment.DeploymentException;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.repository.RemoteRepository;
 
 import com.tobedevoured.naether.DependencyException;
 import com.tobedevoured.naether.NaetherException;
@@ -112,7 +112,7 @@ public interface Naether {
 	/**
 	 * Add dependencies from a Maven POM
 	 * 
-	 * @param project {@link Model}
+	 * @param project {@link Project}
 	 * @throws ProjectException 
 	 * @see {{@link #addDependencies(Project, List)}
 	 */
@@ -140,7 +140,6 @@ public interface Naether {
 	 * 
 	 * @param url String
 	 * @throws URLException
-	 * @throws MalformedURLException
 	 */
 	void addRemoteRepositoryByUrl(String url)
 			throws NaetherException;
@@ -153,7 +152,6 @@ public interface Naether {
 	 * @param username String
 	 * @param password String
 	 * @throws URLException
-	 * @throws MalformedURLException
 	 */
 	void addRemoteRepositoryByUrl(String url, String username,
 			String password) throws URLException;
@@ -244,9 +242,9 @@ public interface Naether {
 	 * If installing a POM, filePath can be null. If install a Jar without a POM, pomPath
 	 * can be null.
 	 * 
-	 * @param String notation String
-	 * @param String pomPath String
-	 * @param String filePath String
+	 * @param notation String
+	 * @param pomPath String
+	 * @param filePath String
 	 * @throws InstallException
 	 */
 	void install(String notation, String pomPath, String filePath) throws InstallException;

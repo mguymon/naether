@@ -23,13 +23,14 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 // Sonatype Aether
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.repository.Authentication;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.util.artifact.SubArtifact;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.repository.Authentication;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.util.artifact.SubArtifact;
 
 import com.tobedevoured.naether.util.RepoBuilder;
+import org.eclipse.aether.util.repository.AuthenticationBuilder;
 
 /**
  * Information for deploying an {@link Artifact}
@@ -62,19 +63,31 @@ public class DeployArtifact {
 	}
 	
 	public void setAuth( String username, String password ) {
-		authentication = new Authentication( username, password );
-		
-		if ( getRemoteRepo() != null ) {
-			getRemoteRepo().setAuthentication( authentication );
+        final AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+        authBuilder.addUsername(username);
+        authBuilder.addPassword(password);
+        authentication = authBuilder.build();
+
+        // If RemoteRepo was already set, reapply to set the new auth settings
+        if ( getRemoteRepo() != null ) {
+           setRemoteRepo( getRemoteRepo() );
 		}
 	}
-	
-	public void setAuth( String username, String password, String publicKeyFile, String passphrase ) {
-		authentication = new Authentication( username, password, publicKeyFile, passphrase );
-		
-		if ( getRemoteRepo() != null ) {
-			getRemoteRepo().setAuthentication( authentication );
-		}
+
+	public void setAuth( String username, String password, String keyFile, String passphrase ) {
+
+        final AuthenticationBuilder authBuilder = new AuthenticationBuilder();;
+        authBuilder.addUsername(username);
+        authBuilder.addPassword(password);
+        authBuilder.addPrivateKey(keyFile, passphrase);
+
+        authentication = authBuilder.build();
+
+        // If RemoteRepo was already set, reapply to set the new auth settings
+        if ( getRemoteRepo() != null ) {
+            setRemoteRepo( getRemoteRepo() );
+        }
+
 	}
 
 
@@ -84,9 +97,11 @@ public class DeployArtifact {
 	
 	public void setRemoteRepo( RemoteRepository remoteRepo ) {
 		this.remoteRepo = remoteRepo;
-		
+
 		if ( authentication != null ) {
-			getRemoteRepo().setAuthentication( authentication );
+            RemoteRepository.Builder repoBuilder = new RemoteRepository.Builder( this.remoteRepo );
+            repoBuilder.setAuthentication( authentication );
+			remoteRepo = repoBuilder.build();
 		}
 	}
 	
