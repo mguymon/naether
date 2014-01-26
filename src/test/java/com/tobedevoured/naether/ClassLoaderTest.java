@@ -24,7 +24,7 @@ public class ClassLoaderTest {
 	
 	@Before
 	public void setup() {
-		classLoader = new PathClassLoader( this.getClass().getClassLoader() );
+		classLoader = new PathClassLoader();
 	}
 	
 	@Test
@@ -77,25 +77,6 @@ public class ClassLoaderTest {
 		assertEquals( "java.io.File", file.getClass().getName() );
 		
 		assertEquals( "Gemfile", file.getPath() );
-	}
-	
-	@Test
-	public void createNaether() throws Exception {
-		Naether naether = new NaetherImpl();
-		naether.setLocalRepoPath( "target/test-repo" );
-		naether.addDependencies( "pom.xml", Arrays.asList( "runtime", "compile" ) );
-		naether.resolveDependencies();
-		
-		Map<String,String> paths = naether.getDependenciesPath();
-		
-		classLoader.addPath( "target/classes" );
-		for (Map.Entry<String, String> entry : paths.entrySet() ) {
-			classLoader.addPath( entry.getValue() );
-		}
-		
-		Object instance = classLoader.newInstance( NaetherImpl.class.getName() );
-		assertEquals( NaetherImpl.class.getName(), instance.getClass().getName() );
-		assertTrue( NaetherImpl.class.equals( instance.getClass() ) );
 	}
 	
 	@Test
