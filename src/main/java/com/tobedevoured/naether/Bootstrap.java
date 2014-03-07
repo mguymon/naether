@@ -42,7 +42,7 @@ public final class Bootstrap {
 		deps.add("com.jcraft:jsch:jar:0.1.44-1");
 		deps.add("com.ning:async-http-client:jar:1.6.5");
 		deps.add("commons-io:commons-io:jar:2.0.1");
-        deps.add("org.apache.maven.shared:maven-invoker:jar:2.1.1");
+    deps.add("org.apache.maven.shared:maven-invoker:jar:2.1.1");
 		deps.add("org.apache.maven:maven-aether-provider:jar:3.0.3");
 		deps.add("org.apache.maven:maven-model:jar:3.0.3");
 		deps.add("org.apache.maven:maven-model-builder:jar:3.0.3");
