@@ -5,9 +5,10 @@
 * Fix check that `Naether::Configuration` is initialized [(#9)](https://github.com/mguymon/naether/issues/9)
 * Updated Jeweler dep
 
-#### 0.13.1 (March 6, 2014)
+#### 0.13.3 (March 6, 2014)
 
 * Set default logging level from LogBack to ERROR
+* Backport logback's NopStatusListener to keep logback form being so chatty on startup
 
 ### 0.12.0 (October 1, 2013)
 
