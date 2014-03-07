@@ -117,7 +117,7 @@ describe Naether do
            "org.sonatype.aether:aether-api:jar:1.13.1", 
            "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13.1", 
            "org.apache.maven.wagon:wagon-file:jar:1.0", 
-           "org.slf4j:jcl-over-slf4j:jar:1.6.6", "ch.qos.logback:logback-classic:jar:1.0.6", 
+           "org.slf4j:jcl-over-slf4j:jar:1.6.6", 
            "does.not:exist:jar:0.1", "org.sonatype.aether:aether-util:jar:1.13.1", 
            "org.sonatype.aether:aether-impl:jar:1.13.1", 
            "org.apache.maven.wagon:wagon-ssh:jar:1.0", 
@@ -197,13 +197,5 @@ describe Naether do
       File.exists?( 'target/test-repo/test/test/22.3/test-22.3.jar' ).should be_true
     end
    
-    it "should change logging level" do
-      @naether.set_log_level( 'debug' )
-      Naether::Java.exec_static_method("com.tobedevoured.naether.util.LogUtil", 'getLogLevel', "com.tobedevoured").toString().should eql( "DEBUG" )
-      
-      @naether.set_log_level( 'info' )
-      Naether::Java.exec_static_method("com.tobedevoured.naether.util.LogUtil", 'getLogLevel', "com.tobedevoured").toString().should eql( "INFO" )
-          
-    end
   end
 end

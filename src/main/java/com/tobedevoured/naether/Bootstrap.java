@@ -37,8 +37,6 @@ public final class Bootstrap {
 	public static final List<String> DEPENDENCIES;
 	static {
 		List<String> deps = new ArrayList<String>();
-		deps.add("ch.qos.logback:logback-classic:jar:1.0.6");
-		deps.add("ch.qos.logback:logback-core:jar:1.0.6");
 		deps.add("com.jcraft:jsch:jar:0.1.44-1");
 		deps.add("com.ning:async-http-client:jar:1.6.5");
 		deps.add("commons-io:commons-io:jar:2.0.1");

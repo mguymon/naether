@@ -1,7 +1,5 @@
 ---
 :dependencies:
-- ch.qos.logback:logback-classic:jar:1.0.6
-- ch.qos.logback:logback-core:jar:1.0.6
 - com.jcraft:jsch:jar:0.1.44-1
 - com.ning:async-http-client:jar:1.6.5
 - commons-io:commons-io:jar:2.0.1

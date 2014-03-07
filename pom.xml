@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tobedevoured.naether</groupId>
     <artifactId>core</artifactId>
-    <version>0.13.3</version>
+    <version>0.13.4</version>
     <name>Naether</name>
     <packaging>jar</packaging>
     <url>https://github.com/mguymon/naether</url>
@@ -54,11 +54,6 @@
     <dependencies>
 
         <!--  Logging -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.0.6</version>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
