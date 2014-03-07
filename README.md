@@ -24,7 +24,7 @@ The jar dependencies for Naether will automatically be downloaded when the gem i
     <dependency>
       <groupId>com.tobedevoured.naether</groupId>
       <artifactId>naether</artifactId>
-      <version>0.13.0</version>
+      <version>0.13.3</version>
     </dependency>
    
 May have to add the Sonatype Repo if the sync to Maven Central is slow.
