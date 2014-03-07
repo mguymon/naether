@@ -15,10 +15,10 @@
 * Add support for executing Maven goals from Naether
 * Hookup Travis for integration tests for Java
 
-### 0.12.1 (October 2, 2013)
+#### 0.12.1 (October 2, 2013)
 
 * Use ModelBuilder to load POM instead of MavenXpp3Reader
 
-### 0.12.2 (October 2, 2013)
+#### 0.12.2 (October 2, 2013)
 
 * Check MAVEN_HOME env for excuting the Maven goal invoker
