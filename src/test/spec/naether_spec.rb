@@ -116,13 +116,13 @@ describe Naether do
          [ "org.apache.maven.wagon:wagon-http-lightweight:jar:1.0", 
            "org.sonatype.aether:aether-api:jar:1.13.1", 
            "org.sonatype.aether:aether-connector-asynchttpclient:jar:1.13.1", 
-           "org.apache.maven.wagon:wagon-file:jar:1.0", 
-           "org.slf4j:jcl-over-slf4j:jar:1.6.6", 
+           "org.apache.maven.wagon:wagon-file:jar:1.0", "org.slf4j:slf4j-jdk14:jar:1.7.6",
+           "org.slf4j:jcl-over-slf4j:jar:1.7.6", 
            "does.not:exist:jar:0.1", "org.sonatype.aether:aether-util:jar:1.13.1", 
            "org.sonatype.aether:aether-impl:jar:1.13.1", 
            "org.apache.maven.wagon:wagon-ssh:jar:1.0", 
            "org.apache.maven:maven-aether-provider:jar:3.0.3", 
-           "org.slf4j:log4j-over-slf4j:jar:1.6.6", 
+           "org.slf4j:log4j-over-slf4j:jar:1.7.6", 
            "org.sonatype.aether:aether-connector-wagon:jar:1.13.1", 
            "org.sonatype.aether:aether-connector-file:jar:1.13.1" ].each do |notation|
             
