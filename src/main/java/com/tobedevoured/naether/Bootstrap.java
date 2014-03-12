@@ -23,14 +23,14 @@ import java.util.List;
 
 /**
  * Helper for bootstrapping Naether
- * 
+ *
  * @author Michael Guymon
- * 
+ *
  */
 public final class Bootstrap {
 
-	private Bootstrap() { } 
-	
+	private Bootstrap() { }
+
 	/**
 	 * Dependencies for Naether to run
 	 */
@@ -59,6 +59,7 @@ public final class Bootstrap {
 		deps.add("org.jsoup:jsoup:jar:1.6.1");
 		deps.add("org.slf4j:slf4j-jdk14:jar:1.7.6");
 		deps.add("org.slf4j:slf4j-api:jar:1.7.6");
+		deps.add("org.slf4j:slf4j-simple:jar:1.7.6");
 		deps.add("org.slf4j:jcl-over-slf4j:jar:1.7.6");
 		deps.add("org.slf4j:log4j-over-slf4j:jar:1.7.6");
 		deps.add("org.sonatype.aether:aether-api:jar:1.13.1");
@@ -70,7 +71,7 @@ public final class Bootstrap {
 		deps.add("org.sonatype.aether:aether-connector-wagon:jar:1.13.1");
 		DEPENDENCIES = deps;
 	}
-	
+
 	public static List<String> dependencies() {
 		return DEPENDENCIES;
 	}

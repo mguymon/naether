@@ -22,6 +22,7 @@
 - org.jsoup:jsoup:jar:1.6.1
 - org.slf4j:slf4j-jdk14:jar:1.7.6
 - org.slf4j:slf4j-api:jar:1.7.6
+- org.slf4j:slf4j-simple:jar:1.7.6
 - org.slf4j:jcl-over-slf4j:jar:1.7.6
 - org.slf4j:log4j-over-slf4j:jar:1.7.6
 - org.sonatype.aether:aether-api:jar:1.13.1
