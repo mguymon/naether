@@ -57,11 +57,8 @@ public final class Bootstrap {
 		deps.add("org.codehaus.plexus:plexus-interpolation:jar:1.14");
 		deps.add("org.codehaus.plexus:plexus-utils:jar:3.0.8");
 		deps.add("org.jsoup:jsoup:jar:1.6.1");
-		deps.add("org.slf4j:slf4j-jdk14:jar:1.7.6");
 		deps.add("org.slf4j:slf4j-api:jar:1.7.6");
 		deps.add("org.slf4j:slf4j-simple:jar:1.7.6");
-		deps.add("org.slf4j:jcl-over-slf4j:jar:1.7.6");
-		deps.add("org.slf4j:log4j-over-slf4j:jar:1.7.6");
 		deps.add("org.sonatype.aether:aether-api:jar:1.13.1");
 		deps.add("org.sonatype.aether:aether-util:jar:1.13.1");
 		deps.add("org.sonatype.aether:aether-impl:jar:1.13.1");
