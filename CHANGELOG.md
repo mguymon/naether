@@ -10,6 +10,10 @@
 * Set default logging level from LogBack to ERROR
 * Use JDK logging instead of Logback to avoid conflict on logback.xml
 
+#### 0.13.7 (March 14, 20014)
+
+* Use simple logger instead of JDK logger, remove slf4j bridge for jdk and log4j [(#13)](https://github.com/mguymon/naether/pull/13) [[thanks ramarnat]](https://github.com/ramarnat)
+
 ### 0.12.0 (October 1, 2013)
 
 * Add support for executing Maven goals from Naether
