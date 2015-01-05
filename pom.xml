@@ -47,8 +47,6 @@
         <mavenVersion>3.0.3</mavenVersion>
         <wagonVersion>1.0</wagonVersion>
         <org.slf4j.version>1.7.6</org.slf4j.version>
-        <maven.compiler.source>1.5</maven.compiler.source>
-        <maven.compiler.target>1.5</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -120,6 +118,11 @@
                     <groupId>org.sonatype.sisu</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>3.0.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>

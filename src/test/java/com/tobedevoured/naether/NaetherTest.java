@@ -217,12 +217,10 @@ public class NaetherTest {
         results.put("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE", ormDeps);
         
         Map<String,Map> graph = naether.getDependenciesGraph();
-        
-        // XXX: Map equality wont place nice (even with Map instead of LinkedHashMap). 
-        assertEquals( results.toString(), graph.toString() );
-        
+        assertEquals( results, graph );
+
         Set<String> resolvedDependencies = naether.getDependenciesNotation();
-		
+
 		Set<String> dependencies = new HashSet<String>();
         dependencies.add("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE");
         dependencies.add("org.springframework:org.springframework.beans:jar:3.0.5.RELEASE");
@@ -414,21 +412,22 @@ public class NaetherTest {
 		}
 		
 		List<String> completeDeps = Bootstrap.DEPENDENCIES;
-		
-		assertEquals( completeDeps.size(), naether.getDependenciesNotation().size() );
-		
+        Set<String> resolvedDeps = naether.getDependenciesNotation();
+
+		assertEquals( completeDeps.size(), resolvedDeps.size() );
+
 		List<String> missingDeps = new ArrayList<String>();
         for( String dep : completeDeps ) {
         	if ( !naether.getDependenciesNotation().contains( dep ) ) {
         		missingDeps.add( dep );
         	}
         }
-        
+
         if ( missingDeps.size() > 0 ) {
         	LoggerFactory.getLogger(this.getClass()).warn( "Resolved Deps: {}", naether.getDependenciesNotation() );
         	fail( "Missing Dependencies: " + missingDeps );
         }
-		
+
 	}
 	
 	@Test
