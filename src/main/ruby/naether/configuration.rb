@@ -59,8 +59,15 @@ module Naether
       end
     end
   end
-  
-  unless defined?(Naether::Configuration)
-    Naether::Configuration = Naether::Configurator.new
+
+  if RUBY_VERSION == '1.8.7'
+    unless Naether.const_defined?('Configuration')
+      Naether::Configuration = Naether::Configurator.new
+    end
+  else
+    unless Naether.const_defined?('Configuration', false)
+      Naether::Configuration = Naether::Configurator.new
+    end
   end
+
 end

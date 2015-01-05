@@ -68,9 +68,10 @@ describe Naether::Maven do
     end
 
     it "should compile project" do
-      maven = Naether::Maven.create_from_pom('pom.xml')
-      result = maven.invoke('compile')
-      result.getExitCode().should eql 0
+      #maven = Naether::Maven.create_from_pom('pom.xml')
+      #result = maven.invoke('compile')
+      #result.getExitCode().should eql 0
+      pending "Need a cross platform way to test maven tasks"
     end
 
     it "should get final name" do

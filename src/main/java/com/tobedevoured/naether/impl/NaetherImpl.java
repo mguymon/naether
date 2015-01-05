@@ -94,7 +94,7 @@ public class NaetherImpl implements Naether {
 	private Set<Dependency> dependencies;
 	private List<Artifact> buildArtifacts;
 	private Set<RemoteRepository> remoteRepositories;
-    private Set<String> repositoryIds;
+  private Set<String> repositoryIds;
 	private PreorderNodeListGenerator preorderedNodeList;
 
 	/**
