@@ -44,7 +44,7 @@ public class PathClassLoader extends URLClassLoader {
 	 * 
 	 * @param path String
 	 * @return boolean if path is loaded.
-	 * @throws MalformedURLException
+	 * @throws MalformedURLException exception
 	 */
 	public boolean addPath(String path) throws MalformedURLException {
 		File file = new File(path);
@@ -57,7 +57,7 @@ public class PathClassLoader extends URLClassLoader {
 	 * 
 	 * @param file {@link File}
 	 * @return boolean if file is loaded.
-	 * @throws MalformedURLException
+	 * @throws MalformedURLException exception
 	 */
 	public boolean addPath(File file) throws MalformedURLException {
 		URL url = file.toURI().toURL();
@@ -73,7 +73,7 @@ public class PathClassLoader extends URLClassLoader {
 	/**
 	 * Get paths loaded by ClassLoader
 	 * 
-	 * @return Set<URL>
+	 * @return Set
 	 */
 	public Set<URL> getLoadedPaths() {
 		return loadedPaths;
@@ -90,7 +90,7 @@ public class PathClassLoader extends URLClassLoader {
 	 * 
 	 * @param name String fully qualified class name
 	 * @return Object
-	 * @throws ClassLoaderException
+	 * @throws ClassLoaderException exception
 	 */
 	public Object newInstance( String name ) throws ClassLoaderException {
 		return newInstance( name, (Object[])null );
@@ -99,10 +99,10 @@ public class PathClassLoader extends URLClassLoader {
 	/**
 	 * Create new instance of Object with constructor parameters using the ClassLoader
 	 * 
-	 * @param name
+	 * @param name String
 	 * @param params Object parameters for constructor
 	 * @return Object
-	 * @throws ClassLoaderException
+	 * @throws ClassLoaderException exception
 	 */
 	public Object newInstance( String name, Object... params ) throws ClassLoaderException {
 		return newInstance( name, params, null );
@@ -111,11 +111,11 @@ public class PathClassLoader extends URLClassLoader {
 	/**
 	 * Create new instance of Object with constructor parameters using the ClassLoader
 	 * 
-	 * @param name
+	 * @param name String
 	 * @param params Object[] parameters for constructor
 	 * @param types String[] Class type for each parameter
 	 * @return Object
-	 * @throws ClassLoaderException
+	 * @throws ClassLoaderException exception
 	 */
 	public Object newInstance( String name, Object[] params, String[] types ) throws ClassLoaderException {
 		Class<?> clazz;
@@ -202,7 +202,7 @@ public class PathClassLoader extends URLClassLoader {
 	 * @param className String fully qualified class
 	 * @param methodName String method name
 	 * @return Object result
-	 * @throws ClassLoaderException
+	 * @throws ClassLoaderException exception
 	 */
 	public Object execStaticMethod( String className, String methodName ) throws ClassLoaderException {
 		return execStaticMethod( className, methodName, null );
@@ -215,7 +215,7 @@ public class PathClassLoader extends URLClassLoader {
 	 * @param methodName String method name
 	 * @param params List of method parameters
 	 * @return Object result
-	 * @throws ClassLoaderException
+	 * @throws ClassLoaderException exception
 	 */
 	public Object execStaticMethod( String className, String methodName, List params ) throws ClassLoaderException {
 		return execStaticMethod( className, methodName, params, null );
@@ -227,9 +227,9 @@ public class PathClassLoader extends URLClassLoader {
 	 * @param className String fully qualified class
 	 * @param methodName String method name
 	 * @param params List of method parameters
-	 * @param paramTypes List<String> of fully qualified class for each params.
+	 * @param paramTypes List of fully qualified class for each params.
 	 * @return Object result
-	 * @throws ClassLoaderException
+	 * @throws ClassLoaderException exception
 	 */
 	public Object execStaticMethod( String className, String methodName, List params, List<String> paramTypes ) throws ClassLoaderException {
 		Class<?> clazz;

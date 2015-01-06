@@ -63,9 +63,9 @@ public final class RepoBuilder {
 	/**
 	 * Create a {@link Repository} from a String url
 	 * 
-	 * @param url
+	 * @param url String
 	 * @return {@link Repository}
-	 * @throws MalformedURLException
+	 * @throws MalformedURLException exception
 	 */
 	public static Repository repositoryFromUrl(String url) throws MalformedURLException {
 		URL parsedUrl = new URL(url);

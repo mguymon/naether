@@ -74,32 +74,31 @@ public class Project {
 		setBasePath( new File("." ) );
 	}
 
-	/**
-	 * New Instance loading Maven pom. The {@link #setBasePath(File)} defaults
-	 * to the pom's parent directory.
-	 * 
-	 * @param pomPath String path
-	 * @throws ProjectException 
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws XmlPullParserException
-	 */
-	public Project(String pomPath) throws ProjectException {
-		this.mavenModel = loadPOM(pomPath, null);
+    /**
+     * New Instance loading Maven pom. The {@link #setBasePath(File)} defaults
+     * to the pom's parent directory.
+     *
+     * @param pomPath String path
+     * @throws ProjectException exception
+     */
+    public Project(String pomPath) throws ProjectException {
+        this.mavenModel = loadPOM(pomPath, null);
         this.mavenModel.setPomFile( new File(pomPath) );
 
-		File parent = (new File(pomPath)).getParentFile();
-		if ( parent != null ) {
-			setBasePath( (new File(pomPath)).getParentFile() );
-		} else {
-			setBasePath( new File("." ) );
-		}
-	}
+        File parent = (new File(pomPath)).getParentFile();
+        if ( parent != null ) {
+            setBasePath( (new File(pomPath)).getParentFile() );
+        } else {
+            setBasePath( new File("." ) );
+        }
+    }
 
 	/**
 	 * Load Maven pom
 	 * 
 	 * @param pomPath String path
+     * @param localRepo String
+     * @return {@link Model}
 	 * @throws ProjectException if fails to open, read, or parse the POM
 	 */
 	public static Model loadPOM(String pomPath, String localRepo) throws ProjectException {
@@ -177,7 +176,7 @@ public class Project {
 	 * Add a Repository to the Project
 	 * 
 	 * @param url String
-	 * @throws ProjectException
+	 * @throws ProjectException exception
 	 */
 	public void addRepository(String url) throws ProjectException {
 		List<Repository> repositories = getRepositories();
@@ -199,8 +198,8 @@ public class Project {
 	/**
 	 * Set Repositories
 	 * 
-	 * @param urls List<String>
-	 * @throws ProjectException
+	 * @param urls List
+	 * @throws ProjectException exception
 	 */
 	public void setRepositories( List<String> urls ) throws ProjectException {
 		List<Repository> repositories = new ArrayList<Repository>();
@@ -218,7 +217,7 @@ public class Project {
 	/**
 	 * Get Repositories
 	 * 
-	 * @return List<Repository>
+	 * @return List
 	 */
 	public List<Repository> getRepositories() {
 		return getMavenModel().getRepositories();
@@ -227,7 +226,7 @@ public class Project {
 	/**
 	 * Get List of Repositories as String url
 	 * 
-	 * @return List<String>
+	 * @return List
 	 */
 	public List<String> getRepositoryUrls() {
 		List<String> urls = new ArrayList<String>();
@@ -265,7 +264,7 @@ public class Project {
 	 * Get List of {@link Dependency} for the Maven Project for scopes compile
 	 * and runtime
 	 * 
-	 * @return List<Dependency>
+	 * @return List
 	 */
 	public List<Dependency> getDependencies() {
 		return getDependencies(null);
@@ -274,8 +273,8 @@ public class Project {
 	/**
 	 * Get List of {@link Dependency} for the Maven Project for specific scopes
 	 * 
-	 * @param scopes List<String>
-	 * @return List<Dependency>
+	 * @param scopes List
+	 * @return List
 	 */
 	public List<Dependency> getDependencies(List<String> scopes) {
 		log.debug( "Valid scopes: {}", scopes );
@@ -328,20 +327,19 @@ public class Project {
 	}
 
 	/**
-	 * Return {@link List<String>} of dependencies in the format of
-	 * {@code groupId:artifactId:packageType:version}
+	 * Return {@link List} of dependencies in the format of {@code groupId:artifactId:packageType:version}
 	 * 
-	 * @return List<String>
+	 * @return List
 	 */
 	public List<String> getDependenciesNotation() {
 		return getDependenciesNotation(null);
 	}
 
 	/**
-	 * Get List<String> of dependencies in format of
-	 * groupId:artifactId:packageType:version
-	 * 
-	 * @return List<String>
+	 * Get List of dependencies in format of groupId:artifactId:packageType:version
+	 *
+     * @param scopes List
+	 * @return List
 	 */
 	public List<String> getDependenciesNotation(List<String> scopes) {
 		List<String> notations = new ArrayList<String>();
@@ -407,7 +405,7 @@ public class Project {
 	/**
 	 * Set Dependencies
 	 * 
-	 * @param dependencies Collection<org.sonatype.aether.graph.Dependency>
+	 * @param dependencies Collection
 	 */
 	public void setDependencies( Collection<org.sonatype.aether.graph.Dependency> dependencies ) {
 		for ( org.sonatype.aether.graph.Dependency dep : dependencies ) {
@@ -480,7 +478,7 @@ public class Project {
 	 * Write pom to path
 	 * 
 	 * @param filePath String
-	 * @throws ProjectException
+	 * @throws ProjectException exception
 	 */
 	public void writePom(String filePath) throws ProjectException {
 		writePom( new File( filePath ) );
@@ -490,7 +488,7 @@ public class Project {
 	 * Write pom to {@link File}
 	 * 
 	 * @param file {@link File}
-	 * @throws ProjectException
+	 * @throws ProjectException exception
 	 */
 	public void writePom(File file) throws ProjectException {
 		log.debug("Writing pom: {}", file.getPath());
@@ -517,7 +515,7 @@ public class Project {
 	 * Convert Project to POM XML
 	 * 
 	 * @return String
-	 * @throws ProjectException
+	 * @throws ProjectException exception
 	 */
 	public String toXml() throws ProjectException {
 		log.debug("Writing xml");

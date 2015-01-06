@@ -86,6 +86,7 @@ public interface Naether {
 
 	/**
 	 * Add {@link org.apache.maven.model.Dependency}
+     * @param projectDependency {@link org.apache.maven.model.Dependency}
 	 */
 	void addDependency( org.apache.maven.model.Dependency projectDependency);
 
@@ -93,42 +94,36 @@ public interface Naether {
 	 * Add dependences from a Maven POM
 	 * 
 	 * @param pomPath String path to POM
-	 * @throws ProjectException
+	 * @throws ProjectException exception
 	 */
-	void addDependencies(String pomPath)
-			throws ProjectException;
+	void addDependencies(String pomPath) throws ProjectException;
 
 	/**
-	 * Add dependencies from a Maven POM, limited to a {@link List<String>} of scopes.
-	 * 
+	 * Add dependencies from a Maven POM, limited to a List of scopes.
+	 *
 	 * @param pomPath String path to POM
-	 * @param scopes Link<String> of scopes
-	 * @throws ProjectException
-	 * @see {{@link #addDependencies(Project, List)}
+	 * @param scopes List of scopes
+	 * @throws ProjectException exception
 	 */
-	void addDependencies(String pomPath, List<String> scopes)
-			throws ProjectException;
+	void addDependencies(String pomPath, List<String> scopes) throws ProjectException;
 
 	/**
 	 * Add dependencies from a Maven POM
 	 * 
-	 * @param project {@link Model}
-	 * @throws ProjectException 
-	 * @see {{@link #addDependencies(Project, List)}
+	 * @param project {@link Project}
+	 * @throws ProjectException exception
 	 */
-	void addDependencies(Project project)
-			throws ProjectException;
+	void addDependencies(Project project) throws ProjectException;
 
 	/**
-	 * Add dependencies from a Maven POM, limited to a {@link List<String>} of scopes. Adds
+	 * Add dependencies from a Maven POM, limited to a {@link List} of scopes. Adds
 	 * all Repositories from the Maven Pom.
 	 * 
 	 * @param project {@link Project}
-	 * @param scopes List<String> of dependency scopes
-	 * @throws ProjectException 
+	 * @param scopes List of dependency scopes
+	 * @throws ProjectException exception
 	 */
-	void addDependencies(Project project, List<String> scopes)
-			throws ProjectException;
+	void addDependencies(Project project, List<String> scopes) throws ProjectException;
 
 	/**
 	 * Remove all {@link RemoteRepository}
@@ -139,11 +134,9 @@ public interface Naether {
 	 * Add a {@link RemoteRepository} by String url
 	 * 
 	 * @param url String
-	 * @throws URLException
-	 * @throws MalformedURLException
+	 * @throws NaetherException exception
 	 */
-	void addRemoteRepositoryByUrl(String url)
-			throws NaetherException;
+	void addRemoteRepositoryByUrl(String url) throws NaetherException;
 
 	/**
 	 * Add a {@link RemoteRepository} by String url with String username and
@@ -152,11 +145,9 @@ public interface Naether {
 	 * @param url String
 	 * @param username String
 	 * @param password String
-	 * @throws URLException
-	 * @throws MalformedURLException
+	 * @throws URLException exception
 	 */
-	void addRemoteRepositoryByUrl(String url, String username,
-			String password) throws URLException;
+	void addRemoteRepositoryByUrl(String url, String username,String password) throws URLException;
 
 	/**
 	 * Add a {@link RemoteRepository}
@@ -179,8 +170,7 @@ public interface Naether {
 	 * 
 	 * @param remoteRepositories {@link List}
 	 */
-	void setRemoteRepositories(
-			Set<RemoteRepository> remoteRepositories);
+	void setRemoteRepositories(Set<RemoteRepository> remoteRepositories);
 
 	/**
 	 * Get {@link Set} of {@link RemoteRepository}
@@ -192,27 +182,24 @@ public interface Naether {
 	/**
 	 * Get {@link List} of String urls 
 	 * 
-	 * @return {@link List<String>}
+	 * @return {@link List}
 	 */
 	List<String> getRemoteRepositoryUrls();
 
 	/**
 	 * Resolve dependencies and download artifacts
-	 * 
-	 * @throws DependencyException
-	 * @throws URLException
-	 * 
-	 * @throws Exception
-	 */
-	void resolveDependencies() throws URLException,
-			DependencyException;
+	 *
+	 * @throws URLException exception
+     * @throws DependencyException exception
+     */
+	void resolveDependencies() throws URLException, DependencyException;
 
 	/**
 	 * Resolve Dependencies
 	 * 
 	 * @param downloadArtifacts boolean if artifacts are to be downloaded
-	 * @throws URLException
-	 * @throws DependencyException
+	 * @throws URLException exception
+	 * @throws DependencyException exception
 	 */
 	void resolveDependencies(boolean downloadArtifacts)
 			throws URLException, DependencyException;
@@ -221,22 +208,19 @@ public interface Naether {
 	 * Resolve Dependencies
 	 * 
 	 * @param downloadArtifacts if artifacts are to be downloaded
-	 * @param properties Map<String,String> of properties
-	 * @throws URLException
-	 * @throws DependencyException
+	 * @param properties Map of properties
+	 * @throws URLException exception
+	 * @throws DependencyException exception
 	 */
-	void resolveDependencies(boolean downloadArtifacts,
-			Map<String, String> properties) throws URLException,
-			DependencyException;
+	void resolveDependencies(boolean downloadArtifacts, Map<String, String> properties) throws URLException, DependencyException;
 
 	/**
 	 * Deploy an Artifact
 	 * 
 	 * @param deployArtifact {@link DeployArtifact}
-	 * @throws DeploymentException
+	 * @throws DeployException exception
 	 */
-	void deployArtifact(DeployArtifact deployArtifact)
-			throws DeployException;
+	void deployArtifact(DeployArtifact deployArtifact) throws DeployException;
 
 	/**
 	 * Install Artifact to local repo. 
@@ -244,18 +228,18 @@ public interface Naether {
 	 * If installing a POM, filePath can be null. If install a Jar without a POM, pomPath
 	 * can be null.
 	 * 
-	 * @param String notation String
-	 * @param String pomPath String
-	 * @param String filePath String
-	 * @throws InstallException
+	 * @param notation String
+	 * @param pomPath String
+	 * @param filePath String
+	 * @throws InstallException exception
 	 */
 	void install(String notation, String pomPath, String filePath) throws InstallException;
 
 	/**
 	 * Get the current dependencies. Returns Collection of resolved Dependencies
 	 * if {@link #resolveDependencies()} has been called, other returns {@link #getDependencies()}
-	 * 
-	 * @return Collection<Dependency>
+	 *
+	 * @return Collection
 	 */
 	Collection<Dependency> currentDependencies();
 	
@@ -267,23 +251,23 @@ public interface Naether {
 	String getResolvedClassPath();
 
 	/**
-	 * {@link List<String>} of {@link Dependency} converted to String notation
+	 * {@link List} of {@link Dependency} converted to String notation
 	 * 
-	 * @return {@link List<String>}
+	 * @return {@link List}
 	 */
 	Set<String> getDependenciesNotation();
 
 	/**
 	 * {@link Map} of String notation and the corresponding String file path 
 	 * 
-	 * @return {@link Map<String,String>}
+	 * @return {@link Map}
 	 */
 	Map<String, String> getDependenciesPath();
 
 	/**
 	 * Graph of Dependencies with their transitive Dependencies as children. 
 	 * 
-	 * @return Map<String,Map>
+	 * @return Map
 	 */
 	Map<String,Map> getDependenciesGraph();
 	
@@ -291,8 +275,7 @@ public interface Naether {
 	 * Set local repository path. This is the destination for downloaded
 	 * metadata and artifacts.
 	 * 
-	 * @param repoPath
-	 *            String
+	 * @param repoPath String
 	 */
 	void setLocalRepoPath(String repoPath);
 
@@ -307,8 +290,7 @@ public interface Naether {
 	/**
 	 * Set the {@link List} of {@link Dependency}
 	 * 
-	 * @param dependencies
-	 *            {@link List}
+	 * @param dependencies {@link List}
 	 */
 	void setDependencies(Set<Dependency> dependencies);
 
@@ -320,27 +302,27 @@ public interface Naether {
 	Set<Dependency> getDependencies();
 
 	/**
-	 * Get List<Artifact> of local artifacts that are used in dependency
+	 * Get List of local artifacts that are used in dependency
 	 * resolution.
 	 * 
-	 * @return List<Artifact>
+	 * @return List
 	 */
 	List<Artifact> getBuildArtifacts();
 
 	/**
-	 * Set List<Artifact> for local artifacts that are used in depdency resolution.
+	 * Set List for local artifacts that are used in dependency resolution.
 	 * 
-	 * @param buildArtifacts List<Artifact>
+	 * @param buildArtifacts List
 	 */
 	void setBuildArtifacts(List<Artifact> buildArtifacts);
 
 	/**
-	 * Download to the local repository a List of {@link Artifact} or String
+	 * Download to the local repository a List of Artifact or String
 	 * notations.
 	 * 
-	 * @param artifactsOrNotations @{link List} of {@link Artifact} or String notation
-	 * @return List<File>
-	 * @throws NaetherException
+	 * @param artifactsOrNotations {@link List} of Artifact or String notation
+	 * @return List
+	 * @throws NaetherException exception
 	 */
 	@SuppressWarnings("rawtypes")
 	List<File> downloadArtifacts(List artifactsOrNotations)

@@ -37,7 +37,7 @@ public class Invoker {
      * @param pom String path
      * @param goals String
      * @return {@link InvocationResult}
-     * @throws NaetherException
+     * @throws NaetherException exception
      */
     public InvocationResult execute(String pom, String... goals) throws NaetherException {
         return execute( pom, Arrays.asList(goals) );
@@ -47,9 +47,9 @@ public class Invoker {
      * Execute goals for a pom
      *
      * @param pom String path
-     * @param goals List<String></String>
+     * @param goals List
      * @return {@link InvocationResult}
-     * @throws NaetherException
+     * @throws NaetherException exception
      */
     public InvocationResult execute(String pom, List<String> goals) throws NaetherException {
         if ( pom == null ) {

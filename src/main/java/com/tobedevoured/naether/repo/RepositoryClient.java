@@ -32,7 +32,7 @@ import org.sonatype.aether.util.graph.selector.AndDependencySelector;
 import com.tobedevoured.naether.aether.ValidSystemScopeDependencySelector;
 
 /**
- * Repositoy Client, manages the {@link RepsitorySystem} and the {@link RepositorySystemSession}.
+ * Repository Client, manages the {@link RepositorySystem} and the {@link MavenRepositorySystemSession}.
  * 
  * @author Michael Guymon
  *
@@ -51,9 +51,9 @@ public class RepositoryClient {
 	}
 	
 	/**
-	 * Set User Properties for a {@link RepositorySystemSession}
+	 * Set User Properties for a {@link MavenRepositorySystemSession}
 	 * 
-	 * @param properties Map<String,String>
+	 * @param properties Map
 	 */
 	public void setProperties( Map<String,String> properties ) {
 		Map<String,String> userProperties = systemSession.getUserProperties();
@@ -73,7 +73,7 @@ public class RepositoryClient {
 	 * 
 	 * @param collectRequest {@link CollectRequest}
 	 * @return {@link CollectRequest}
-	 * @throws DependencyCollectionException
+	 * @throws DependencyCollectionException exception
 	 */
 	public CollectResult collectDependencies( CollectRequest collectRequest) throws DependencyCollectionException {
 		return repositorySystem.collectDependencies(systemSession,collectRequest);
@@ -84,7 +84,7 @@ public class RepositoryClient {
 	 * 
 	 * @param dependencyRequest {@link DependencyRequest}
 	 * @return {@link DependencyResult}
-	 * @throws DependencyResolutionException
+	 * @throws DependencyResolutionException exception
 	 */
 	public DependencyResult resolveDependencies( DependencyRequest dependencyRequest ) throws DependencyResolutionException {
 		return repositorySystem.resolveDependencies(systemSession, dependencyRequest);
@@ -94,7 +94,7 @@ public class RepositoryClient {
 	 * Deploy
 	 * 
 	 * @param deployRequest {@link DeployRequest}
-	 * @throws DeploymentException
+	 * @throws DeploymentException exception
 	 */
 	public void deploy(DeployRequest deployRequest) throws DeploymentException {
 		repositorySystem.deploy(systemSession, deployRequest);
@@ -104,7 +104,7 @@ public class RepositoryClient {
 	 * Install
 	 * 
 	 * @param installRequest {@link InstallRequest}
-	 * @throws InstallationException
+	 * @throws InstallationException exception
 	 */
 	public void install(InstallRequest installRequest) throws InstallationException {
 		repositorySystem.install(systemSession, installRequest);
@@ -115,7 +115,7 @@ public class RepositoryClient {
 	 * 
 	 * @param artifactRequest {@link ArtifactResult}
 	 * @return {@link ArtifactResult}
-	 * @throws ArtifactResolutionException
+	 * @throws ArtifactResolutionException exception
 	 */
 	public ArtifactResult resolveArtifact(ArtifactRequest artifactRequest) throws ArtifactResolutionException {
 		return repositorySystem.resolveArtifact(systemSession, artifactRequest);
@@ -123,9 +123,9 @@ public class RepositoryClient {
 	
 	
 	/**
-	 * Set the {@link BuildWorkspaceReadeR}
+	 * Set the {@link BuildWorkspaceReader}
 	 * 
-	 * @param artifacts List<Artifact>
+	 * @param artifacts List
 	 */
 	public void setBuildWorkspaceReader(List<Artifact> artifacts) {
 		BuildWorkspaceReader reader = new BuildWorkspaceReader();
@@ -137,29 +137,27 @@ public class RepositoryClient {
 		systemSession = (MavenRepositorySystemSession)systemSession.setWorkspaceReader( reader );
 		
 	}
-	
+
 	/**
 	 * Create new {@link RepositorySystem}
-	 * 
-	 * @return {@link RepositorySystem}
 	 */
 	public void newRepositorySystem() {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
 		locator.setServices(WagonProvider.class, new ManualWagonProvider());
 		locator.addService(RepositoryConnectorFactory.class, WagonRepositoryConnectorFactory.class);
-		
+
 		repositorySystem = locator.getService(RepositorySystem.class);
-	
+
 		MavenRepositorySystemSession session = new MavenRepositorySystemSession();
 		session = (MavenRepositorySystemSession)session.setDependencySelector( new AndDependencySelector( session.getDependencySelector(), new ValidSystemScopeDependencySelector() ) );
 		session = (MavenRepositorySystemSession)session.setTransferListener(new LogTransferListener());
 		session = (MavenRepositorySystemSession)session.setRepositoryListener(new LogRepositoryListener());
-		
+
 		session = (MavenRepositorySystemSession)session.setIgnoreMissingArtifactDescriptor( false );
-		
+
 		LocalRepository localRepo = new LocalRepository( localRepoPath );
 		session.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(localRepo));
-		
+
 		systemSession = session;
 	}
 

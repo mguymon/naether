@@ -56,8 +56,8 @@ public final class Notation {
 	/**
 	 * Convert a {@link org.apache.maven.model.Dependency} to String notation of
 	 * groupId:artifactId:type:version or groupId:artifactId:type:classifier:version
-	 * 
-	 * @param dependency
+	 *
+	 * @param dependency {@link org.apache.maven.model.Dependency}
 	 * @return String notation
 	 */
 	public static String generate(org.apache.maven.model.Dependency dependency) {
@@ -85,7 +85,7 @@ public final class Notation {
 	 * Convert a {@link Project} to String notation of
 	 * groupId:artifactId:type:version
 	 * 
-	 * @param pom
+	 * @param pom {@link Project}
 	 * @return String notation
 	 */
 	public static String generate( Project pom ) {
@@ -103,7 +103,7 @@ public final class Notation {
 	 * Convert a {@link org.sonatype.aether.graph.Dependency} to String notation of
 	 * groupId:artifactId:extension:version or groupId:artifactId::type:classifier:version
 	 * 
-	 * @param dependency
+	 * @param dependency {@link org.sonatype.aether.graph.Dependency}
 	 * @return String notation
 	 */
 	public static String generate(org.sonatype.aether.graph.Dependency dependency) {
@@ -111,13 +111,12 @@ public final class Notation {
 	}
 	
 	/**
-	 * Convert a {@link Map<String,String>} to String notation of
+	 * Convert a {@link Map} to String notation of
 	 * groupId:artifactId:version or if type is present, groupId:artifactId:type:version
 	 * 
-	 * @param notationMap Map<String,String>
+	 * @param notationMap Map
 	 * @return String notation
-	 * @see {@link #parse(String)}
-	 */
+     */
 	public static String generate( Map<String,String> notationMap ) {
 		StringBuilder notation = new StringBuilder();
 		notation.append( notationMap.get( "groupId" ) ).append(":").append( notationMap.get( "artifactId") ).append(":");
@@ -141,7 +140,7 @@ public final class Notation {
 	 *   </ul>
 	 *      
 	 * @param notation String
-	 * @return Map<String,String>
+	 * @return Map
 	 */
 	public static Map<String,String> parse( String notation ) {
 		Matcher matcher = NOTATION_PATTERN.matcher(notation);
@@ -180,7 +179,7 @@ public final class Notation {
 	 * Convert a {@link Artifact} to String notation of
 	 * groupId:artifactId::type:classifier:version
 	 * 
-	 * @param dependency
+	 * @param artifact {@link Artifact}
 	 * @return String notation
 	 */
 	public static String generate(Artifact artifact) {
@@ -202,9 +201,9 @@ public final class Notation {
 	 * Get local paths for notations
 	 * 
 	 * @param localRepoPath String path
-	 * @param notations List<String> of notations
-	 * @return List<String> of paths
-	 * @throws NaetherException
+	 * @param notations List of notations
+	 * @return List of paths
+	 * @throws NaetherException exception
 	 */
 	public static List<String> getLocalPaths( String localRepoPath, List<String> notations ) throws NaetherException {
 		DefaultServiceLocator locator = new DefaultServiceLocator();
