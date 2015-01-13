@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tobedevoured.naether</groupId>
     <artifactId>core</artifactId>
-    <version>0.13.7</version>
+    <version>0.13.8</version>
     <name>Naether</name>
     <packaging>jar</packaging>
     <url>https://github.com/mguymon/naether</url>
