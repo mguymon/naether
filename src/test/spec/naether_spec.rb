@@ -107,7 +107,7 @@ describe Naether do
     context "setting mixed list of dependencies" do
       it "should handle a list of dependencies" do
          @naether.dependencies = [ "junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29" ]
-         @naether.dependencies_notation.should eql ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
+         @naether.dependencies_notation.should =~ ["junit:junit:jar:4.8.2", "ch.qos.logback:logback-classic:jar:0.9.29"]
       end
 
       it "should handle poms in a list of dependencies" do
@@ -130,7 +130,7 @@ describe Naether do
 
       it "should handle pom with scopes" do
         @naether.dependencies = [ {"src/test/resources/valid_pom.xml" => ["test"]}, {"junit:junit:jar:4.8.2" => "test"}, "ch.qos.logback:logback-classic:jar:0.9.29" ]
-        @naether.dependencies_notation.should eql [
+        @naether.dependencies_notation.should =~ [
           "com.google.code.greaze:greaze-client:jar:test-jar:0.5.1",
           "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2"]
         @naether.resolve_dependencies().should =~ [
@@ -145,7 +145,7 @@ describe Naether do
 
     it "should resolve dependencies" do
       @naether.dependencies = "ch.qos.logback:logback-classic:jar:0.9.29"
-      @naether.resolve_dependencies().should eql [
+      @naether.resolve_dependencies().should =~ [
         "ch.qos.logback:logback-core:jar:0.9.29",
         "ch.qos.logback:logback-classic:jar:0.9.29",
         "org.slf4j:slf4j-api:jar:1.6.1"]
@@ -159,7 +159,7 @@ describe Naether do
 
     it "should resolve pom dependencies with properties" do
       @naether.dependencies  = 'src/test/resources/pom_with_broken_dep.xml'
-      @naether.resolve_dependencies(false, { 'project.basedir' => File.expand_path( 'src/test/resources' ) } ).should eql(
+      @naether.resolve_dependencies(false, { 'project.basedir' => File.expand_path( 'src/test/resources' ) } ).should =~ (
         ["commons-beanutils:commons-beanutils:jar:1.8.3",
          "ch.qos.logback:logback-core:jar:0.9.29", "pom:with-system-path:jar:2",
          "ch.qos.logback:logback-classic:jar:0.9.29", "org.slf4j:slf4j-api:jar:1.6.1"] )

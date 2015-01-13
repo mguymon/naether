@@ -132,4 +132,4 @@ require 'yard'
 YARD::Rake::YardocTask.new do |t|
   t.files   = ['lib/**/*.rb', 'LICENSE', 'pom.xml', 'jar_dependencies.yml'] 
 end
-Rake::Task["build"].enhance ['yard']
+#Rake::Task["build"].enhance ['yard']
