@@ -1,5 +1,7 @@
 source "http://rubygems.org"
 
+gem 'httpclient'
+
 platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
  if platform != 'java'
   gem 'rjb', '~> 1.4.0'

@@ -4,6 +4,7 @@ require "#{File.dirname(__FILE__)}/configuration"
 require 'yaml'
 require 'open-uri'
 require 'fileutils'
+require 'httpclient'
 
 module Naether
 
@@ -113,6 +114,7 @@ module Naether
         deps[:downloaded] = []
 
         if deps[:missing].size > 0
+          http_client = HTTPClient.new
 
           deps[:missing].each do |dep|
             notation = dep.split(":")
@@ -126,10 +128,16 @@ module Naether
             maven_path = "#{dest}#{File::SEPARATOR}#{jar}"
 
             if !File.exists? maven_path
-              maven_mirror = "#{maven_url}/#{group}/#{artifact}/#{version}/#{jar}"
+              maven_jar_url = "#{maven_url}/#{group}/#{artifact}/#{version}/#{jar}"
 
-              open(maven_path, 'wb') do |io|
-                io.print open(maven_mirror).read
+              data = http_client.get(maven_jar_url)
+
+              if data.ok?
+                open(maven_path, 'wb') do |io|
+                  io.print data.content
+                end
+              else
+                raise "Failed to download #{maven_jar_url}"
               end
 
               deps[:downloaded] << { dep => maven_path }
