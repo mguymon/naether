@@ -18,6 +18,12 @@ JRuby is natively supported. Vanilla Ruby uses [Rjb](http://rjb.rubyforge.org) t
     gem install naether
     
 The jar dependencies for Naether will automatically be downloaded when the gem installs.
+    
+#### Custom Maven Repo
+
+You can override the default Maven Repo used to download jar dependencies by setting the _NAETHER_MIRROR_ environment variable.
+
+    NAETHER_MIRROR=http://my.local.repo/m2 gem install naether
 
 ### Java
 
