@@ -30,7 +30,7 @@ You can override the default Maven Repo used to download jar dependencies by set
     <dependency>
       <groupId>com.tobedevoured.naether</groupId>
       <artifactId>naether</artifactId>
-      <version>0.13.7</version>
+      <version>0.14.1</version>
     </dependency>
    
 May have to add the Sonatype Repo if the sync to Maven Central is slow.
