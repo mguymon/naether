@@ -1,5 +1,13 @@
 ## Naether Changelog
 
+### 0.14.0 (Feburary 13, 2015)
+
+* Add support for NAETHER_MIRROR env when bootstraping Naether.
+ 
+#### 0.14.1 (Feburary 18, 2015)
+
+* Add support for NAETHER_MIRROR env in Java
+
 ### 0.13.0 (January 20, 2014)
 
 * Fix check that `Naether::Configuration` is initialized [(#9)](https://github.com/mguymon/naether/issues/9)

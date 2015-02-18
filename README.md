@@ -21,9 +21,11 @@ The jar dependencies for Naether will automatically be downloaded when the gem i
     
 #### Custom Maven Repo
 
-You can override the default Maven Repo used to download jar dependencies by setting the _NAETHER_MIRROR_ environment variable.
+You can override the default Maven Repo used in bootstraping Naether by setting the _NAETHER_MIRROR_ environment variable.
 
     NAETHER_MIRROR=http://my.local.repo/m2 gem install naether
+    
+The _NAETHER_MIRROR_ environment is also appended to the remote repositories used when resolving dependences.
 
 ### Java
 
