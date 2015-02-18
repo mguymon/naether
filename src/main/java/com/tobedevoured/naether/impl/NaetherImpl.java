@@ -128,6 +128,11 @@ public class NaetherImpl implements Naether {
         } else {
             this.localRepoPath = (new File(m2Repo)).getAbsolutePath();
         }
+
+        String naetherMirror = env.get("NAETHER_MIRROR");
+        if (naetherMirror != null) {
+            addRemoteRepository("naetherMirror", "default", naetherMirror);
+        }
     }
 
     /* (non-Javadoc)
