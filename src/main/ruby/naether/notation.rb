@@ -33,10 +33,10 @@ module Naether
         end
           
       end
-      
-      def to_notation
-        "#{group}:#{artifact}:#{type}#{":#{classifier}" if classifier}:#{version}"
-      end
+    end
+
+    def to_notation
+      "#{group}:#{artifact}:#{type}#{":#{classifier}" if classifier}:#{version}"
     end
   end
 end
