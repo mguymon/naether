@@ -4,7 +4,7 @@ gem 'httpclient'
 
 platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
  if platform != 'java'
-  gem 'rjb', '~> 1.4.0'
+  gem 'rjb', '> 1.4.0', '< 1.6.0'
 end
 
 group :development do
