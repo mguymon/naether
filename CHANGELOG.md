@@ -8,6 +8,10 @@
 
 * Add support for NAETHER_MIRROR env in Java
 
+#### 0.14.2 (May 5, 2015)
+
+* Fix Notation#to_notation [(LockJar#29)](https://github.com/mguymon/lock_jar/issues/29)
+
 ### 0.13.0 (January 20, 2014)
 
 * Fix check that `Naether::Configuration` is initialized [(#9)](https://github.com/mguymon/naether/issues/9)
