@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tobedevoured.naether</groupId>
     <artifactId>core</artifactId>
-    <version>0.14.3</version>
+    <version>0.15.0</version>
     <name>Naether</name>
     <packaging>jar</packaging>
     <url>https://github.com/mguymon/naether</url>
@@ -47,8 +47,8 @@
         <mavenVersion>3.0.3</mavenVersion>
         <wagonVersion>1.0</wagonVersion>
         <org.slf4j.version>1.7.6</org.slf4j.version>
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
 
     <dependencies>
