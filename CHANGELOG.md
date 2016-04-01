@@ -1,5 +1,9 @@
 ## Naether Changelog
 
+### 0.15.0 (June 3, 2015)
+
+* Compile using Java 1.7
+
 ### 0.14.0 (Feburary 13, 2015)
 
 * Add support for NAETHER_MIRROR env when bootstraping Naether.
