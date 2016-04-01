@@ -12,8 +12,4 @@ group :development do
   gem "jeweler", "~> 2.0.0"
   gem "yard"
   gem "kramdown"
-
-   if platform == 'java'
-  	gem 'jruby-openssl'
-  end
 end
