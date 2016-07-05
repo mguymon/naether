@@ -19,6 +19,7 @@ package com.tobedevoured.naether.util;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.repository.internal.DefaultServiceLocator;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.graph.Dependency;
@@ -228,5 +231,41 @@ public final class Notation {
 		}
 		
 		return localPaths;
+	}
+
+	/**
+	 * Convert to {@link Parent} into url pom path, e.g.  /com/tobedevoured/naether/core/0.15.0/core-0.15.pom.xml
+	 *
+	 * @param parent {@link Parent}
+	 * @return String url path
+	 */
+	public static String toUrlPath(Parent parent) throws IOException {
+		String relativePath = "pom.xml";
+
+		if (relativePath != parent.getRelativePath())  {
+			if ("".equals(parent.getRelativePath())) {
+				relativePath = new StringBuilder()
+					.append(parent.getArtifactId())
+					.append("-")
+					.append(parent.getVersion())
+					.append(".pom")
+					.toString();
+			} else {
+				relativePath = new File(parent.getRelativePath()).getCanonicalPath();
+			}
+
+		}
+
+		String urlPath = new StringBuilder()
+				.append(parent.getGroupId().replaceAll("\\.", "/").toLowerCase())
+				.append("/")
+				.append(parent.getArtifactId().replaceAll("\\.", "/").toLowerCase())
+				.append("/")
+				.append(parent.getVersion())
+				.append("/")
+				.append(relativePath)
+				.toString();
+
+		return urlPath;
 	}
 }

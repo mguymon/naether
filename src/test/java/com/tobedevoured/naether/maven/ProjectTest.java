@@ -33,6 +33,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.tobedevoured.naether.DependencyException;
+import com.tobedevoured.naether.URLException;
+import com.tobedevoured.naether.api.Naether;
+import com.tobedevoured.naether.impl.NaetherImpl;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.model.Dependency;
@@ -143,17 +147,6 @@ public class ProjectTest {
 		}
 	}
 
-    /*
-     * XXX: Naether pom no longer has a parent
-	@Test
-	public void hasParentPom() throws ProjectException {
-		Project coreProject = new Project("pom.xml");
-		Project parentProject = new Project("../pom.xml" );
-		
-		assertEquals( coreProject.getVersion(), parentProject.getVersion() );
-	}
-	*/
-	
 	// XXX: collision with the ruby spec, the dep block appears in different positions
 	public void toXml() throws ProjectException, FileNotFoundException, IOException {
 		Project project = new Project();

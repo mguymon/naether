@@ -19,10 +19,6 @@ package com.tobedevoured.naether;
  */
 
 // Java SE
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +35,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Exclusion;
+import org.hamcrest.core.IsEqual;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -58,6 +55,9 @@ import com.tobedevoured.naether.impl.NaetherImpl;
 import com.tobedevoured.naether.maven.Project;
 import com.tobedevoured.naether.maven.ProjectException;
 import com.tobedevoured.naether.util.Notation;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.*;
 
 
 /**
@@ -615,7 +615,7 @@ public class NaetherTest {
         if ( jar2.exists() ) {
         	FileUtils.deleteDirectory( jar2.getParentFile() );
         }
-		
+
         assertFalse( "Jar1 should remove to test downloaded", jar1.exists() );
         assertFalse( "Jar2 should remove to test downloaded", jar2.exists() );
         
@@ -625,6 +625,24 @@ public class NaetherTest {
 		assertTrue( "Jar1 downloaded", jar1.exists() );
 		assertTrue( "Jar2 downloaded", jar2.exists() );
 	}
+
+    @Test
+    public void hasParentPom() throws ProjectException, DependencyException, URLException {
+        naether.addDependencies("./src/test/resources/pomWithRemoteParent.xml");
+        naether.resolveDependencies(true);
+
+        Set expectedDeps = new HashSet(Arrays.asList(
+            "org.hamcrest:hamcrest-core:jar:1.3",
+            "org.hamcrest:hamcrest-library:jar:1.3",
+            "org.springframework:spring-test:jar:4.2.7.RELEASE",
+            "org.mockito:mockito-core:jar:1.10.19",
+            "junit:junit:jar:4.12",
+            "org.springframework.boot:spring-boot-starter-test:jar:1.3.6.RELEASE",
+            "org.objenesis:objenesis:jar:2.1",
+            "org.springframework:spring-core:jar:4.2.7.RELEASE"
+        ));
+        assertEquals(expectedDeps, naether.getDependenciesNotation());
+    }
 	
 	// http://stackoverflow.com/a/7201825/1272477
 	private static void setEnv(Map<String, String> newenv) {

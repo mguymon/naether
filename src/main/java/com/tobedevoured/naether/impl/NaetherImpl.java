@@ -21,7 +21,9 @@ package com.tobedevoured.naether.impl;
 // Java SE
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 // Apache Maven 
+import com.tobedevoured.naether.util.Http;
 import org.apache.maven.model.Repository;
 
 // SLF4J Logger
@@ -321,16 +324,67 @@ public class NaetherImpl implements Naether {
         
         // Add Dependencies and Repositories from parent
         if ( project.getMavenModel().getParent() != null ) {
-            
-            Project parent = new Project( project.getBasePath() + File.separator + project.getMavenModel().getParent().getRelativePath() );
-            
-            for ( org.apache.maven.model.Dependency dependency : parent.getDependencies(scopes) ) {
-                addDependency( dependency );
+
+            String relativePomPath = project.getMavenModel().getParent().getRelativePath();
+            // If path is not set, use default http://maven.apache.org/ref/3.0.3/maven-model/maven.html#class_parent
+            if (relativePomPath == "") {
+                relativePomPath = "../pom.xml";
             }
-            
+
+            // Check for local pom
+            File localPom = new File(project.getBasePath() + File.separator + relativePomPath);
+            boolean isTempPom = false;
+
+            // Local file not found, check remote repo
+            if (!localPom.exists()) {
+                String urlPath = null;
+                try {
+                    urlPath = Notation.toUrlPath(project.getMavenModel().getParent());
+                } catch (IOException e) {
+                    throw new ProjectException((e));
+                }
+
+                for (Repository repo : project.getMavenModel().getRepositories()) {
+                    String url = new StringBuilder(repo.getUrl()).append("/").append(urlPath).toString();
+                    if (Http.exists(url)) {
+                        isTempPom = true;
+                        try {
+                            File destination = File.createTempFile("parent", "xml");
+                            Http.fetch(url, destination);
+                            localPom = destination;
+                        } catch (IOException e) {
+                            log.error("Failed to fetch remote parent pom", e);
+                            throw new ProjectException(e);
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            if (!localPom.exists()) {
+                throw new ProjectException("Failed to find parent pom " + localPom.getPath() + " locally or remotely");
+            }
+
+            Project parent = null;
+            try {
+                parent = new Project(localPom.getCanonicalPath());
+            } catch (IOException e) {
+               throw new ProjectException(e);
+            }
+
+            for (org.apache.maven.model.Dependency dependency : parent.getDependencies(scopes)) {
+                addDependency(dependency);
+            }
+
             // Add remote repositories from pom
-            for ( Repository repo : parent.getMavenModel().getRepositories() ) {
-                this.addRemoteRepository( repo.getId(), repo.getLayout(), repo.getUrl() );
+            for (Repository repo : parent.getMavenModel().getRepositories()) {
+                this.addRemoteRepository(repo.getId(), repo.getLayout(), repo.getUrl());
+            }
+
+            // The local pom was downloaded to a temp file, remove when done with work
+            if (isTempPom) {
+                localPom.delete();
             }
         }
     }
