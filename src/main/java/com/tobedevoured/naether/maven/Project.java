@@ -84,15 +84,7 @@ public class Project {
      * @throws ProjectException exception
      */
     public Project(String pomPath) throws ProjectException {
-        this.mavenModel = loadPOM(pomPath, null, null);
-        this.mavenModel.setPomFile( new File(pomPath) );
-
-        File parent = (new File(pomPath)).getParentFile();
-        if ( parent != null ) {
-            setBasePath( (new File(pomPath)).getParentFile() );
-        } else {
-            setBasePath( new File("." ) );
-        }
+        this(pomPath, null, null);
     }
 
 	public Project(String pomPath, String localRepo, Collection<RemoteRepository> remoteRepos) throws ProjectException {
