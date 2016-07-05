@@ -39,6 +39,7 @@ import org.apache.maven.model.building.*;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 
 // Codehause Plexus
+import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 // SLF4J
@@ -48,6 +49,7 @@ import org.sonatype.aether.artifact.Artifact;
 
 import com.tobedevoured.naether.util.Notation;
 import com.tobedevoured.naether.util.RepoBuilder;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Maven Project Model
@@ -82,7 +84,7 @@ public class Project {
      * @throws ProjectException exception
      */
     public Project(String pomPath) throws ProjectException {
-        this.mavenModel = loadPOM(pomPath, null);
+        this.mavenModel = loadPOM(pomPath, null, null);
         this.mavenModel.setPomFile( new File(pomPath) );
 
         File parent = (new File(pomPath)).getParentFile();
@@ -93,6 +95,18 @@ public class Project {
         }
     }
 
+	public Project(String pomPath, String localRepo, Collection<RemoteRepository> remoteRepos) throws ProjectException {
+		this.mavenModel = loadPOM(pomPath, localRepo, remoteRepos);
+		this.mavenModel.setPomFile( new File(pomPath) );
+
+		File parent = (new File(pomPath)).getParentFile();
+		if ( parent != null ) {
+			setBasePath( (new File(pomPath)).getParentFile() );
+		} else {
+			setBasePath( new File("." ) );
+		}
+	}
+
 	/**
 	 * Load Maven pom
 	 * 
@@ -101,23 +115,22 @@ public class Project {
      * @return {@link Model}
 	 * @throws ProjectException if fails to open, read, or parse the POM
 	 */
-	public static Model loadPOM(String pomPath, String localRepo) throws ProjectException {
+	public static Model loadPOM(String pomPath, String localRepo, Collection<RemoteRepository> repositories) throws ProjectException {
         if ( localRepo == null ) {
             String userHome = System.getProperty("user.home");
             localRepo = userHome + File.separator + ".m2" + File.separator + "repository";
         }
         RepositoryClient repoClient = new RepositoryClient(localRepo);
-        NaetherModelResolver resolver = new NaetherModelResolver(repoClient, null);
+        NaetherModelResolver resolver = new NaetherModelResolver(repoClient, repositories);
 
-        ModelBuildingRequest req = new DefaultModelBuildingRequest();
+		ModelBuildingRequest req = new DefaultModelBuildingRequest();
         req.setProcessPlugins( false );
         req.setPomFile( new File(pomPath) );
         req.setModelResolver( resolver );
         req.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
 
         DefaultModelBuilder builder = (new DefaultModelBuilderFactory()).newInstance();
-        try
-        {
+        try {
             return builder.build( req ).getEffectiveModel();
         } catch ( ModelBuildingException e ) {
             throw new ProjectException("Failed to build project from pom", e);

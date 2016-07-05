@@ -1,6 +1,7 @@
 package com.tobedevoured.naether.maven;
 
 import com.tobedevoured.naether.repo.RepositoryClient;
+import com.tobedevoured.naether.util.RepoBuilder;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
@@ -19,6 +20,7 @@ import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.*;
 
 public class NaetherModelResolver implements ModelResolver {
@@ -31,7 +33,7 @@ public class NaetherModelResolver implements ModelResolver {
 
     private RemoteRepositoryManager remoteRepositoryManager;
 
-    public NaetherModelResolver(RepositoryClient repositoryClient, List<RemoteRepository> remoteRepositories) {
+    public NaetherModelResolver(RepositoryClient repositoryClient, Collection<RemoteRepository> remoteRepositories) {
         this.system = repositoryClient.getRepositorySystem();
         this.session = repositoryClient.getSystemSession();
         if ( remoteRepositories != null ) {
