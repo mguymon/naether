@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// Apache Maven 
-import com.tobedevoured.naether.util.Http;
+// Apache Maven
 import org.apache.maven.model.Repository;
 
 // SLF4J Logger
