@@ -24,16 +24,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 // Apache Maven
+import com.tobedevoured.naether.util.Env;
 import org.apache.maven.model.Repository;
 
 // SLF4J Logger
@@ -89,8 +83,12 @@ import com.tobedevoured.naether.util.RepoBuilder;
  * 
  */
 public class NaetherImpl implements Naether {
+
+    public static final String MIRROR_ENV = "NAETHER_MIRROR";
+    public static final RemoteRepository DEFAULT_REPOSITORY =
+        new RemoteRepository("central", "default", "http://repo1.maven.org/maven2/");
     
-    private static Logger log = LoggerFactory.getLogger(NaetherImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(NaetherImpl.class);
 
     private String localRepoPath;
     private Set<Dependency> dependencies;
@@ -115,23 +113,14 @@ public class NaetherImpl implements Naether {
         this.buildArtifacts = new ArrayList<Artifact>();
         
         // Set the initial LinkedHashSet
-        this.remoteRepositories = new LinkedHashSet<RemoteRepository>();
+        this.remoteRepositories = new LinkedHashSet<RemoteRepository>(Arrays.asList(DEFAULT_REPOSITORY));
 
         // Set the initial HashSet
-        this.repositoryIds = new HashSet<String>();
-        
-        addRemoteRepository("central", "default", "http://repo1.maven.org/maven2/");
+        this.repositoryIds = new HashSet<String>(Arrays.asList("central"));
 
-        Map<String, String> env = System.getenv();
-        String m2Repo = env.get("M2_REPO");
-        if (m2Repo == null) {
-            String userHome = System.getProperty("user.home");
-            this.localRepoPath = userHome + File.separator + ".m2" + File.separator + "repository";
-        } else {
-            this.localRepoPath = (new File(m2Repo)).getAbsolutePath();
-        }
+        this.localRepoPath = Env.getLocalRepository();
 
-        String naetherMirror = env.get("NAETHER_MIRROR");
+        String naetherMirror = Env.get(MIRROR_ENV);
         if (naetherMirror != null) {
             addRemoteRepository("naetherMirror", "default", naetherMirror);
         }
