@@ -38,31 +38,31 @@ import com.tobedevoured.naether.util.Notation;
  */
 public class NotationTest {
 
-	@Test
-	public void parse() {
-		Map<String,String> results = Notation.parse( "testGroup:testArtifact:testType:testVersion" );
-		assertEquals( "testGroup", results.get( "groupId" ) );
-		assertEquals( "testArtifact", results.get( "artifactId" ) );
-		assertEquals( "testType", results.get( "type" ) );
-		assertEquals( "testVersion", results.get( "version" ) );
-		
-		results = Notation.parse( "testGroup:testArtifact:testVersion" );
-		assertEquals( "testGroup", results.get( "groupId" ) );
-		assertEquals( "testArtifact", results.get( "artifactId" ) );
-		assertEquals( null, results.get( "type" ) );
-		assertEquals( "testVersion", results.get( "version" ) );
-	}
-	
-	@Test
-	public void generateForArtifact() {
-		Artifact artifact = new DefaultArtifact("groupId", "artifactId", "classifier", "extension", "version");
-	
-		assertEquals( "groupId:artifactId:extension:classifier:version", Notation.generate(artifact) );
-	}
-	
+    @Test
+    public void parse() {
+        Map<String,String> results = Notation.parse( "testGroup:testArtifact:testType:testVersion" );
+        assertEquals( "testGroup", results.get( "groupId" ) );
+        assertEquals( "testArtifact", results.get( "artifactId" ) );
+        assertEquals( "testType", results.get( "type" ) );
+        assertEquals( "testVersion", results.get( "version" ) );
+        
+        results = Notation.parse( "testGroup:testArtifact:testVersion" );
+        assertEquals( "testGroup", results.get( "groupId" ) );
+        assertEquals( "testArtifact", results.get( "artifactId" ) );
+        assertEquals( null, results.get( "type" ) );
+        assertEquals( "testVersion", results.get( "version" ) );
+    }
+    
+    @Test
+    public void generateForArtifact() {
+        Artifact artifact = new DefaultArtifact("groupId", "artifactId", "classifier", "extension", "version");
+    
+        assertEquals( "groupId:artifactId:extension:classifier:version", Notation.generate(artifact) );
+    }
+    
 
-	@Test
-	public void getLocalPaths() throws NaetherException {
-		assertTrue( "Path to junit in test repo", Notation.getLocalPaths( "target/test-repo", Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
-	}
+    @Test
+    public void getLocalPaths() throws NaetherException {
+        assertTrue( "Path to junit in test repo", Notation.getLocalPaths( "target/test-repo", Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
+    }
 }

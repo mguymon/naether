@@ -39,117 +39,117 @@ import com.tobedevoured.naether.util.RepoBuilder;
  */
 public class DeployArtifact {
 
-	private RemoteRepository remoteRepo;
-	private String pomPath;
-	private String filePath;
-	private String notation;
-	private Artifact jarArtifact;
-	private Artifact pomArtifact;
-	private Authentication authentication;
-	
-	public DeployArtifact() {
-		
-	}
-	
-	public DeployArtifact( String notation, String filePath, RemoteRepository remoteRepo ) {
-		this.notation = notation;
-		jarArtifact = new DefaultArtifact( notation );
-		
-		this.filePath = filePath;
-		jarArtifact = jarArtifact.setFile( new File( filePath ) );
-		
-		this.remoteRepo = remoteRepo;
-	}
-	
-	public void setAuth( String username, String password ) {
-		authentication = new Authentication( username, password );
-		
-		if ( getRemoteRepo() != null ) {
-			getRemoteRepo().setAuthentication( authentication );
-		}
-	}
-	
-	public void setAuth( String username, String password, String publicKeyFile, String passphrase ) {
-		authentication = new Authentication( username, password, publicKeyFile, passphrase );
-		
-		if ( getRemoteRepo() != null ) {
-			getRemoteRepo().setAuthentication( authentication );
-		}
-	}
+    private RemoteRepository remoteRepo;
+    private String pomPath;
+    private String filePath;
+    private String notation;
+    private Artifact jarArtifact;
+    private Artifact pomArtifact;
+    private Authentication authentication;
+    
+    public DeployArtifact() {
+        
+    }
+    
+    public DeployArtifact( String notation, String filePath, RemoteRepository remoteRepo ) {
+        this.notation = notation;
+        jarArtifact = new DefaultArtifact( notation );
+        
+        this.filePath = filePath;
+        jarArtifact = jarArtifact.setFile( new File( filePath ) );
+        
+        this.remoteRepo = remoteRepo;
+    }
+    
+    public void setAuth( String username, String password ) {
+        authentication = new Authentication( username, password );
+        
+        if ( getRemoteRepo() != null ) {
+            getRemoteRepo().setAuthentication( authentication );
+        }
+    }
+    
+    public void setAuth( String username, String password, String publicKeyFile, String passphrase ) {
+        authentication = new Authentication( username, password, publicKeyFile, passphrase );
+        
+        if ( getRemoteRepo() != null ) {
+            getRemoteRepo().setAuthentication( authentication );
+        }
+    }
 
 
-	public void setRemoteRepo( String url ) throws MalformedURLException {
-		this.setRemoteRepo( RepoBuilder.remoteRepositoryFromUrl( url ) );
-	}
-	
-	public void setRemoteRepo( RemoteRepository remoteRepo ) {
-		this.remoteRepo = remoteRepo;
-		
-		if ( authentication != null ) {
-			getRemoteRepo().setAuthentication( authentication );
-		}
-	}
-	
-	public RemoteRepository getRemoteRepo() {
-		return remoteRepo;
-	}
+    public void setRemoteRepo( String url ) throws MalformedURLException {
+        this.setRemoteRepo( RepoBuilder.remoteRepositoryFromUrl( url ) );
+    }
+    
+    public void setRemoteRepo( RemoteRepository remoteRepo ) {
+        this.remoteRepo = remoteRepo;
+        
+        if ( authentication != null ) {
+            getRemoteRepo().setAuthentication( authentication );
+        }
+    }
+    
+    public RemoteRepository getRemoteRepo() {
+        return remoteRepo;
+    }
 
-	public void setPomPath(String pomPath) {
-		this.pomPath = pomPath;
-		
-		// Depends on notation
-		if ( getJarArtifact() != null ) {
-			pomArtifact = new SubArtifact( getJarArtifact(), "", "pom" );
-	        pomArtifact = pomArtifact.setFile( new File( this.pomPath ) );
-		}
-	}
+    public void setPomPath(String pomPath) {
+        this.pomPath = pomPath;
+        
+        // Depends on notation
+        if ( getJarArtifact() != null ) {
+            pomArtifact = new SubArtifact( getJarArtifact(), "", "pom" );
+            pomArtifact = pomArtifact.setFile( new File( this.pomPath ) );
+        }
+    }
 
-	public Authentication getAuthentication() {
-		return authentication;
-	}
-	
-	public String getPomPath() {
-		return pomPath;
-	}
+    public Authentication getAuthentication() {
+        return authentication;
+    }
+    
+    public String getPomPath() {
+        return pomPath;
+    }
 
-	public Artifact getPomArtifact() {
-		return pomArtifact;
-	}
+    public Artifact getPomArtifact() {
+        return pomArtifact;
+    }
 
-	public void setFilePath( String filePath ) {
-		this.filePath = filePath;
-		
-		// Depends on notation
-		if ( getJarArtifact() != null ) {
-			jarArtifact = getJarArtifact().setFile( new File( filePath ) );
-		}
-	}
-	
-	public String getFilePath() {
-		return filePath;
-	}
+    public void setFilePath( String filePath ) {
+        this.filePath = filePath;
+        
+        // Depends on notation
+        if ( getJarArtifact() != null ) {
+            jarArtifact = getJarArtifact().setFile( new File( filePath ) );
+        }
+    }
+    
+    public String getFilePath() {
+        return filePath;
+    }
 
-	public void setNotation( String notation ) {
-		this.notation = notation;
-		jarArtifact = new DefaultArtifact( notation );
-		
-		// Depends on notation
-		if ( getFilePath() != null ) {
-			jarArtifact = jarArtifact.setFile( new File( getFilePath() ) );
-		}
-		
-		// Depends on notation
-		if ( getPomPath() != null ) {
-			pomArtifact = new SubArtifact( getJarArtifact(), "", "pom" );
-	        pomArtifact = pomArtifact.setFile( new File( getPomPath() ) );
-		}
-	}
-	
-	public String getNotation() {
-		return notation;
-	}
+    public void setNotation( String notation ) {
+        this.notation = notation;
+        jarArtifact = new DefaultArtifact( notation );
+        
+        // Depends on notation
+        if ( getFilePath() != null ) {
+            jarArtifact = jarArtifact.setFile( new File( getFilePath() ) );
+        }
+        
+        // Depends on notation
+        if ( getPomPath() != null ) {
+            pomArtifact = new SubArtifact( getJarArtifact(), "", "pom" );
+            pomArtifact = pomArtifact.setFile( new File( getPomPath() ) );
+        }
+    }
+    
+    public String getNotation() {
+        return notation;
+    }
 
-	public Artifact getJarArtifact() {
-		return jarArtifact;
-	}
+    public Artifact getJarArtifact() {
+        return jarArtifact;
+    }
 }

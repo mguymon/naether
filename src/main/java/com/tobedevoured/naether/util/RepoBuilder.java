@@ -32,62 +32,62 @@ import org.sonatype.aether.repository.RemoteRepository;
  */
 public final class RepoBuilder {
 
-	private RepoBuilder() { }
-	
-	/**
-	 * Create a {@link RemoteRepository} from a String url
-	 * 
-	 * @param url String
-	 * @return {@link RemoteRepository}
-	 * @throws MalformedURLException exceptions
-	 */
-	public static RemoteRepository remoteRepositoryFromUrl(String url) throws MalformedURLException {
-		URL parsedUrl = new URL(url);
+    private RepoBuilder() { }
+    
+    /**
+     * Create a {@link RemoteRepository} from a String url
+     * 
+     * @param url String
+     * @return {@link RemoteRepository}
+     * @throws MalformedURLException exceptions
+     */
+    public static RemoteRepository remoteRepositoryFromUrl(String url) throws MalformedURLException {
+        URL parsedUrl = new URL(url);
 
-		StringBuffer id = new StringBuffer(parsedUrl.getHost());
-		String path = parsedUrl.getPath();
-		if (path.length() > 0) {
-			path = path.replaceFirst("/", "").replaceAll("/", "-").replaceAll(":", "-");
-			id.append("-");
-			id.append(path);
-		}
+        StringBuffer id = new StringBuffer(parsedUrl.getHost());
+        String path = parsedUrl.getPath();
+        if (path.length() > 0) {
+            path = path.replaceFirst("/", "").replaceAll("/", "-").replaceAll(":", "-");
+            id.append("-");
+            id.append(path);
+        }
 
-		if (parsedUrl.getPort() > -1) {
-			id.append("-");
-			id.append(parsedUrl.getPort());
-		}
+        if (parsedUrl.getPort() > -1) {
+            id.append("-");
+            id.append(parsedUrl.getPort());
+        }
 
-		return new RemoteRepository(id.toString(), "default", url);
-	}
-	
-	/**
-	 * Create a {@link Repository} from a String url
-	 * 
-	 * @param url String
-	 * @return {@link Repository}
-	 * @throws MalformedURLException exception
-	 */
-	public static Repository repositoryFromUrl(String url) throws MalformedURLException {
-		URL parsedUrl = new URL(url);
+        return new RemoteRepository(id.toString(), "default", url);
+    }
+    
+    /**
+     * Create a {@link Repository} from a String url
+     * 
+     * @param url String
+     * @return {@link Repository}
+     * @throws MalformedURLException exception
+     */
+    public static Repository repositoryFromUrl(String url) throws MalformedURLException {
+        URL parsedUrl = new URL(url);
 
-		StringBuffer id = new StringBuffer(parsedUrl.getHost());
-		String path = parsedUrl.getPath();
-		if (path.length() > 0) {
-			path = path.replaceFirst("/", "").replaceAll("/", "-").replaceAll(":", "-");
-			id.append("-");
-			id.append(path);
-		}
+        StringBuffer id = new StringBuffer(parsedUrl.getHost());
+        String path = parsedUrl.getPath();
+        if (path.length() > 0) {
+            path = path.replaceFirst("/", "").replaceAll("/", "-").replaceAll(":", "-");
+            id.append("-");
+            id.append(path);
+        }
 
-		if (parsedUrl.getPort() > -1) {
-			id.append("-");
-			id.append(parsedUrl.getPort());
-		}
+        if (parsedUrl.getPort() > -1) {
+            id.append("-");
+            id.append(parsedUrl.getPort());
+        }
 
-		Repository repo = new Repository();
-		repo.setId( id.toString() );
-		repo.setName( parsedUrl.getHost() );
-		repo.setUrl( url );
-		
-		return repo;
-	}
+        Repository repo = new Repository();
+        repo.setId( id.toString() );
+        repo.setName( parsedUrl.getHost() );
+        repo.setUrl( url );
+        
+        return repo;
+    }
 }

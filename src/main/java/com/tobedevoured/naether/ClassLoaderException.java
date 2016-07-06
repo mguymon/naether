@@ -19,14 +19,14 @@ package com.tobedevoured.naether;
  */
 
 public class ClassLoaderException extends Exception {
-	
-	private static final long serialVersionUID = -3555453855808854873L;
+    
+    private static final long serialVersionUID = -3555453855808854873L;
 
-	public ClassLoaderException( Throwable throwable ) {
-		super( throwable );
-	}
-	
-	public ClassLoaderException( String message, Throwable throwable ) {
-		super( message, throwable );
-	}
+    public ClassLoaderException( Throwable throwable ) {
+        super( throwable );
+    }
+    
+    public ClassLoaderException( String message, Throwable throwable ) {
+        super( message, throwable );
+    }
 }

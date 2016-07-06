@@ -34,7 +34,7 @@ import com.tobedevoured.naether.Const;
 public class LogRepositoryListener
     extends AbstractRepositoryListener {
 
-	private static Logger log = LoggerFactory.getLogger("NaetherRepository");
+    private static Logger log = LoggerFactory.getLogger("NaetherRepository");
 
     public void artifactDeployed( RepositoryEvent event )
     {

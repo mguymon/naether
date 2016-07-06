@@ -34,21 +34,21 @@ import org.sonatype.aether.graph.Dependency;
  */
 public class ValidSystemScopeDependencySelector implements DependencySelector {
 
-	private static final String SYSTEM_SCOPE = "system";
-	
-	public boolean selectDependency(Dependency dependency) {
-		if ( SYSTEM_SCOPE.equals( dependency.getScope() ) ) {
-			String localPath = dependency.getArtifact().getProperties().get( "localPath" );
-			if ( localPath == null || !(new File( localPath )).exists() ) {
-				return false;
-			}
-		}
-		
-		return true;
-	}
+    private static final String SYSTEM_SCOPE = "system";
+    
+    public boolean selectDependency(Dependency dependency) {
+        if ( SYSTEM_SCOPE.equals( dependency.getScope() ) ) {
+            String localPath = dependency.getArtifact().getProperties().get( "localPath" );
+            if ( localPath == null || !(new File( localPath )).exists() ) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 
-	public DependencySelector deriveChildSelector( DependencyCollectionContext context) {
-		return this;
-	}
+    public DependencySelector deriveChildSelector( DependencyCollectionContext context) {
+        return this;
+    }
 
 }

@@ -16,33 +16,33 @@ import com.tobedevoured.naether.util.Notation;
 @Component(role = WorkspaceReader.class, hint = "local-build")
 public class BuildWorkspaceReader implements WorkspaceReader {
 
-	private Map<String,Artifact> artifacts = new HashMap<String,Artifact>();
-	
-	private WorkspaceRepository workspaceRepository;
-	
-	public BuildWorkspaceReader() {
-		this.workspaceRepository = new WorkspaceRepository("local-build", getClass());
-	}
-	
-	public WorkspaceRepository getRepository() {
-		return workspaceRepository;
-	}
-	
-	public void addArtifact( Artifact artifact ) {
-		artifacts.put( Notation.generate( artifact ), artifact );
-	}
+    private Map<String,Artifact> artifacts = new HashMap<String,Artifact>();
+    
+    private WorkspaceRepository workspaceRepository;
+    
+    public BuildWorkspaceReader() {
+        this.workspaceRepository = new WorkspaceRepository("local-build", getClass());
+    }
+    
+    public WorkspaceRepository getRepository() {
+        return workspaceRepository;
+    }
+    
+    public void addArtifact( Artifact artifact ) {
+        artifacts.put( Notation.generate( artifact ), artifact );
+    }
 
-	public File findArtifact(Artifact artifact) {
-		Artifact buildArtifact = artifacts.get( Notation.generate( artifact ) );
-		if ( buildArtifact != null ) {
-			return buildArtifact.getFile();
-		} else {
-			return null;
-		}
-	}
+    public File findArtifact(Artifact artifact) {
+        Artifact buildArtifact = artifacts.get( Notation.generate( artifact ) );
+        if ( buildArtifact != null ) {
+            return buildArtifact.getFile();
+        } else {
+            return null;
+        }
+    }
 
-	public List<String> findVersions(Artifact artifact) {
-		return Collections.emptyList();
-	}
+    public List<String> findVersions(Artifact artifact) {
+        return Collections.emptyList();
+    }
 
 }

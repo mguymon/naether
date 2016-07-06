@@ -37,10 +37,10 @@ import org.sonatype.aether.transfer.TransferResource;
  */
 public class LogTransferListener extends AbstractTransferListener {
 
-	private static final int INITAL_CAPACITY = 64;
-	private static final int KB = 1024;
-			
-	private Logger log = LoggerFactory.getLogger( "NaetherTransfer" ); 
+    private static final int INITAL_CAPACITY = 64;
+    private static final int KB = 1024;
+            
+    private Logger log = LoggerFactory.getLogger( "NaetherTransfer" ); 
     private Map<TransferResource, Long> downloads = new ConcurrentHashMap<TransferResource, Long>();
 
     private int lastLength;
@@ -55,27 +55,27 @@ public class LogTransferListener extends AbstractTransferListener {
 
     @Override
     public void transferProgressed( TransferEvent event ) {
-    	if ( log.isDebugEnabled() ) {
-	        TransferResource resource = event.getResource();
-	        downloads.put( resource, Long.valueOf( event.getTransferredBytes() ) );
-	
-	        
-	        StringBuilder buffer = new StringBuilder( INITAL_CAPACITY );
-	
-	        for ( Map.Entry<TransferResource, Long> entry : downloads.entrySet() )
-	        {
-	            long total = entry.getKey().getContentLength();
-	            long complete = entry.getValue().longValue();
-	
-	            buffer.append( getStatus( complete, total ) ).append( "  " );
-	        }
-	
-	        int pad = lastLength - buffer.length();
-	        lastLength = buffer.length();
-	        pad( buffer, pad );
-	
-	        log.debug( buffer.toString() );
-    	}
+        if ( log.isDebugEnabled() ) {
+            TransferResource resource = event.getResource();
+            downloads.put( resource, Long.valueOf( event.getTransferredBytes() ) );
+    
+            
+            StringBuilder buffer = new StringBuilder( INITAL_CAPACITY );
+    
+            for ( Map.Entry<TransferResource, Long> entry : downloads.entrySet() )
+            {
+                long total = entry.getKey().getContentLength();
+                long complete = entry.getValue().longValue();
+    
+                buffer.append( getStatus( complete, total ) ).append( "  " );
+            }
+    
+            int pad = lastLength - buffer.length();
+            lastLength = buffer.length();
+            pad( buffer, pad );
+    
+            log.debug( buffer.toString() );
+        }
     }
 
     private String getStatus( long complete, long total ) {
