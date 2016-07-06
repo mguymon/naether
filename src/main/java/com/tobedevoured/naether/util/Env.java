@@ -1,13 +1,13 @@
 package com.tobedevoured.naether.util;
 
+import java.io.File;
 import java.util.Map;
 
 public class Env {
 
     public static String getMavenHome() {
 
-        Map<String, String> env = System.getenv();
-        String mavenHome = env.get("MAVEN_HOME");
+        String mavenHome = get("MAVEN_HOME");
         if ( mavenHome == null ) {
             mavenHome = System.getProperty("maven.home");
             if (mavenHome == null) {
@@ -17,6 +17,21 @@ public class Env {
         }
 
         return mavenHome;
+    }
+
+    public static String getLocalRepository() {
+        String m2Repo = get("M2_REPO");
+        if (m2Repo == null) {
+            return new StringBuilder()
+                .append(System.getProperty("user.home"))
+                .append(File.separator)
+                .append(".m2")
+                .append(File.separator)
+                .append("repository")
+                .toString();
+        } else {
+            return new File(m2Repo).getAbsolutePath();
+        }
     }
 
     public static String get(String name ){
