@@ -31,7 +31,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // Apache Maven
+import com.tobedevoured.naether.impl.NaetherImpl;
 import com.tobedevoured.naether.repo.RepositoryClient;
+import com.tobedevoured.naether.util.Env;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
@@ -52,7 +54,7 @@ import com.tobedevoured.naether.util.RepoBuilder;
 import org.sonatype.aether.repository.RemoteRepository;
 
 /**
- * Maven Project Model
+ * Helper for working with Maven's Project Model
  * 
  * @author Michael Guymon
  * 
@@ -66,7 +68,8 @@ public class Project {
 	private String basePath;
 	
 	/**
-	 * New Instance. The {@link #setBasePath(File)} defaults to current directory.
+	 * Create an empty instance. Local Repository and Remote Repositories will not be set.
+	 * The {@link #getBasePath()} defaults to current working directory.
 	 */
 	public Project() {
 		Model model = new Model();
@@ -77,17 +80,35 @@ public class Project {
 	}
 
     /**
-     * New Instance loading Maven pom. The {@link #setBasePath(File)} defaults
-     * to the pom's parent directory.
+     * Create an instance based on an existing pom xml. The default Local Repository and Remote Repositories
+	 * will be used. The {@link #getBasePath()} defaults to the pom's parent directory.
      *
-     * @param pomPath String path
+     * @param pomPath String file path
      * @throws ProjectException exception
      */
     public Project(String pomPath) throws ProjectException {
-        this(pomPath, null, null);
+		 this(pomPath, null, null);
     }
 
+	/**
+	 *  Create an instance based on an existing pom xml. The defaults will be used if localRepo or remoteRepo params
+	 *  are null. The {@link #getBasePath()} defaults to the pom's parent directory.
+	 *
+	 * @param pomPath String file path
+	 * @param localRepo String directory path
+	 * @param remoteRepos {@link Collection<RemoteRepository>}
+	 * @throws ProjectException exception
+	 */
 	public Project(String pomPath, String localRepo, Collection<RemoteRepository> remoteRepos) throws ProjectException {
+
+		if (localRepo == null) {
+			localRepo = Env.getLocalRepository();
+        }
+
+		if (remoteRepos == null) {
+			remoteRepos = Arrays.asList(NaetherImpl.DEFAULT_REPOSITORY);
+		}
+
 		this.mavenModel = loadPOM(pomPath, localRepo, remoteRepos);
 		this.mavenModel.setPomFile( new File(pomPath) );
 
@@ -104,14 +125,11 @@ public class Project {
 	 * 
 	 * @param pomPath String path
      * @param localRepo String
+	 * @param repositories {@link Collection<RemoteRepository>}
      * @return {@link Model}
 	 * @throws ProjectException if fails to open, read, or parse the POM
 	 */
 	public static Model loadPOM(String pomPath, String localRepo, Collection<RemoteRepository> repositories) throws ProjectException {
-        if ( localRepo == null ) {
-            String userHome = System.getProperty("user.home");
-            localRepo = userHome + File.separator + ".m2" + File.separator + "repository";
-        }
         RepositoryClient repoClient = new RepositoryClient(localRepo);
         NaetherModelResolver resolver = new NaetherModelResolver(repoClient, repositories);
 
