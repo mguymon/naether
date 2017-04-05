@@ -362,7 +362,7 @@ public class NaetherTest {
         naether.resolveDependencies();
         String junit = (new File( "target/test-repo/junit/junit/4.10/junit-4.10.jar")).getAbsolutePath();
         String hamcrest = (new File( "target/test-repo/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar")).getAbsolutePath();
-        assertEquals( junit + ":" + hamcrest, naether.getResolvedClassPath() );
+        assertEquals( junit + File.pathSeparator + hamcrest, naether.getResolvedClassPath() );
         assertTrue( (new File( junit ).exists()) );
         assertTrue( (new File( hamcrest ).exists()) );
     }
