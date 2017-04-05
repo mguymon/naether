@@ -20,6 +20,8 @@ package com.tobedevoured.naether.util;
 
 import static org.junit.Assert.*;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -63,6 +65,7 @@ public class NotationTest {
 
     @Test
     public void getLocalPaths() throws NaetherException {
-        assertTrue( "Path to junit in test repo", Notation.getLocalPaths( "target/test-repo", Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
+        Path path = Paths.get( "test-repo", "junit", "junit", "4.8.2", "junit-4.8.2.jar" );
+        assertTrue( "Path to junit in test repo", Notation.getLocalPaths( "target/test-repo", Arrays.asList( "junit:junit:jar:4.8.2" ) ).get(0).endsWith(path.toString()) );
     }
 }

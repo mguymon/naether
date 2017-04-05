@@ -23,6 +23,8 @@ package com.tobedevoured.naether;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -164,7 +166,8 @@ public class NaetherTest {
         
         Map<String, String> match =  naether.getDependenciesPath();
         assertTrue( "Has notation key", match.containsKey("junit:junit:jar:4.8.2") );
-        assertTrue( "Has path", match.get("junit:junit:jar:4.8.2").contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
+        Path path = Paths.get( "test-repo", "junit", "junit", "4.8.2", "junit-4.8.2.jar" );
+        assertTrue( "Has path", match.get("junit:junit:jar:4.8.2").endsWith(path.toString()) );
     }
     
     @Test
