@@ -93,7 +93,7 @@ public class NaetherTest {
         setEnv( env );
         
         naether = new NaetherImpl();
-        assertEquals( "/m2_repo_test", naether.getLocalRepoPath() );
+        assertEquals( new File("/m2_repo_test").getAbsolutePath(), naether.getLocalRepoPath() );
     
     }
     
