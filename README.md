@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/mguymon/naether.png?branch=master)](https://travis-ci.org/mguymon/naether)
 
-Naether is a Java Dependency Resolver using Maven's [Aether](https://github.com/sonatype/sonatype-aether) 
+Naether is a Java Dependency Resolver using Maven's [Aether](https://github.com/sonatype/sonatype-aether)
 that can be used by Ruby or Java.
 
 <https://github.com/mguymon/naether>
@@ -16,15 +16,15 @@ that can be used by Ruby or Java.
 JRuby is natively supported. Vanilla Ruby uses [Rjb](http://rjb.rubyforge.org) to proxy over JNI.
 
     gem install naether
-    
+
 The jar dependencies for Naether will automatically be downloaded when the gem installs.
-    
+
 #### Custom Maven Repo
 
 You can override the default Maven Repo used in bootstraping Naether by setting the _NAETHER_MIRROR_ environment variable.
 
     NAETHER_MIRROR=http://my.local.repo/m2 gem install naether
-    
+
 The _NAETHER_MIRROR_ environment is also appended to the remote repositories used when resolving dependences.
 
 ### Java
@@ -32,9 +32,9 @@ The _NAETHER_MIRROR_ environment is also appended to the remote repositories use
     <dependency>
       <groupId>com.tobedevoured.naether</groupId>
       <artifactId>core</artifactId>
-      <version>0.15.3</version>
+      <version>0.15.4</version>
     </dependency>
-   
+
 May have to add the Sonatype Repo if the sync to Maven Central is slow.
 
     <repositories>
@@ -53,7 +53,7 @@ All of the Naether dependencies are loaded via a Custom ClassLoader.
 
 #### Bootstraping
 
-Naether [jar dependences](https://github.com/mguymon/naether/blob/master/jar_dependencies.yml) 
+Naether [jar dependences](https://github.com/mguymon/naether/blob/master/jar_dependencies.yml)
 must be loaded for Naether to work. This is easily done with the [bootstrap helper](http://rdoc.info/gems/naether/Naether/Bootstrap)
 
     Naether::Bootstrap.bootstrap_local_repo
@@ -62,14 +62,14 @@ must be loaded for Naether to work. This is easily done with the [bootstrap help
 
     require 'rubygems'
     require 'naether'
-    
+
     Naether::Bootstrap.bootstrap_local_repo
     naether = Naether.create
     naether.dependencies = [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" ]
     naether.resolve_dependencies()
-    
+
     puts naether.dependencies_notation
-    
+
 Will output
 
     ["ch.qos.logback:logback-core:jar:0.9.29",
@@ -92,7 +92,7 @@ Will output
     System.out.println( naether.getDependenciesNotation().toString() );
 
 Will output:
-   
+
     ["ch.qos.logback:logback-core:jar:0.9.29",
      "ch.qos.logback:logback-classic:jar:0.9.29",
      "junit:junit:jar:4.8.2",
