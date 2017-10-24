@@ -23,6 +23,8 @@ package com.tobedevoured.naether;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -93,7 +95,7 @@ public class NaetherTest {
         setEnv( env );
         
         naether = new NaetherImpl();
-        assertEquals( "/m2_repo_test", naether.getLocalRepoPath() );
+        assertEquals( new File("/m2_repo_test").getAbsolutePath(), naether.getLocalRepoPath() );
     
     }
     
@@ -164,7 +166,8 @@ public class NaetherTest {
         
         Map<String, String> match =  naether.getDependenciesPath();
         assertTrue( "Has notation key", match.containsKey("junit:junit:jar:4.8.2") );
-        assertTrue( "Has path", match.get("junit:junit:jar:4.8.2").contains("test-repo/junit/junit/4.8.2/junit-4.8.2.jar") );
+        Path path = Paths.get( "test-repo", "junit", "junit", "4.8.2", "junit-4.8.2.jar" );
+        assertTrue( "Has path", match.get("junit:junit:jar:4.8.2").endsWith(path.toString()) );
     }
     
     @Test
@@ -362,7 +365,7 @@ public class NaetherTest {
         naether.resolveDependencies();
         String junit = (new File( "target/test-repo/junit/junit/4.10/junit-4.10.jar")).getAbsolutePath();
         String hamcrest = (new File( "target/test-repo/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar")).getAbsolutePath();
-        assertEquals( junit + ":" + hamcrest, naether.getResolvedClassPath() );
+        assertEquals( junit + File.pathSeparator + hamcrest, naether.getResolvedClassPath() );
         assertTrue( (new File( junit ).exists()) );
         assertTrue( (new File( hamcrest ).exists()) );
     }

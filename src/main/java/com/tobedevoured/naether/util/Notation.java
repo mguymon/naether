@@ -225,9 +225,8 @@ public final class Notation {
 
         for ( String notation : notations ) {
             Dependency dependency = new Dependency(new DefaultArtifact(notation), "compile");
-            String path = new StringBuilder( localRepo.getBasedir().getAbsolutePath() )
-                .append( File.separator ).append( manager.getPathForLocalArtifact( dependency.getArtifact() ) ).toString();
-            localPaths.add( path );
+            File path = new File( localRepo.getBasedir(), manager.getPathForLocalArtifact( dependency.getArtifact() ) );
+            localPaths.add( path.toString() );
         }
 
         return localPaths;
