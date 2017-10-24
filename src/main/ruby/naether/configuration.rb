@@ -26,7 +26,6 @@ module Naether
         :gem_dir =>     gem_dir,
         :naether_jar => File.join( gem_dir, "core-#{version}.jar"),
         :platform =>    ($platform || RUBY_PLATFORM[/java/] || 'ruby'),
-        :version =>     version,
         :dependencies_yml => File.expand_path("#{File.dirname( __FILE__ )}/../../jar_dependencies.yml")
       }
       
