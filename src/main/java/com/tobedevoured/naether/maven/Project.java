@@ -55,9 +55,9 @@ import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Helper for working with Maven's Project Model
- * 
+ *
  * @author Michael Guymon
- * 
+ *
  */
 public class Project {
 
@@ -96,7 +96,7 @@ public class Project {
      *
      * @param pomPath String file path
      * @param localRepo String directory path
-     * @param remoteRepos {@link Collection<RemoteRepository>}
+     * @param remoteRepos {@link Collection}
      * @throws ProjectException exception
      */
     public Project(String pomPath, String localRepo, Collection<RemoteRepository> remoteRepos) throws ProjectException {
@@ -125,7 +125,7 @@ public class Project {
      *
      * @param pomPath String path
      * @param localRepo String
-     * @param repositories {@link Collection<RemoteRepository>}
+     * @param repositories {@link Collection}
      * @return {@link Model}
      * @throws ProjectException if fails to open, read, or parse the POM
      */

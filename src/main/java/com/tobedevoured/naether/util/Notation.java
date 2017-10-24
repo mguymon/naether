@@ -44,18 +44,18 @@ import com.tobedevoured.naether.maven.Project;
 
 /**
  * Helper for converting the dependency notations:
- * 
- *   groupId:artifactId:version, groupId:artifactId:type:version, groupId:artifactId:type:classifier:version 
- * 
+ *
+ *   groupId:artifactId:version, groupId:artifactId:type:version, groupId:artifactId:type:classifier:version
+ *
  * @author Michael Guymon
- * 
+ *
  */
 public final class Notation {
-    
+
     private static final Pattern NOTATION_PATTERN = Pattern.compile("^(.+?):(.+?):(.+?)(:(.+))?$");
-    
+
     private Notation() { }
-    
+
     /**
      * Convert a {@link org.apache.maven.model.Dependency} to String notation of
      * groupId:artifactId:type:version or groupId:artifactId:type:classifier:version
@@ -67,7 +67,7 @@ public final class Notation {
         StringBuilder notation = new StringBuilder()
                 .append(dependency.getGroupId()).append(":")
                 .append(dependency.getArtifactId()).append(":");
-        
+
         String classifier = dependency.getClassifier();
         if ( classifier != null && Const.TEST_JAR.equals( classifier ) ) {
             notation.append( "jar:test-jar:");
@@ -80,14 +80,14 @@ public final class Notation {
             }
         }
         notation.append(dependency.getVersion());
-        
+
         return notation.toString();
     }
 
     /**
      * Convert a {@link Project} to String notation of
      * groupId:artifactId:type:version
-     * 
+     *
      * @param pom {@link Project}
      * @return String notation
      */
@@ -101,38 +101,38 @@ public final class Notation {
             .append( pom.getVersion() )
             .toString();
     }
-    
+
     /**
      * Convert a {@link org.sonatype.aether.graph.Dependency} to String notation of
      * groupId:artifactId:extension:version or groupId:artifactId::type:classifier:version
-     * 
+     *
      * @param dependency {@link org.sonatype.aether.graph.Dependency}
      * @return String notation
      */
     public static String generate(org.sonatype.aether.graph.Dependency dependency) {
-        return dependency.getArtifact().toString();        
+        return dependency.getArtifact().toString();
     }
-    
+
     /**
      * Convert a {@link Map} to String notation of
      * groupId:artifactId:version or if type is present, groupId:artifactId:type:version
-     * 
+     *
      * @param notationMap Map
      * @return String notation
      */
     public static String generate( Map<String,String> notationMap ) {
         StringBuilder notation = new StringBuilder();
         notation.append( notationMap.get( "groupId" ) ).append(":").append( notationMap.get( "artifactId") ).append(":");
-        
+
         if ( notationMap.get( "type" ) != null ) {
             notation.append( notationMap.get("type") ).append( ":" );
         }
-        
+
         notation.append( notationMap.get( "version" ) );
-        
+
         return notation.toString();
     }
-    
+
     /**
      * Parsing the notation and returns a Map with keys
      *   <ul>
@@ -141,37 +141,37 @@ public final class Notation {
      *   <li>type - may be null if not in the notation param</li>
      *   <li>version</li>
      *   </ul>
-     *      
+     *
      * @param notation String
      * @return Map
      */
     public static Map<String,String> parse( String notation ) {
         Matcher matcher = NOTATION_PATTERN.matcher(notation);
         if ( matcher.find() ) {
-            
+
             Map<String,String> notationMap = new HashMap<String,String>();
-            
+
             int groupIdMatch = 1;
             notationMap.put( "groupId", matcher.group(groupIdMatch) );
-            
+
             int artifactIdMatch = 2;
             notationMap.put( "artifactId", matcher.group(artifactIdMatch) );
-            
+
             // if type is null
             int groupingMatch = 4;
             if ( matcher.group(groupingMatch) == null ) {
                 int versionMatch = 3;
                 notationMap.put( "version", matcher.group(versionMatch) );
-                
+
             // if type exists
             } else {
                 int typeMatch = 3;
                 notationMap.put( "type", matcher.group(typeMatch) );
-                
+
                 int versionMatch = 5;
                 notationMap.put( "version", matcher.group(versionMatch) );
             }
-            
+
             return notationMap;
         } else {
             return null;
@@ -181,7 +181,7 @@ public final class Notation {
     /**
      * Convert a {@link Artifact} to String notation of
      * groupId:artifactId::type:classifier:version
-     * 
+     *
      * @param artifact {@link Artifact}
      * @return String notation
      */
@@ -190,19 +190,19 @@ public final class Notation {
             .append(artifact.getGroupId()).append(":")
             .append(artifact.getArtifactId()).append(":")
             .append(artifact.getExtension()).append(":");
-        
+
         if ( artifact.getClassifier() != null && artifact.getClassifier().length() > 0 ) {
             notation.append(artifact.getClassifier()).append(":");
         }
-        
+
         notation.append(artifact.getBaseVersion());
-        
+
         return notation.toString();
     }
-    
+
     /**
      * Get local paths for notations
-     * 
+     *
      * @param localRepoPath String path
      * @param notations List of notations
      * @return List of paths
@@ -212,7 +212,7 @@ public final class Notation {
         DefaultServiceLocator locator = new DefaultServiceLocator();
         SimpleLocalRepositoryManagerFactory factory = new SimpleLocalRepositoryManagerFactory();
         factory.initService( locator );
-        
+
         LocalRepository localRepo = new LocalRepository(localRepoPath);
         LocalRepositoryManager manager = null;
         try {
@@ -220,16 +220,16 @@ public final class Notation {
         } catch (NoLocalRepositoryManagerException e) {
             throw new NaetherException( "Failed to initial local repository manage", e  );
         }
-        
+
         List<String> localPaths = new ArrayList<String>();
-        
+
         for ( String notation : notations ) {
             Dependency dependency = new Dependency(new DefaultArtifact(notation), "compile");
             String path = new StringBuilder( localRepo.getBasedir().getAbsolutePath() )
                 .append( File.separator ).append( manager.getPathForLocalArtifact( dependency.getArtifact() ) ).toString();
             localPaths.add( path );
         }
-        
+
         return localPaths;
     }
 
@@ -238,6 +238,7 @@ public final class Notation {
      *
      * @param parent {@link Parent}
      * @return String url path
+     * @throws IOException
      */
     public static String toUrlPath(Parent parent) throws IOException {
         String relativePath = "pom.xml";
