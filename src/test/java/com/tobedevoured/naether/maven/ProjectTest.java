@@ -88,7 +88,7 @@ public class ProjectTest {
         Project mavenProject = new Project("src/test/resources/valid_pom.xml");
         List<String> repositories = mavenProject.getRepositoryUrls();
 
-        assertEquals( Arrays.asList( "https://repository.jboss.org/nexus/content/groups/public-jboss", "https://repo1.maven.org/maven2" ), repositories );
+        assertEquals( Arrays.asList( "https://repository.jboss.org/nexus/content/groups/public-jboss", "http://repo1.maven.org/maven2" ), repositories );
     }
 
     @Test
