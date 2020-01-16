@@ -1,10 +1,10 @@
 require "#{File.dirname(__FILE__)}/../naether"
 require "#{File.dirname(__FILE__)}/java"
 require "#{File.dirname(__FILE__)}/configuration"
-require 'yaml'
-require 'open-uri'
-require 'fileutils'
-require 'httpclient'
+require "yaml"
+require "open-uri"
+require "fileutils"
+require "httpclient"
 
 module Naether
 
@@ -14,7 +14,6 @@ module Naether
   # @author Michael Guymon
   #
   class Bootstrap
-
     @@dependencies = nil
 
     class << self
@@ -23,28 +22,28 @@ module Naether
       #
       # @return [String]
       def default_local_repo
-        ENV['M2_REPO'] || File.expand_path('~/.m2/repository')
+        ENV["M2_REPO"] || File.expand_path("~/.m2/repository")
       end
 
       # Maven URL to fetch jars from, ENV['NAETHER_MIRROR'] or
       #
       # @return [String]
       def maven_url
-        ENV['NAETHER_MIRROR'] || 'http://repo1.maven.org/maven2'
+        ENV["NAETHER_MIRROR"] || "https://repo1.maven.org/maven2"
       end
 
       # Write bootstrap dependencies to yaml file
-      def write_dependencies( dest = 'jar_dependencies.yml' )
-        deps = {};
-        if Naether::Configuration.platform == 'java'
+      def write_dependencies(dest = "jar_dependencies.yml")
+        deps = {}
+        if Naether::Configuration.platform == "java"
           deps[:dependencies] = com.tobedevoured.naether.Bootstrap.dependencies.to_a
         else
-          bootstrap = Rjb::import('com.tobedevoured.naether.Bootstrap')
-          deps[:dependencies] = bootstrap.dependencies.toArray().map{ |dep| dep.toString() }
+          bootstrap = Rjb::import("com.tobedevoured.naether.Bootstrap")
+          deps[:dependencies] = bootstrap.dependencies.toArray().map { |dep| dep.toString() }
         end
 
-        File.open( dest, 'w' ) do |out|
-          YAML.dump( deps, out )
+        File.open(dest, "w") do |out|
+          YAML.dump(deps, out)
         end
       end
 
@@ -53,8 +52,7 @@ module Naether
       #
       # @param [String] dep_file path, defaults to Naether::Configuration.dependencies_yml
       # @return [List]
-      def dependencies( dep_file=nil )
-
+      def dependencies(dep_file = nil)
         if @@dependencies
           return @@dependencies
         end
@@ -63,31 +61,30 @@ module Naether
           dep_file = Naether::Configuration.dependencies_yml
         end
 
-        dep = YAML.load_file( dep_file )
+        dep = YAML.load_file(dep_file)
         @@dependencies = dep[:dependencies]
       end
-
 
       #
       # Bootstrap the local repo by downloading Naether's dependencies
       # @param [String] local_repo defaults to #default_local_repo
       # @param [hash] opts
       #
-      def bootstrap_local_repo(local_repo = nil, opts = {} )
+      def bootstrap_local_repo(local_repo = nil, opts = {})
         local_repo = local_repo || default_local_repo
 
         opts[:local_repo] = local_repo
 
-        temp_naether_dir = File.join( local_repo, ".naether" )
+        temp_naether_dir = File.join(local_repo, ".naether")
 
-        deps = download_dependencies( temp_naether_dir, opts )
+        deps = download_dependencies(temp_naether_dir, opts)
 
-        jars = (deps[:exists] + deps[:downloaded]).map {|jar| jar.values.first }
+        jars = (deps[:exists] + deps[:downloaded]).map { |jar| jar.values.first }
 
-        jars = Naether::Java.internal_load_paths( jars )
+        jars = Naether::Java.internal_load_paths(jars)
 
-        if ( deps[:downloaded].size > 0)
-          install_dependencies_to_local_repo( deps[:downloaded], jars, opts )
+        if (deps[:downloaded].size > 0)
+          install_dependencies_to_local_repo(deps[:downloaded], jars, opts)
         end
       end
 
@@ -97,10 +94,9 @@ module Naether
       # @param [String] dest to download dependencies t
       # @param [Hash] opts
       # @return [Hash] with status of missing, downloaded, exists dependencies
-      def download_dependencies( dest, opts = {} )
-
+      def download_dependencies(dest, opts = {})
         if !File.exists? dest
-          FileUtils.mkdir_p( dest )
+          FileUtils.mkdir_p(dest)
         end
 
         deps = {}
@@ -108,7 +104,7 @@ module Naether
         if opts[:deps]
           deps[:missing] = opts[:deps]
         else
-          deps = check_local_repo_for_deps( opts[:local_repo], opts )
+          deps = check_local_repo_for_deps(opts[:local_repo], opts)
         end
 
         deps[:downloaded] = []
@@ -133,7 +129,7 @@ module Naether
               data = http_client.get(maven_jar_url)
 
               if data.ok?
-                open(maven_path, 'wb') do |io|
+                open(maven_path, "wb") do |io|
                   io.print data.content
                 end
               else
@@ -156,16 +152,15 @@ module Naether
       # @param [String] local_repo
       # @param [Hash] opts
       # @return [Hash] with status of missing, downloaded, exists dependencies
-      def check_local_repo_for_deps(local_repo = nil, opts = {} )
-
+      def check_local_repo_for_deps(local_repo = nil, opts = {})
         local_repo = local_repo || default_local_repo
         local_repo = File.expand_path(local_repo)
 
         #puts "Checking #{local_repo} for jars to bootstrap Naether"
 
-        deps = {:exists => [], :missing => [], :downloaded => [] }
+        deps = { :exists => [], :missing => [], :downloaded => [] }
 
-        dependencies( opts[:dep_yaml] ).each do |dep|
+        dependencies(opts[:dep_yaml]).each do |dep|
           notation = dep.split(":")
           group = notation[0].gsub("\.", File::SEPARATOR)
           artifact = notation[1].gsub("\.", File::SEPARATOR)
@@ -181,7 +176,6 @@ module Naether
           else
             deps[:missing] << dep
           end
-
         end
         deps
       end
@@ -194,11 +188,10 @@ module Naether
       # @param [Hash] opts
       # @return [Naether]
       #
-      def install_dependencies_to_local_repo( install_jars, naether_jars, opts = {}  )
-
+      def install_dependencies_to_local_repo(install_jars, naether_jars, opts = {})
         require "#{File.dirname(__FILE__)}/../naether"
 
-        @naether = Naether.create_from_jars( naether_jars )
+        @naether = Naether.create_from_jars(naether_jars)
 
         if opts[:local_repo]
           @naether.local_repo_path = opts[:local_repo]
@@ -206,7 +199,7 @@ module Naether
 
         install_jars.each do |dep|
           notation, path = dep.to_a.first
-          @naether.install( notation, nil, path )
+          @naether.install(notation, nil, path)
         end
 
         @naether

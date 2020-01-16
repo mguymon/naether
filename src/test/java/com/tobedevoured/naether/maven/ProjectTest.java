@@ -43,9 +43,9 @@ import org.apache.maven.model.Dependency;
 import org.junit.Test;
 
 /**
- * 
+ *
  * @author Michael Guymon
- * 
+ *
  */
 public class ProjectTest {
 
@@ -63,12 +63,12 @@ public class ProjectTest {
         } catch (ProjectException e) {
             fail("failed to read pom: " + e.toString());
         }
-        
+
         assertNotNull(mavenProject.getMavenModel());
         assertEquals( "3", mavenProject.getVersion());
         assertEquals( "valid:pom:jar:3", mavenProject.getProjectNotation() );
     }
-    
+
     @Test(expected=ProjectException.class)
     public void createInstanceWithPomPathWithException() throws Exception {
         new Project("src/test/resources/does_not_exist_pom.xml");
@@ -82,56 +82,56 @@ public class ProjectTest {
         assertEquals( "test", project.getArtifactId() );
         assertEquals( "10", project.getVersion() );
     }
-    
+
     @Test
     public void getRepositories() throws ProjectException {
         Project mavenProject = new Project("src/test/resources/valid_pom.xml");
         List<String> repositories = mavenProject.getRepositoryUrls();
-        
-        assertEquals( Arrays.asList( "http://repository.jboss.org/nexus/content/groups/public-jboss", "http://repo1.maven.org/maven2" ), repositories );
+
+        assertEquals( Arrays.asList( "https://repository.jboss.org/nexus/content/groups/public-jboss", "https://repo1.maven.org/maven2" ), repositories );
     }
 
     @Test
     public void getDependenciesByScope() throws ProjectException {
         Project mavenProject = new Project("src/test/resources/valid_pom.xml");
-        
+
         List<String> scopes = new ArrayList<String>();
         scopes.add("test");
-        
+
         List<Dependency> dependencies = mavenProject.getDependencies( scopes );
         assertEquals( "Only junit and greaze-client should be in deps", 2, dependencies.size() );
         assertEquals( "junit", dependencies.get(0).getArtifactId() );
         assertEquals( "junit", dependencies.get(0).getGroupId() );
-        
+
         assertEquals( "greaze-client", dependencies.get(1).getArtifactId() );
         assertEquals( "com.google.code.greaze", dependencies.get(1).getGroupId() );
-                
+
         scopes = new ArrayList<String>();
         scopes.add("compile");
-        
+
         dependencies = mavenProject.getDependencies( scopes );
         assertEquals( "Only logback classic should be in deps", 1, dependencies.size() );
         assertEquals( "logback-classic", dependencies.get(0).getArtifactId() );
         assertEquals( "ch.qos.logback", dependencies.get(0).getGroupId() );
-        
+
         for ( Dependency dependency : dependencies ) {
             assertFalse( "junit dep should not be in dependencies", "junit".equals( dependency.getArtifactId() ) );
         }
     }
-    
+
     @Test
     public void getDependenciesNotation() throws ProjectException {
         Project mavenProject = new Project("src/test/resources/valid_pom.xml");
         List<String> notations = new ArrayList<String>();
         notations.add("ch.qos.logback:logback-classic:jar:0.9.29");
-                
+
         assertEquals( notations, mavenProject.getDependenciesNotation() );
 
         mavenProject = new Project("src/test/resources/valid_pom.xml");
         notations = new ArrayList<String>();
         notations.add("junit:junit:jar:4.8.2");
         notations.add("com.google.code.greaze:greaze-client:jar:test-jar:0.5.1");
-                
+
         assertEquals( notations, mavenProject.getDependenciesNotation( Arrays.asList( "test" ) ) );
     }
 
@@ -139,7 +139,7 @@ public class ProjectTest {
     public void substituteProperty() throws ProjectException {
         Project project = new Project( "src/test/resources/pom_with_system_path.xml" );
         List<Dependency> dependencies = project.getDependencies();
-        
+
         for ( Dependency dependency : dependencies ) {
             if ( "gdata-spreadsheet".equals( dependency.getArtifactId() ) ) {
                 assertEquals( (new File( "src/test/resources")).getAbsolutePath(), dependency.getSystemPath() );
@@ -156,13 +156,13 @@ public class ProjectTest {
         project.setType("jar");
         project.addDependency("junit:junit:jar:4.8.2", "test");
         project.addDependency("org.apache.maven.wagon:wagon-file:jar:1.0");
-        project.addRepository( "http://repo1.maven.org/maven2/" );
-        project.addRepository( "http://repository.jboss.org/nexus/content/groups/public-jboss" );
+        project.addRepository( "https://repo1.maven.org/maven2/" );
+        project.addRepository( "https://repository.jboss.org/nexus/content/groups/public-jboss" );
         String xml = project.toXml();
-        
+
         assertEquals( IOUtils.toString( new FileReader("src/test/resources/generated_pom.xml") ), xml );
     }
-    
+
     @Test
     public void writePom() throws ProjectException {
         Project project = new Project();
@@ -172,10 +172,10 @@ public class ProjectTest {
         project.setType("jar");
         project.addDependency("org.apache.maven.wagon:wagon-file:jar:1.0");
         project.addDependency("junit:junit:jar:4.8.2", "test");
-    
+
         project.writePom("target/test-classes/test-pom.xml");
         assertTrue((new File("target/test-classes/test-pom.xml")).exists());
-        
+
         Project testProject = new Project( "target/test-classes/test-pom.xml" );
         assertEquals( project.getArtifactId(), testProject.getArtifactId() );
         assertEquals( project.getGroupId(), testProject.getGroupId() );

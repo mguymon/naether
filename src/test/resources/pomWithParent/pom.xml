@@ -11,7 +11,7 @@ ttp://maven.apache.org/maven-v4_0_0.xsd ">
 	  <repository>
 	    <id>org.jboss.repository</id>
 	    <name>JBoss Repository</name>
-	    <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
+	    <url>https://repository.jboss.org/nexus/content/groups/public-jboss</url>
 	  </repository>
 	</repositories>
   <dependencies>

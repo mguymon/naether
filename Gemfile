@@ -8,8 +8,8 @@ platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
 end
 
 group :development do
-  gem "rspec", "> 2.9.0"
-  gem "jeweler", "~> 2.0.0"
+  gem "rspec", "> 2.9"
+  gem "jeweler", "~> 2.1"
   gem "yard"
   gem "kramdown"
 end
