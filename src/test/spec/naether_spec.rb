@@ -178,8 +178,8 @@ describe Naether do
 
       paths = @naether.download_artifacts(["junit:junit:4.10", "junit:junit:4.9"])
 
-      File.exists?("target/test-repo/junit/junit/4.9/junit-4.9.jar").should be_true
-      File.exists?("target/test-repo/junit/junit/4.10/junit-4.10.jar").should be_true
+      File.exists?("target/test-repo/junit/junit/4.9/junit-4.9.jar").should be_truthy
+      File.exists?("target/test-repo/junit/junit/4.10/junit-4.10.jar").should be_truthy
     end
 
     it "should deploy artifact" do
@@ -190,7 +190,7 @@ describe Naether do
 
       @naether.deploy_artifact("test:test:jar:22.3", jar, "file:target/test-repo")
 
-      File.exists?("target/test-repo/test/test/22.3/test-22.3.jar").should be_true
+      File.exists?("target/test-repo/test/test/22.3/test-22.3.jar").should be_truthy
     end
   end
 end

@@ -57,7 +57,7 @@ describe Naether::Maven do
     maven.load_naether(@naether)
     maven.write_pom(test_file)
 
-    File.exists?(test_file).should be_true
+    expect(File.exists?(test_file)).to be_truthy
 
     xml = IO.read(test_file)
     xml.should match /.+junit<\/groupId>\s+<artifactId>junit<\/artifactId>\s+<version>4.8.2<\/version>\s+<scope>test.+/
@@ -70,7 +70,7 @@ describe Naether::Maven do
     #maven = Naether::Maven.create_from_pom('pom.xml')
     #result = maven.invoke('compile')
     #result.getExitCode().should eql 0
-    pending "Need a cross platform way to test maven tasks"
+    #pending "Need a cross platform way to test maven tasks"
   end
 
   it "should get final name" do
