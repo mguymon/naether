@@ -1,11 +1,11 @@
 source "http://rubygems.org"
 
 gem 'httpclient'
-gem 'rake', '< 11.0'
+gem 'rake', '>= 12.3.3'
 
 platform = $platform || RUBY_PLATFORM[/java/] || 'ruby'
  if platform != 'java'
-  gem 'rjb', '> 1.4.0', '< 1.6.0'
+  gem 'rjb', '> 1.6'
 end
 
 group :development do
