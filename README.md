@@ -60,9 +60,9 @@ must be loaded for Naether to work. This is easily done with the [bootstrap help
 
 #### Resolving Dependencies
 
-    require 'rubygems'
     require 'naether'
-
+    require 'naether/bootstrap'
+    
     Naether::Bootstrap.bootstrap_local_repo
     naether = Naether.create
     naether.dependencies = [ "ch.qos.logback:logback-classic:jar:0.9.29", "junit:junit:jar:4.8.2" ]
