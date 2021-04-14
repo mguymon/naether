@@ -32,7 +32,7 @@ The _NAETHER_MIRROR_ environment is also appended to the remote repositories use
     <dependency>
       <groupId>com.tobedevoured.naether</groupId>
       <artifactId>core</artifactId>
-      <version>0.15.6</version>
+      <version>0.15.7</version>
     </dependency>
 
 May have to add the Sonatype Repo if the sync to Maven Central is slow.
