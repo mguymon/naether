@@ -17,7 +17,7 @@ ttp://maven.apache.org/maven-v4_0_0.xsd ">
     <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>0.9.29</version>
+        <version>1.2.0</version>
     </dependency>
 	  <dependency>
 	      <groupId>org.apache.maven</groupId>
