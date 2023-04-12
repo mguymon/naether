@@ -40,7 +40,6 @@ namespace :naether do
       FileUtils.copy( 'VERSION', "target/gem/VERSION" )
       FileUtils.copy( 'PostInstallRakefile', "target/gem/Rakefile" )
       FileUtils.copy( 'Gemfile', "target/gem/Gemfile" )
-      FileUtils.copy( 'Gemfile.lock', "target/gem/Gemfile.lock" )
 
       version = IO.read('VERSION').strip
       if !File.exists? "target/core-#{version}.jar"
