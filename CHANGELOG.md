@@ -16,6 +16,14 @@
 
 * Make rake a requirement since it is used in the post deploy.
 
+#### 0.15.9 (Apr 12, 2023)
+
+* Remove Gemfile.lock as an artifact in the gem
+
+#### 0.15.10 (Apr 12, 2023)
+
+* Remove dependency on jeweler (which was pulling in the psych dep) in the gemspec.
+
 ### 0.14.0 (Feburary 13, 2015)
 
 * Add support for NAETHER_MIRROR env when bootstraping Naether.
