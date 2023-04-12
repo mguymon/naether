@@ -55,7 +55,7 @@ public final class Bootstrap {
         deps.add("org.codehaus.plexus:plexus-component-annotations:jar:1.5.5");
         deps.add("org.codehaus.plexus:plexus-interactivity-api:jar:1.0-alpha-6");
         deps.add("org.codehaus.plexus:plexus-interpolation:jar:1.14");
-        deps.add("org.codehaus.plexus:plexus-utils:jar:3.0.8");
+        deps.add("org.codehaus.plexus:plexus-utils:jar:3.0.16");
         deps.add("org.jsoup:jsoup:jar:1.6.1");
         deps.add("org.slf4j:slf4j-api:jar:1.7.6");
         deps.add("org.slf4j:slf4j-simple:jar:1.7.6");
