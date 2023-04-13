@@ -1,7 +1,14 @@
 version: '3.2'
 services:
-  naether:
+  ruby:
     build:
       context: .
+      dockerfile: Dockerfile.ruby
+    volumes:
+      - .:/app
+  jruby:
+    build:
+      context: .
+      dockerfile: Dockerfile.jruby
     volumes:
       - .:/app

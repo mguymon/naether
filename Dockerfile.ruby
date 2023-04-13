@@ -13,8 +13,12 @@ RUN mkdir /app
 
 WORKDIR /app
 
+COPY pom.xml /app/
+
+RUN mvn dependency:resolve
+
 COPY Gemfile* /app/
 
-RUN  bundle install
+RUN bundle install
 
 COPY . /app/
