@@ -73,7 +73,7 @@ module Naether
         
         paths.each do |path|
           expanded_path = File.expand_path(path)
-          if File.exists?( expanded_path )
+          if File.exist?( expanded_path )
             @class_loader.addPath( expanded_path )
             
             load_paths << expanded_path
@@ -96,7 +96,7 @@ module Naether
         
         paths.each do |path|
           expanded_path = File.expand_path(path)
-          if !@loaded_paths.include?( expanded_path ) && File.exists?( expanded_path )
+          if !@loaded_paths.include?( expanded_path ) && File.exist?( expanded_path )
             $CLASSPATH << expanded_path
             load_paths << expanded_path
             @loaded_paths << expanded_path

@@ -20,7 +20,7 @@ describe Naether do
       )
 
       @test_dir = "target/test-rb"
-      unless File.exists?(@test_dir)
+      unless File.exist?(@test_dir)
         Dir.mkdir @test_dir
       end
 
@@ -168,29 +168,29 @@ describe Naether do
     end
 
     it "should download artifacts" do
-      if File.exists?("target/test-repo/junit/junit/4.9/junit-4.9.jar")
+      if File.exist?("target/test-repo/junit/junit/4.9/junit-4.9.jar")
         FileUtils.rm_rf("target/test-repo/junit/junit/4.9")
       end
 
-      if File.exists?("target/test-repo/junit/junit/4.10/junit-4.10.jar")
+      if File.exist?("target/test-repo/junit/junit/4.10/junit-4.10.jar")
         FileUtils.rm_rf("target/test-repo/junit/junit/4.10")
       end
 
       paths = @naether.download_artifacts(["junit:junit:4.10", "junit:junit:4.9"])
 
-      File.exists?("target/test-repo/junit/junit/4.9/junit-4.9.jar").should be_truthy
-      File.exists?("target/test-repo/junit/junit/4.10/junit-4.10.jar").should be_truthy
+      File.exist?("target/test-repo/junit/junit/4.9/junit-4.9.jar").should be_truthy
+      File.exist?("target/test-repo/junit/junit/4.10/junit-4.10.jar").should be_truthy
     end
 
     it "should deploy artifact" do
-      if File.exists?("target/test-repo/test/test/22.3/test-22.3.jar")
+      if File.exist?("target/test-repo/test/test/22.3/test-22.3.jar")
         File.delete("target/test-repo/test/test/22.3/test-22.3.jar")
       end
       jar = "target/test-repo/junit/junit/4.8.2/junit-4.8.2.jar"
 
       @naether.deploy_artifact("test:test:jar:22.3", jar, "file:target/test-repo")
 
-      File.exists?("target/test-repo/test/test/22.3/test-22.3.jar").should be_truthy
+      File.exist?("target/test-repo/test/test/22.3/test-22.3.jar").should be_truthy
     end
   end
 end

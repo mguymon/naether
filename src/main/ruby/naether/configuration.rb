@@ -11,7 +11,7 @@ module Naether
       version = nil
       
       # Load VERSION file from gem to VERSION var
-      if File.exists?( File.expand_path("#{File.dirname(__FILE__)}/../../VERSION") )
+      if File.exist?( File.expand_path("#{File.dirname(__FILE__)}/../../VERSION") )
         version = IO.read(File.expand_path("#{File.dirname(__FILE__)}/../../VERSION")).strip
           
       # VERSION file not found in gem dir, assume in current path, e.g.running from checkout

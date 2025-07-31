@@ -107,7 +107,7 @@ module Naether
         
         paths.each do |path|
           expanded_path = File.expand_path(path)
-          if File.exists?( expanded_path )
+          if File.exist?( expanded_path )
             @class_loader.addPath( path )
             loadable_paths << expanded_path
           end
@@ -129,7 +129,7 @@ module Naether
         
         paths.each do |path|
           expanded_path = File.expand_path(path)
-          if !@loaded_paths.include?(expanded_path) && File.exists?( expanded_path )
+          if !@loaded_paths.include?(expanded_path) && File.exist?( expanded_path )
             @loaded_paths << expanded_path
             Rjb::add_jar( expanded_path )
             loadable_paths << expanded_path

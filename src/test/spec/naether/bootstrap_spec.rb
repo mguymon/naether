@@ -9,14 +9,14 @@ describe Naether::Bootstrap do
   context "Class" do
     it "should write jar dependencies yml" do
       Naether::Bootstrap.write_dependencies("target/jar_dependencies.yml")
-      expect(File.exists?("target/jar_dependencies.yml")).to be_truthy
+      expect(File.exist?("target/jar_dependencies.yml")).to be_truthy
 
       deps = YAML.load_file("target/jar_dependencies.yml")
       deps.size.should > 0
     end
 
     it "should download dependencies" do
-      if File.exists? "target/test/bootstrap"
+      if File.exist? "target/test/bootstrap"
         FileUtils.rm_r "target/test/bootstrap"
       end
 
@@ -27,11 +27,11 @@ describe Naether::Bootstrap do
     end
 
     it "should install dependencies to local repo" do
-      if File.exists? "target/test/bootstrap-repo"
+      if File.exist? "target/test/bootstrap-repo"
         FileUtils.rm_r "target/test/bootstrap-repo"
       end
 
-      if File.exists? "target/test/bootstrap"
+      if File.exist? "target/test/bootstrap"
         FileUtils.rm_r "target/test/bootstrap"
       end
 

@@ -57,7 +57,7 @@ describe Naether::Maven do
     maven.load_naether(@naether)
     maven.write_pom(test_file)
 
-    expect(File.exists?(test_file)).to be_truthy
+    expect(File.exist?(test_file)).to be_truthy
 
     xml = IO.read(test_file)
     xml.should match /.+junit<\/groupId>\s+<artifactId>junit<\/artifactId>\s+<version>4.8.2<\/version>\s+<scope>test.+/

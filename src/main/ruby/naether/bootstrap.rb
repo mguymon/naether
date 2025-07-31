@@ -95,7 +95,7 @@ module Naether
       # @param [Hash] opts
       # @return [Hash] with status of missing, downloaded, exists dependencies
       def download_dependencies(dest, opts = {})
-        if !File.exists? dest
+        if !File.exist? dest
           FileUtils.mkdir_p(dest)
         end
 
@@ -123,7 +123,7 @@ module Naether
 
             maven_path = "#{dest}#{File::SEPARATOR}#{jar}"
 
-            if !File.exists? maven_path
+            if !File.exist? maven_path
               maven_jar_url = "#{maven_url}/#{group}/#{artifact}/#{version}/#{jar}"
 
               data = http_client.get(maven_jar_url)
@@ -171,7 +171,7 @@ module Naether
 
           maven_path = "#{local_repo}#{File::SEPARATOR}#{group}#{File::SEPARATOR}#{artifact}#{File::SEPARATOR}#{version}#{File::SEPARATOR}#{jar}"
 
-          if File.exists? maven_path
+          if File.exist? maven_path
             deps[:exists] << { dep => maven_path }
           else
             deps[:missing] << dep
