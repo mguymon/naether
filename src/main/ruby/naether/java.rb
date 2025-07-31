@@ -20,7 +20,7 @@ module Naether
     def initialize()
       naether_jar = Naether::Configuration.naether_jar
       
-      unless File.exists? naether_jar
+      unless File.exist? naether_jar
         raise "Cannot create Naether::Java: #{naether_jar} does not exist"
       end
       

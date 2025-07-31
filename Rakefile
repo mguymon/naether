@@ -6,15 +6,15 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'src/main/ruby/naethe
 
 namespace :naether do
   task :setup_naether_gem_build do
-      unless File.exists?( "target" )
+      unless File.exist?( "target" )
         raise "Run `mvn package` to build java first"
       end
 
-      unless File.exists?( "target/gem" )
+      unless File.exist?( "target/gem" )
         Dir.mkdir( "target/gem" )
       end
 
-      unless File.exists?( "target/gem/lib" )
+      unless File.exist?( "target/gem/lib" )
         FileUtils.mkdir_p( "target/gem/lib/naether/java" )
       end
 
@@ -32,7 +32,7 @@ namespace :naether do
       FileUtils.copy( 'Gemfile', "target/gem/Gemfile" )
 
       version = IO.read('VERSION').strip
-      if !File.exists? "target/core-#{version}.jar"
+      if !File.exist? "target/core-#{version}.jar"
         raise "target/core-#{version}.jar does not exist"
       end
 
