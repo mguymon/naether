@@ -191,6 +191,8 @@ module Naether
       def install_dependencies_to_local_repo(install_jars, naether_jars, opts = {})
         require "#{File.dirname(__FILE__)}/../naether"
 
+        # Load jars into main classpath first to ensure all dependencies are available
+        Naether::Java.load_paths(naether_jars)
         @naether = Naether.create_from_jars(naether_jars)
 
         if opts[:local_repo]
