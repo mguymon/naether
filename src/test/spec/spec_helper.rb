@@ -16,11 +16,12 @@ require 'rspec'
 require 'naether/bootstrap'
 
 Naether::Configuration.naether_jar = "target/core-#{Naether::Configuration.version}.jar"
-Naether::Bootstrap.bootstrap_local_repo(  
+Naether::Bootstrap.bootstrap_local_repo(
   File.expand_path( '../../../../target/test-repo', __FILE__ ),
   :dep_yaml => File.expand_path( '../../../../jar_dependencies.yml', __FILE__ ) )
 
 RSpec.configure do |config|
-  
+  config.expect_with :rspec do |c|
+    c.syntax = [:should, :expect]
+  end
 end
-

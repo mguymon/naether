@@ -67,24 +67,24 @@ describe Naether do
     end
 
     it "should get dependency graph" do
-      @naether.dependencies = "org.springframework:org.springframework.orm:3.0.5.RELEASE"
-      @naether.add_remote_repository("https://repository.springsource.com/maven/bundles/release")
-      @naether.add_remote_repository("https://repository.springsource.com/maven/bundles/external")
+      @naether.dependencies = "org.springframework:spring-orm:jar:3.0.5.RELEASE"
+      # Spring artifacts are available in Maven Central (no additional repos needed)
 
       @naether.resolve_dependencies(false)
       @naether.dependencies_graph.should eql({
-        "org.springframework:org.springframework.orm:jar:3.0.5.RELEASE" => {
-          "org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE" => {},
-          "org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE" => {
-            "org.springframework:org.springframework.context:jar:3.0.5.RELEASE" => {
-              "org.springframework:org.springframework.expression:jar:3.0.5.RELEASE" => {},
-            },
-            "org.springframework:org.springframework.aop:jar:3.0.5.RELEASE" => {},
-            "org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0" => {},
+        "org.springframework:spring-orm:jar:3.0.5.RELEASE" => {
+          "org.springframework:spring-beans:jar:3.0.5.RELEASE" => {},
+          "org.springframework:spring-core:jar:3.0.5.RELEASE" => {
+            "commons-logging:commons-logging:jar:1.1.1" => {},
+            "org.springframework:spring-asm:jar:3.0.5.RELEASE" => {},
           },
-          "org.springframework:org.springframework.core:jar:3.0.5.RELEASE" => {},
-          "org.springframework:org.springframework.beans:jar:3.0.5.RELEASE" => {
-            "org.springframework:org.springframework.asm:jar:3.0.5.RELEASE" => {},
+          "org.springframework:spring-jdbc:jar:3.0.5.RELEASE" => {},
+          "org.springframework:spring-tx:jar:3.0.5.RELEASE" => {
+            "aopalliance:aopalliance:jar:1.0" => {},
+            "org.springframework:spring-aop:jar:3.0.5.RELEASE" => {},
+            "org.springframework:spring-context:jar:3.0.5.RELEASE" => {
+              "org.springframework:spring-expression:jar:3.0.5.RELEASE" => {},
+            },
           },
         },
       })

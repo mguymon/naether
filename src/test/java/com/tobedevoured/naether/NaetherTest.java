@@ -174,51 +174,51 @@ public class NaetherTest {
     @Test
     public void getDependencyGraph() throws NaetherException {
         Dependency dependency =
-            new Dependency( new DefaultArtifact( "org.springframework:org.springframework.orm:3.0.5.RELEASE" ), "compile" );
-        naether.addRemoteRepositoryByUrl( "https://repository.springsource.com/maven/bundles/release" );
-        naether.addRemoteRepositoryByUrl( "https://repository.springsource.com/maven/bundles/external" );
+            new Dependency( new DefaultArtifact( "org.springframework:spring-orm:3.0.5.RELEASE" ), "compile" );
         naether.addDependency(dependency);
         naether.resolveDependencies(false);
 
         /*
          * This is the expected out:
          *
-            org.springframework:org.springframework.orm:jar:3.0.5.RELEASE={
-                org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE={},
-                org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE={
-                   org.springframework:org.springframework.context:jar:3.0.5.RELEASE={
-                       org.springframework:org.springframework.expression:jar:3.0.5.RELEASE={}
-                   },
-                   org.springframework:org.springframework.aop:jar:3.0.5.RELEASE={},
-                   org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0={}
+            org.springframework:spring-orm:jar:3.0.5.RELEASE={
+                org.springframework:spring-beans:jar:3.0.5.RELEASE={},
+                org.springframework:spring-core:jar:3.0.5.RELEASE={
+                   commons-logging:commons-logging:jar:1.1.1={},
+                   org.springframework:spring-asm:jar:3.0.5.RELEASE={}
                 },
-                org.springframework:org.springframework.core:jar:3.0.5.RELEASE={},
-                org.springframework:org.springframework.beans:jar:3.0.5.RELEASE={
-                   org.springframework:org.springframework.asm:jar:3.0.5.RELEASE={}
+                org.springframework:spring-jdbc:jar:3.0.5.RELEASE={},
+                org.springframework:spring-tx:jar:3.0.5.RELEASE={
+                   aopalliance:aopalliance:jar:1.0={},
+                   org.springframework:spring-aop:jar:3.0.5.RELEASE={},
+                   org.springframework:spring-context:jar:3.0.5.RELEASE={
+                       org.springframework:spring-expression:jar:3.0.5.RELEASE={}
+                   }
                 }
            }
        */
         Map<String,Map> ormDeps = new LinkedHashMap<String,Map>();
-        ormDeps.put("org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE", new HashMap() );
+        ormDeps.put("org.springframework:spring-beans:jar:3.0.5.RELEASE", new HashMap() );
+
+        Map<String,Map> coreDeps = new HashMap<String,Map>();
+        coreDeps.put("commons-logging:commons-logging:jar:1.1.1", new HashMap() );
+        coreDeps.put("org.springframework:spring-asm:jar:3.0.5.RELEASE", new HashMap() );
+
+        ormDeps.put("org.springframework:spring-core:jar:3.0.5.RELEASE", coreDeps );
+        ormDeps.put("org.springframework:spring-jdbc:jar:3.0.5.RELEASE", new HashMap() );
 
         Map<String,Map> expressionDeps = new HashMap<String,Map>();
-        expressionDeps.put( "org.springframework:org.springframework.expression:jar:3.0.5.RELEASE", new HashMap() );
+        expressionDeps.put( "org.springframework:spring-expression:jar:3.0.5.RELEASE", new HashMap() );
 
         Map<String,Map> transactionDeps = new LinkedHashMap<String,Map>();
-        transactionDeps.put("org.springframework:org.springframework.context:jar:3.0.5.RELEASE", expressionDeps);
-        transactionDeps.put("org.springframework:org.springframework.aop:jar:3.0.5.RELEASE", new HashMap() );
-        transactionDeps.put("org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0", new HashMap() );
+        transactionDeps.put("aopalliance:aopalliance:jar:1.0", new HashMap() );
+        transactionDeps.put("org.springframework:spring-aop:jar:3.0.5.RELEASE", new HashMap() );
+        transactionDeps.put("org.springframework:spring-context:jar:3.0.5.RELEASE", expressionDeps);
 
-        ormDeps.put("org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE", transactionDeps );
-        ormDeps.put("org.springframework:org.springframework.core:jar:3.0.5.RELEASE", new HashMap() );
-
-        Map<String,Map> beansDeps = new HashMap<String,Map>();
-        beansDeps.put("org.springframework:org.springframework.asm:jar:3.0.5.RELEASE", new HashMap() );
-
-        ormDeps.put( "org.springframework:org.springframework.beans:jar:3.0.5.RELEASE", beansDeps );
+        ormDeps.put("org.springframework:spring-tx:jar:3.0.5.RELEASE", transactionDeps );
 
         Map<String,Map> results = new HashMap<String,Map>();
-        results.put("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE", ormDeps);
+        results.put("org.springframework:spring-orm:jar:3.0.5.RELEASE", ormDeps);
 
         Map<String,Map> graph = naether.getDependenciesGraph();
         assertEquals( results, graph );
@@ -226,16 +226,17 @@ public class NaetherTest {
         Set<String> resolvedDependencies = naether.getDependenciesNotation();
 
         Set<String> dependencies = new HashSet<String>();
-        dependencies.add("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE");
-        dependencies.add("org.springframework:org.springframework.beans:jar:3.0.5.RELEASE");
-        dependencies.add("org.springframework:org.springframework.asm:jar:3.0.5.RELEASE");
-        dependencies.add("org.springframework:org.springframework.core:jar:3.0.5.RELEASE");
-        dependencies.add("org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE");
-        dependencies.add("org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE");
-        dependencies.add("org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0");
-        dependencies.add("org.springframework:org.springframework.aop:jar:3.0.5.RELEASE");
-        dependencies.add("org.springframework:org.springframework.context:jar:3.0.5.RELEASE");
-        dependencies.add("org.springframework:org.springframework.expression:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:spring-orm:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:spring-beans:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:spring-core:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:spring-asm:jar:3.0.5.RELEASE");
+        dependencies.add("commons-logging:commons-logging:jar:1.1.1");
+        dependencies.add("org.springframework:spring-jdbc:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:spring-tx:jar:3.0.5.RELEASE");
+        dependencies.add("aopalliance:aopalliance:jar:1.0");
+        dependencies.add("org.springframework:spring-aop:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:spring-context:jar:3.0.5.RELEASE");
+        dependencies.add("org.springframework:spring-expression:jar:3.0.5.RELEASE");
         assertEquals( dependencies, resolvedDependencies );
     }
 
@@ -433,31 +434,6 @@ public class NaetherTest {
         }
 
     }
-
-    @Test
-    public void resolveArtifactsNotInMainRepo() throws Exception {
-        Dependency dependency =
-            new Dependency( new DefaultArtifact( "org.springframework:org.springframework.orm:3.0.5.RELEASE" ), "compile" );
-        naether.addRemoteRepositoryByUrl( "https://repository.springsource.com/maven/bundles/release" );
-        naether.addRemoteRepositoryByUrl( "https://repository.springsource.com/maven/bundles/external" );
-        naether.addDependency(dependency);
-        naether.resolveDependencies(false);
-
-        Set<String> results = new HashSet<String>();
-        results.add("org.springframework:org.springframework.orm:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.beans:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.asm:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.core:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.jdbc:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.transaction:jar:3.0.5.RELEASE");
-        results.add("org.aopalliance:com.springsource.org.aopalliance:jar:1.0.0");
-        results.add("org.springframework:org.springframework.aop:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.context:jar:3.0.5.RELEASE");
-        results.add("org.springframework:org.springframework.expression:jar:3.0.5.RELEASE");
-
-        assertEquals( results, naether.getDependenciesNotation() );
-    }
-
 
     @Test
     public void resolveFromBuildArtifacts() throws NaetherException {

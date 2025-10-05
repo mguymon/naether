@@ -20,7 +20,8 @@
 # @author Michael Guymon
 # @see https://github.com/mguymon/naether/tree/master/core
 #
-require "#{File.dirname(__FILE__)}/naether/configuration"
+require_relative "naether/configuration"
+require_relative "naether/version"
 
 module Naether
 

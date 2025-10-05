@@ -30,6 +30,7 @@ namespace :naether do
       FileUtils.copy( 'VERSION', "target/gem/VERSION" )
       FileUtils.copy( 'PostInstallRakefile', "target/gem/Rakefile" )
       FileUtils.copy( 'Gemfile', "target/gem/Gemfile" )
+      FileUtils.copy( 'naether.gemspec', "target/gem/naether.gemspec" )
 
       version = IO.read('VERSION').strip
       if !File.exist? "target/core-#{version}.jar"
@@ -61,36 +62,12 @@ namespace :naether do
   end
 end
 
-require 'jeweler'
-Jeweler::Tasks.new do |gem|
-  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "naether"
-  gem.rubyforge_project  = 'naether'
-  gem.homepage = "http://github.com/mguymon/naether"
-  gem.license = "Apache"
-  gem.summary = %Q{Java dependency resolver using Maven's Aether}
-  gem.description = %Q{Java dependency resolver using Maven's Aether}
-  gem.email = "michael@tobedevoured.com"
-  gem.authors = ["Michael Guymon"]
-  gem.platform      = $platform || RUBY_PLATFORM[/java/] || 'ruby'
-  gem.require_paths = %w[lib]
-  gem.extensions = ["Rakefile"]
+require 'bundler/gem_tasks'
 
-  # all files in target/gem should be included, expect for pkg
-  gem.files = Dir.glob("**/*").select{ |path| !(path =~ /^pkg/) }
-
-end
-Jeweler::RubygemsDotOrgTasks.new
+# Bundler::GemHelper provides build, install, and release tasks
+Bundler::GemHelper.install_tasks
 
 Rake::Task["build"].enhance ["naether:setup_naether_gem_build"]
-Rake::Task["version_required"].enhance ["naether:setup_naether_gem_build"]
-Rake::Task["gemspec:release"].enhance ["naether:setup_naether_gem_build"]
-
-Rake::Task["version:bump:major"].enhance ['naether:version_return_from_target']
-Rake::Task["version:bump:minor"].enhance ['naether:version_return_from_target']
-Rake::Task["version:bump:patch"].enhance ['naether:version_return_from_target']
-
-Rake::Task["build"]
 
 require 'rspec/core/rake_task'
 
