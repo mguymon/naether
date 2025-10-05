@@ -1,16 +1,10 @@
 package com.tobedevoured.naether.maven;
 
 import com.tobedevoured.naether.NaetherException;
-import com.tobedevoured.naether.util.Env;
-import org.apache.maven.shared.invoker.InvocationResult;
-import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class InvokerTest {
 
-    //@Test
+    // @Test
     public void execute() throws NaetherException {
         /*
         String mavenHome = System.getProperty("maven.home");

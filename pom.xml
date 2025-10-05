@@ -43,12 +43,12 @@
     <properties>
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <aetherVersion>1.13.1</aetherVersion>
-        <mavenVersion>3.0.3</mavenVersion>
-        <wagonVersion>1.0</wagonVersion>
-        <org.slf4j.version>1.7.6</org.slf4j.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <resolverVersion>2.0.11</resolverVersion>
+        <mavenVersion>3.9.9</mavenVersion>
+        <wagonVersion>3.5.3</wagonVersion>
+        <org.slf4j.version>1.7.36</org.slf4j.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -70,65 +70,63 @@
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-invoker</artifactId>
-            <version>2.1.1</version>
+            <version>3.2.0</version>
         </dependency>
 
-        <!-- Aeth -->
+        <!-- Maven Resolver (formerly Aether) -->
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-api</artifactId>
-            <version>${aetherVersion}</version>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-api</artifactId>
+            <version>${resolverVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-util</artifactId>
-            <version>${aetherVersion}</version>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-util</artifactId>
+            <version>${resolverVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-impl</artifactId>
-            <version>${aetherVersion}</version>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-impl</artifactId>
+            <version>${resolverVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-spi</artifactId>
-            <version>${aetherVersion}</version>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-spi</artifactId>
+            <version>${resolverVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-connector-file</artifactId>
-            <version>${aetherVersion}</version>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-transport-file</artifactId>
+            <version>${resolverVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-connector-asynchttpclient</artifactId>
-            <version>${aetherVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>netty</artifactId>
-                    <groupId>org.jboss.netty</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-connector-basic</artifactId>
+            <version>${resolverVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.aether</groupId>
-            <artifactId>aether-connector-wagon</artifactId>
-            <version>${aetherVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>sisu-inject-plexus</artifactId>
-                    <groupId>org.sonatype.sisu</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-transport-wagon</artifactId>
+            <version>${resolverVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-transport-apache</artifactId>
+            <version>${resolverVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-supplier-mvn3</artifactId>
+            <version>${resolverVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.0.16</version>
+            <version>3.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
-            <artifactId>maven-aether-provider</artifactId>
+            <artifactId>maven-resolver-provider</artifactId>
             <version>${mavenVersion}</version>
         </dependency>
         <dependency>
@@ -171,6 +169,15 @@
                 <version>2.0</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <useSystemClassLoader>true</useSystemClassLoader>
+                    <useManifestOnlyJar>false</useManifestOnlyJar>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.github.github</groupId>
                 <artifactId>site-maven-plugin</artifactId>
                 <version>0.10</version>
@@ -202,7 +209,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.12.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -256,39 +263,38 @@
                 <publishingServerId>central</publishingServerId>
               </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <java>
+                        <!-- Apply Google Java Format -->
+                        <googleJavaFormat>
+                            <version>1.23.0</version>
+                            <style>AOSP</style>
+                            <reflowLongStrings>true</reflowLongStrings>
+                        </googleJavaFormat>
+
+                        <!-- Remove unused imports -->
+                        <removeUnusedImports />
+
+                        <!-- Standard import order -->
+                        <importOrder />
+
+                        <!-- Format annotations correctly -->
+                        <formatAnnotations />
+                    </java>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>dependencies</report>
-                            <report>scm</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.12.3</version>
-            </plugin>
-        </plugins>
-    </reporting>
-
 </project>

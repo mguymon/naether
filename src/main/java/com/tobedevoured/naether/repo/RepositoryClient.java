@@ -1,172 +1,210 @@
 package com.tobedevoured.naether.repo;
 
+import com.tobedevoured.naether.aether.ValidSystemScopeDependencySelector;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.maven.repository.internal.DefaultServiceLocator;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.deployment.DeployRequest;
+import org.eclipse.aether.deployment.DeploymentException;
+import org.eclipse.aether.installation.InstallRequest;
+import org.eclipse.aether.installation.InstallationException;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.resolution.DependencyResult;
+import org.eclipse.aether.supplier.RepositorySystemSupplier;
+import org.eclipse.aether.supplier.SessionBuilderSupplier;
+import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.collection.CollectRequest;
-import org.sonatype.aether.collection.CollectResult;
-import org.sonatype.aether.collection.DependencyCollectionException;
-import org.sonatype.aether.connector.wagon.WagonProvider;
-import org.sonatype.aether.connector.wagon.WagonRepositoryConnectorFactory;
-import org.sonatype.aether.deployment.DeployRequest;
-import org.sonatype.aether.deployment.DeploymentException;
-import org.sonatype.aether.installation.InstallRequest;
-import org.sonatype.aether.installation.InstallationException;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.resolution.DependencyRequest;
-import org.sonatype.aether.resolution.DependencyResolutionException;
-import org.sonatype.aether.resolution.DependencyResult;
-import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
-import org.sonatype.aether.util.graph.selector.AndDependencySelector;
-
-import com.tobedevoured.naether.aether.ValidSystemScopeDependencySelector;
 
 /**
- * Repository Client, manages the {@link RepositorySystem} and the {@link MavenRepositorySystemSession}.
- * 
- * @author Michael Guymon
+ * Repository Client, manages the {@link RepositorySystem} and the {@link RepositorySystemSession}.
  *
+ * @author Michael Guymon
  */
 public class RepositoryClient {
-    private static Logger log = LoggerFactory.getLogger(RepositoryClient.class);
+    private static final Logger log = LoggerFactory.getLogger(RepositoryClient.class);
 
     private RepositorySystem repositorySystem = null;
-    private MavenRepositorySystemSession systemSession = null;
-    private String localRepoPath;
-    
-    public RepositoryClient( String localRepoPath ) {
+    private RepositorySystemSession systemSession = null;
+    private final String localRepoPath;
+
+    public RepositoryClient(String localRepoPath) {
         this.localRepoPath = localRepoPath;
-        
+
         newRepositorySystem();
     }
-    
+
     /**
-     * Set User Properties for a {@link MavenRepositorySystemSession}
-     * 
+     * Set User Properties for a {@link RepositorySystemSession}
+     *
      * @param properties Map
      */
-    public void setProperties( Map<String,String> properties ) {
-        Map<String,String> userProperties = systemSession.getUserProperties();
-        if ( userProperties == null ) {
-            userProperties = new HashMap<String,String>();
+    public void setProperties(Map<String, String> properties) {
+        Map<String, String> userProperties = systemSession.getUserProperties();
+        Map<String, String> newUserProperties = new HashMap<>();
+        if (userProperties != null) {
+            newUserProperties.putAll(userProperties);
         }
-        userProperties.putAll( properties );
-        
-        log.debug( "Session userProperties: {}", userProperties );
-        
-        systemSession = (MavenRepositorySystemSession)systemSession.setUserProperties( userProperties );
-        
+        newUserProperties.putAll(properties);
+
+        log.debug("Session userProperties: {}", newUserProperties);
+
+        // Rebuild session with updated properties using withLocalRepositoryBaseDirectories
+        RepositorySystemSession.SessionBuilder sessionBuilder =
+                new SessionBuilderSupplier(repositorySystem).get();
+
+        systemSession =
+                sessionBuilder
+                        .setUserProperties(newUserProperties)
+                        .withLocalRepositoryBaseDirectories(Paths.get(localRepoPath))
+                        .setTransferListener(new LogTransferListener())
+                        .setRepositoryListener(new LogRepositoryListener())
+                        .setConfigProperty("aether.artifactDescriptor.ignoreMissing", false)
+                        .build();
     }
-    
+
     /**
      * Collect Dependencies
-     * 
+     *
      * @param collectRequest {@link CollectRequest}
      * @return {@link CollectRequest}
      * @throws DependencyCollectionException exception
      */
-    public CollectResult collectDependencies( CollectRequest collectRequest) throws DependencyCollectionException {
-        return repositorySystem.collectDependencies(systemSession,collectRequest);
+    public CollectResult collectDependencies(CollectRequest collectRequest)
+            throws DependencyCollectionException {
+        return repositorySystem.collectDependencies(systemSession, collectRequest);
     }
-    
+
     /**
      * Resolve Dependencies
-     * 
+     *
      * @param dependencyRequest {@link DependencyRequest}
      * @return {@link DependencyResult}
      * @throws DependencyResolutionException exception
      */
-    public DependencyResult resolveDependencies( DependencyRequest dependencyRequest ) throws DependencyResolutionException {
+    public DependencyResult resolveDependencies(DependencyRequest dependencyRequest)
+            throws DependencyResolutionException {
         return repositorySystem.resolveDependencies(systemSession, dependencyRequest);
     }
-    
+
     /**
      * Deploy
-     * 
+     *
      * @param deployRequest {@link DeployRequest}
      * @throws DeploymentException exception
      */
     public void deploy(DeployRequest deployRequest) throws DeploymentException {
         repositorySystem.deploy(systemSession, deployRequest);
     }
-    
+
     /**
      * Install
-     * 
+     *
      * @param installRequest {@link InstallRequest}
      * @throws InstallationException exception
      */
     public void install(InstallRequest installRequest) throws InstallationException {
         repositorySystem.install(systemSession, installRequest);
     }
-    
+
     /**
      * Resolve Artifact
-     * 
+     *
      * @param artifactRequest {@link ArtifactResult}
      * @return {@link ArtifactResult}
      * @throws ArtifactResolutionException exception
      */
-    public ArtifactResult resolveArtifact(ArtifactRequest artifactRequest) throws ArtifactResolutionException {
+    public ArtifactResult resolveArtifact(ArtifactRequest artifactRequest)
+            throws ArtifactResolutionException {
         return repositorySystem.resolveArtifact(systemSession, artifactRequest);
     }
-    
-    
+
     /**
      * Set the {@link BuildWorkspaceReader}
-     * 
+     *
      * @param artifacts List
      */
     public void setBuildWorkspaceReader(List<Artifact> artifacts) {
         BuildWorkspaceReader reader = new BuildWorkspaceReader();
-        
-        for ( Artifact artifact : artifacts ) {
-            reader.addArtifact( artifact );
+
+        for (Artifact artifact : artifacts) {
+            reader.addArtifact(artifact);
         }
-        
-        systemSession = (MavenRepositorySystemSession)systemSession.setWorkspaceReader( reader );
-        
+
+        // Rebuild session with workspace reader using withLocalRepositoryBaseDirectories
+        DependencySelector currentSelector = systemSession.getDependencySelector();
+        RepositorySystemSession.SessionBuilder sessionBuilder =
+                new SessionBuilderSupplier(repositorySystem).get();
+
+        systemSession =
+                sessionBuilder
+                        .setWorkspaceReader(reader)
+                        .setDependencySelector(currentSelector)
+                        .withLocalRepositoryBaseDirectories(Paths.get(localRepoPath))
+                        .setTransferListener(new LogTransferListener())
+                        .setRepositoryListener(new LogRepositoryListener())
+                        .setConfigProperty("aether.artifactDescriptor.ignoreMissing", false)
+                        .build();
     }
 
-    /**
-     * Create new {@link RepositorySystem}
-     */
+    /** Create new {@link RepositorySystem} */
     public void newRepositorySystem() {
-        DefaultServiceLocator locator = new DefaultServiceLocator();
-        locator.setServices(WagonProvider.class, new ManualWagonProvider());
-        locator.addService(RepositoryConnectorFactory.class, WagonRepositoryConnectorFactory.class);
+        // Validate localRepoPath before using it
+        if (localRepoPath == null) {
+            throw new IllegalStateException(
+                    "localRepoPath must be set before creating RepositorySystem");
+        }
 
-        repositorySystem = locator.getService(RepositorySystem.class);
+        // Use RepositorySystemSupplier to create a fully configured RepositorySystem
+        RepositorySystemSupplier repositorySystemSupplier = new RepositorySystemSupplier();
+        repositorySystem = repositorySystemSupplier.get();
 
-        MavenRepositorySystemSession session = new MavenRepositorySystemSession();
-        session = (MavenRepositorySystemSession)session.setDependencySelector( new AndDependencySelector( session.getDependencySelector(), new ValidSystemScopeDependencySelector() ) );
-        session = (MavenRepositorySystemSession)session.setTransferListener(new LogTransferListener());
-        session = (MavenRepositorySystemSession)session.setRepositoryListener(new LogRepositoryListener());
+        // Use SessionBuilderSupplier to create a Maven-like session
+        SessionBuilderSupplier sessionBuilderSupplier =
+                new SessionBuilderSupplier(repositorySystem);
 
-        session = (MavenRepositorySystemSession)session.setIgnoreMissingArtifactDescriptor( false );
+        // Create a temporary session to get the default dependency selector
+        Path path = Paths.get(localRepoPath);
 
-        LocalRepository localRepo = new LocalRepository( localRepoPath );
-        session.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(localRepo));
+        try (RepositorySystemSession.CloseableSession tempSession =
+                sessionBuilderSupplier.get().withLocalRepositoryBaseDirectories(path).build()) {
 
-        systemSession = session;
+            DependencySelector defaultSelector = tempSession.getDependencySelector();
+            DependencySelector customSelector =
+                    new AndDependencySelector(
+                            defaultSelector, new ValidSystemScopeDependencySelector());
+
+            // Build final session with a NEW session builder
+            systemSession =
+                    sessionBuilderSupplier
+                            .get()
+                            .setDependencySelector(customSelector)
+                            .withLocalRepositoryBaseDirectories(path)
+                            .setTransferListener(new LogTransferListener())
+                            .setRepositoryListener(new LogRepositoryListener())
+                            .setConfigProperty("aether.artifactDescriptor.ignoreMissing", false)
+                            .build();
+        }
     }
 
     public RepositorySystem getRepositorySystem() {
         return repositorySystem;
     }
 
-    public MavenRepositorySystemSession getSystemSession() {
+    public RepositorySystemSession getSystemSession() {
         return systemSession;
     }
-
 }

@@ -1,122 +1,106 @@
 package com.tobedevoured.naether.maven;
 
 /**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * <p>Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
 // Java SE
-import java.io.*;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-// Apache Maven
 import com.tobedevoured.naether.impl.NaetherImpl;
 import com.tobedevoured.naether.repo.RepositoryClient;
 import com.tobedevoured.naether.util.Env;
+import com.tobedevoured.naether.util.Notation;
+import com.tobedevoured.naether.util.RepoBuilder;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.*;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-
-// Codehause Plexus
-import org.apache.maven.model.resolution.InvalidRepositoryException;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-// SLF4J
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.aether.artifact.Artifact;
-
-import com.tobedevoured.naether.util.Notation;
-import com.tobedevoured.naether.util.RepoBuilder;
-import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Helper for working with Maven's Project Model
  *
  * @author Michael Guymon
- *
  */
 public class Project {
 
-    private static Logger log = LoggerFactory.getLogger(Project.class);
+    private static final Logger log = LoggerFactory.getLogger(Project.class);
     private static final Pattern PROPERTY_PATTERN = Pattern.compile("\\$\\{(.+)\\}");
 
     private Model mavenModel;
     private String basePath;
 
     /**
-     * Create an empty instance. Local Repository and Remote Repositories will not be set.
-     * The {@link #getBasePath()} defaults to current working directory.
+     * Create an empty instance. Local Repository and Remote Repositories will not be set. The
+     * {@link #getBasePath()} defaults to current working directory.
      */
     public Project() {
         Model model = new Model();
         model.setModelVersion("4.0.0");
         model.setPackaging("jar");
         this.mavenModel = model;
-        setBasePath( new File("." ) );
+        setBasePath(new File("."));
     }
 
     /**
-     * Create an instance based on an existing pom xml. The default Local Repository and Remote Repositories
-     * will be used. The {@link #getBasePath()} defaults to the pom's parent directory.
+     * Create an instance based on an existing pom xml. The default Local Repository and Remote
+     * Repositories will be used. The {@link #getBasePath()} defaults to the pom's parent directory.
      *
      * @param pomPath String file path
      * @throws ProjectException exception
      */
     public Project(String pomPath) throws ProjectException {
-         this(pomPath, null, null);
+        this(pomPath, null, null);
     }
 
     /**
-     *  Create an instance based on an existing pom xml. The defaults will be used if localRepo or remoteRepo params
-     *  are null. The {@link #getBasePath()} defaults to the pom's parent directory.
+     * Create an instance based on an existing pom xml. The defaults will be used if localRepo or
+     * remoteRepo params are null. The {@link #getBasePath()} defaults to the pom's parent
+     * directory.
      *
      * @param pomPath String file path
      * @param localRepo String directory path
      * @param remoteRepos {@link Collection}
      * @throws ProjectException exception
      */
-    public Project(String pomPath, String localRepo, Collection<RemoteRepository> remoteRepos) throws ProjectException {
+    public Project(String pomPath, String localRepo, Collection<RemoteRepository> remoteRepos)
+            throws ProjectException {
 
         if (localRepo == null) {
             localRepo = Env.getLocalRepository();
         }
 
         if (remoteRepos == null) {
-            remoteRepos = Arrays.asList(NaetherImpl.DEFAULT_REPOSITORY);
+            remoteRepos = Collections.singletonList(NaetherImpl.DEFAULT_REPOSITORY);
         }
 
         this.mavenModel = loadPOM(pomPath, localRepo, remoteRepos);
-        this.mavenModel.setPomFile( new File(pomPath) );
+        this.mavenModel.setPomFile(new File(pomPath));
 
         File parent = (new File(pomPath)).getParentFile();
-        if ( parent != null ) {
-            setBasePath( (new File(pomPath)).getParentFile() );
+        if (parent != null) {
+            setBasePath((new File(pomPath)).getParentFile());
         } else {
-            setBasePath( new File("." ) );
+            setBasePath(new File("."));
         }
     }
 
@@ -129,20 +113,22 @@ public class Project {
      * @return {@link Model}
      * @throws ProjectException if fails to open, read, or parse the POM
      */
-    public static Model loadPOM(String pomPath, String localRepo, Collection<RemoteRepository> repositories) throws ProjectException {
+    public static Model loadPOM(
+            String pomPath, String localRepo, Collection<RemoteRepository> repositories)
+            throws ProjectException {
         RepositoryClient repoClient = new RepositoryClient(localRepo);
         NaetherModelResolver resolver = new NaetherModelResolver(repoClient, repositories);
 
         ModelBuildingRequest req = new DefaultModelBuildingRequest();
-        req.setProcessPlugins( false );
-        req.setPomFile( new File(pomPath) );
-        req.setModelResolver( resolver );
-        req.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+        req.setProcessPlugins(false);
+        req.setPomFile(new File(pomPath));
+        req.setModelResolver(resolver);
+        req.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
 
         DefaultModelBuilder builder = (new DefaultModelBuilderFactory()).newInstance();
         try {
-            return builder.build( req ).getEffectiveModel();
-        } catch ( ModelBuildingException e ) {
+            return builder.build(req).getEffectiveModel();
+        } catch (ModelBuildingException e) {
             throw new ProjectException("Failed to build project from pom", e);
         }
     }
@@ -154,7 +140,7 @@ public class Project {
      */
     public String getVersion() {
         String version = getMavenModel().getVersion();
-        if ( version == null && getMavenModel().getParent() != null ) {
+        if (version == null && getMavenModel().getParent() != null) {
             version = getMavenModel().getParent().getVersion();
         }
 
@@ -194,7 +180,6 @@ public class Project {
         getMavenModel().setPackaging(type);
     }
 
-
     /**
      * Add a Repository to the Project
      *
@@ -204,18 +189,18 @@ public class Project {
     public void addRepository(String url) throws ProjectException {
         List<Repository> repositories = getRepositories();
 
-        if ( repositories == null ) {
-            repositories = new ArrayList<Repository>();
+        if (repositories == null) {
+            repositories = new ArrayList<>();
         }
 
         try {
-            Repository repository = RepoBuilder.repositoryFromUrl( url );
-            repositories.add( repository );
+            Repository repository = RepoBuilder.repositoryFromUrl(url);
+            repositories.add(repository);
         } catch (MalformedURLException e) {
-            throw new ProjectException( e );
+            throw new ProjectException(e);
         }
 
-        getMavenModel().setRepositories( repositories );
+        getMavenModel().setRepositories(repositories);
     }
 
     /**
@@ -224,17 +209,17 @@ public class Project {
      * @param urls List
      * @throws ProjectException exception
      */
-    public void setRepositories( List<String> urls ) throws ProjectException {
-        List<Repository> repositories = new ArrayList<Repository>();
-        for ( String url : urls  ) {
+    public void setRepositories(List<String> urls) throws ProjectException {
+        List<Repository> repositories = new ArrayList<>();
+        for (String url : urls) {
             try {
-                Repository repository = RepoBuilder.repositoryFromUrl( url );
-                repositories.add( repository );
+                Repository repository = RepoBuilder.repositoryFromUrl(url);
+                repositories.add(repository);
             } catch (MalformedURLException e) {
-                throw new ProjectException( e );
+                throw new ProjectException(e);
             }
         }
-        getMavenModel().setRepositories( repositories);
+        getMavenModel().setRepositories(repositories);
     }
 
     /**
@@ -252,10 +237,10 @@ public class Project {
      * @return List
      */
     public List<String> getRepositoryUrls() {
-        List<String> urls = new ArrayList<String>();
+        List<String> urls = new ArrayList<>();
 
-        for ( Repository repo : getRepositories() ) {
-            urls.add( repo.getUrl() );
+        for (Repository repo : getRepositories()) {
+            urls.add(repo.getUrl());
         }
 
         return urls;
@@ -267,7 +252,7 @@ public class Project {
      * @return String
      */
     public String getProjectNotation() {
-        return Notation.generate( this );
+        return Notation.generate(this);
     }
 
     /**
@@ -284,8 +269,7 @@ public class Project {
     }
 
     /**
-     * Get List of {@link Dependency} for the Maven Project for scopes compile
-     * and runtime
+     * Get List of {@link Dependency} for the Maven Project for scopes compile and runtime
      *
      * @return List
      */
@@ -300,18 +284,18 @@ public class Project {
      * @return List
      */
     public List<Dependency> getDependencies(List<String> scopes) {
-        log.debug( "Valid scopes: {}", scopes );
-        List<Dependency> dependencies = new ArrayList<Dependency>();
+        log.debug("Valid scopes: {}", scopes);
+        List<Dependency> dependencies = new ArrayList<>();
 
         for (Dependency dependency : getMavenModel().getDependencies()) {
 
             // Substitute Properties
             // XXX: There has to be a way maven handles this automatically
-            log.debug( "Project properties: {} ", this.mavenModel.getProperties() );
+            log.debug("Project properties: {} ", this.mavenModel.getProperties());
             String artifactId = substituteProperty(dependency.getArtifactId());
-            String groupId    = substituteProperty(dependency.getGroupId());
-            String version    = substituteProperty(dependency.getVersion());
-            String type       = substituteProperty(dependency.getType());
+            String groupId = substituteProperty(dependency.getGroupId());
+            String version = substituteProperty(dependency.getVersion());
+            String type = substituteProperty(dependency.getType());
             String classifier = substituteProperty(dependency.getClassifier());
             String systemPath = substituteProperty(dependency.getSystemPath());
 
@@ -320,28 +304,27 @@ public class Project {
             dependency.setGroupId(groupId);
             dependency.setVersion(version);
             dependency.setType(type);
-            dependency.setClassifier( classifier );
+            dependency.setClassifier(classifier);
 
             dependencies.add(dependency);
         }
 
-
-        if ( scopes == null ) {
-            scopes = Arrays.asList( "compile", "runtime" );
+        if (scopes == null) {
+            scopes = Arrays.asList("compile", "runtime");
         }
 
-        for ( Iterator<Dependency> iterator = dependencies.iterator(); iterator.hasNext(); ) {
+        for (Iterator<Dependency> iterator = dependencies.iterator(); iterator.hasNext(); ) {
             Dependency dependency = iterator.next();
 
             String scope = dependency.getScope();
 
             // Default scope for dependencies is compile
-            if ( scope == null ) {
+            if (scope == null) {
                 scope = "compile";
             }
 
-            if ( !scopes.contains( scope ) ) {
-                log.debug( "Removing {} with scope {}", dependency, dependency.getScope() );
+            if (!scopes.contains(scope)) {
+                log.debug("Removing {} with scope {}", dependency, dependency.getScope());
                 iterator.remove();
             }
         }
@@ -350,7 +333,8 @@ public class Project {
     }
 
     /**
-     * Return {@link List} of dependencies in the format of {@code groupId:artifactId:packageType:version}
+     * Return {@link List} of dependencies in the format of {@code
+     * groupId:artifactId:packageType:version}
      *
      * @return List
      */
@@ -365,7 +349,7 @@ public class Project {
      * @return List
      */
     public List<String> getDependenciesNotation(List<String> scopes) {
-        List<String> notations = new ArrayList<String>();
+        List<String> notations = new ArrayList<>();
 
         for (Dependency dependency : getDependencies(scopes)) {
             notations.add(Notation.generate(dependency));
@@ -388,8 +372,8 @@ public class Project {
      *
      * @param notation String
      */
-    public void addDependency(String notation ) {
-        addDependency( notation, "compile" );
+    public void addDependency(String notation) {
+        addDependency(notation, "compile");
     }
 
     /**
@@ -398,31 +382,32 @@ public class Project {
      * @param notation String
      * @param scope String
      */
-    public void addDependency(String notation, String scope ) {
+    public void addDependency(String notation, String scope) {
         Map<String, String> notationMap = Notation.parse(notation);
         Dependency dependency = new Dependency();
         dependency.setGroupId(notationMap.get("groupId"));
         dependency.setArtifactId(notationMap.get("artifactId"));
         dependency.setType(notationMap.get("type"));
         dependency.setVersion(notationMap.get("version"));
-        dependency.setScope( scope );
+        dependency.setScope(scope);
         addDependency(dependency);
     }
 
     /**
-     * Add a Dependency of {@link org.sonatype.aether.graph.Dependency}
-     * @param aetherDep {@link org.sonatype.aether.graph.Dependency}
+     * Add a Dependency of {@link org.eclipse.aether.graph.Dependency}
+     *
+     * @param aetherDep {@link org.eclipse.aether.graph.Dependency}
      */
-    public void addDependency(org.sonatype.aether.graph.Dependency aetherDep) {
+    public void addDependency(org.eclipse.aether.graph.Dependency aetherDep) {
         Artifact artifact = aetherDep.getArtifact();
 
         Dependency dependency = new Dependency();
-        dependency.setGroupId( artifact.getGroupId() );
-        dependency.setArtifactId( artifact.getArtifactId() );
-        dependency.setType( artifact.getExtension() );
-        dependency.setVersion( artifact.getVersion() );
-        dependency.setScope( aetherDep.getScope() );
-        addDependency( dependency );
+        dependency.setGroupId(artifact.getGroupId());
+        dependency.setArtifactId(artifact.getArtifactId());
+        dependency.setType(artifact.getExtension());
+        dependency.setVersion(artifact.getVersion());
+        dependency.setScope(aetherDep.getScope());
+        addDependency(dependency);
     }
 
     /**
@@ -430,9 +415,9 @@ public class Project {
      *
      * @param dependencies Collection
      */
-    public void setDependencies( Collection<org.sonatype.aether.graph.Dependency> dependencies ) {
-        for ( org.sonatype.aether.graph.Dependency dep : dependencies ) {
-            addDependency( dep );
+    public void setDependencies(Collection<org.eclipse.aether.graph.Dependency> dependencies) {
+        for (org.eclipse.aether.graph.Dependency dep : dependencies) {
+            addDependency(dep);
         }
     }
 
@@ -455,23 +440,23 @@ public class Project {
     }
 
     public void addProperty(String property, String value) {
-        this.mavenModel.getProperties().put( property, value );
+        this.mavenModel.getProperties().put(property, value);
     }
 
     public void removeProperty(String property) {
-        this.mavenModel.getProperties().remove( property );
+        this.mavenModel.getProperties().remove(property);
     }
 
     /**
-     * Substitute a Maven Property expression, i.e. ${aetherVersion}, to its
-     * corresponding Maven pom definition, i.e. 1.11 from
-     * {@code <properties><aetherVersion>1.11</aetherVersion></properties>}
+     * Substitute a Maven Property expression, i.e. ${aetherVersion}, to its corresponding Maven pom
+     * definition, i.e. 1.11 from {@code
+     * <properties><aetherVersion>1.11</aetherVersion></properties>}
      *
      * @param field
      * @return
      */
     private String substituteProperty(String field) {
-        if ( field != null ) {
+        if (field != null) {
             String property = null;
             Matcher matcher = PROPERTY_PATTERN.matcher(field);
             while (matcher.find()) {
@@ -479,7 +464,10 @@ public class Project {
             }
 
             if (property != null) {
-                log.debug("Set property {} to {}", property, this.getMavenModel().getProperties().getProperty(property));
+                log.debug(
+                        "Set property {} to {}",
+                        property,
+                        this.getMavenModel().getProperties().getProperty(property));
                 return this.getMavenModel().getProperties().getProperty(property);
             } else {
                 return field;
@@ -491,6 +479,7 @@ public class Project {
 
     /**
      * Get Pom {@link File}
+     *
      * @return {@link File}
      */
     public File getPomFile() {
@@ -504,7 +493,7 @@ public class Project {
      * @throws ProjectException exception
      */
     public void writePom(String filePath) throws ProjectException {
-        writePom( new File( filePath ) );
+        writePom(new File(filePath));
     }
 
     /**
@@ -517,7 +506,7 @@ public class Project {
         log.debug("Writing pom: {}", file.getPath());
 
         Project copy = this;
-        copy.removeProperty( "project.basedir" );
+        copy.removeProperty("project.basedir");
 
         Writer writer;
         try {
@@ -544,7 +533,7 @@ public class Project {
         log.debug("Writing xml");
 
         Project copy = this;
-        copy.removeProperty( "project.basedir" );
+        copy.removeProperty("project.basedir");
 
         StringWriter writer = new StringWriter();
 
@@ -575,15 +564,16 @@ public class Project {
      */
     public final void setBasePath(File basePath) {
         this.basePath = basePath.getAbsolutePath();
-        this.addProperty( "project.basedir", this.basePath);
+        this.addProperty("project.basedir", this.basePath);
     }
 
     /**
      * Get the final name of the build artifact for this project
+     *
      * @return String
      */
     public String getFinalName() {
-        if ( this.mavenModel.getBuild() != null ) {
+        if (this.mavenModel.getBuild() != null) {
             return this.mavenModel.getBuild().getFinalName();
         } else {
             return null;
