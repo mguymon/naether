@@ -57,7 +57,10 @@ namespace :naether do
     require "#{File.dirname(__FILE__)}/src/main/ruby/naether/java"
     Naether::Java.load_paths( "target/classes" )
     require "#{File.dirname(__FILE__)}/src/main/ruby/naether/bootstrap"
-    Naether::Bootstrap.bootstrap_local_repo("target/test-repo", :dep_yaml => File.expand_path( '../jar_dependencies.yml', __FILE__ ) )
+    Naether::Bootstrap.bootstrap_local_repo(
+      "target/test-repo",
+      dependencies_yml: File.expand_path( '../jar_dependencies.yml', __FILE__ )
+    )
     Naether::Bootstrap.write_dependencies()
   end
 end

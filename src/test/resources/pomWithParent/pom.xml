@@ -7,13 +7,6 @@ ttp://maven.apache.org/maven-v4_0_0.xsd ">
   <artifactId>parent</artifactId>
   <version>3</version>
   <packaging>pom</packaging>
-  <repositories>
-	  <repository>
-	    <id>org.jboss.repository</id>
-	    <name>JBoss Repository</name>
-	    <url>https://repository.jboss.org/nexus/content/groups/public-jboss</url>
-	  </repository>
-	</repositories>
   <dependencies>
     <dependency>
 	      <groupId>ch.qos.logback</groupId>

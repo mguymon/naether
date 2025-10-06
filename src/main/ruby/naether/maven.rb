@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements. See the NOTICE file distributed with this
 # work for additional information regarding copyright ownership. The ASF
@@ -16,167 +18,155 @@
 require "#{File.dirname(__FILE__)}/java"
 
 module Naether
-  
   # Helper for interacting with a Maven POM
   #
   # @author Michael Guymon
   #
   class Maven
-    
     class << self
-      
       # Create an instance from a POM
       #
       # @param [String] pom_path
       # @return [Naether::Maven]
-      def create_from_pom( pom_path )
-        maven = Maven.new( pom_path )
+      def create_from_pom(pom_path)
+        Maven.new(pom_path)
       end
-      
+
       # Create an instance based on notation
-      # 
+      #
       # @param [String] notation
       # @return [Naether::Maven]
       # @see https://github.com/mguymon/naether/wiki/Notations
-      def create_from_notation( notation )
+      def create_from_notation(notation)
         maven = Maven.new
         maven.notation = notation
         maven
       end
     end
-    
+
     #
     # Create new instance
     #
     def initialize(pom_path = nil)
-      if pom_path
-        @project = Naether::Java.create("com.tobedevoured.naether.maven.Project", pom_path )
-      else
-        @project = Naether::Java.create("com.tobedevoured.naether.maven.Project" )
-      end
-      
+      @project = if pom_path
+                   Naether::Java.create('com.tobedevoured.naether.maven.Project', pom_path)
+                 else
+                   Naether::Java.create('com.tobedevoured.naether.maven.Project')
+                 end
     end
-    
+
     # Set the Notation for this Project
     #
     # @param [String] notation
     # @see https://github.com/mguymon/naether/wiki/Notations
     def notation=(notation)
-      @project.setProjectNotation( notation )
+      @project.setProjectNotation(notation)
     end
-    
+
     # Get dependences for Project as notations
-    # 
+    #
     # @param [Array<String>] scopes valid options are compile,test,runtime
-    def dependencies( scopes = nil)
-      if scopes
-        unless scopes.is_a? Array
-           scopes = [scopes]
-        end
-      end
-          
+    def dependencies(scopes = nil)
+      scopes = [scopes] if scopes && !scopes.is_a?(Array)
+
       if Naether.platform == 'java'
-        if scopes.nil?
-          deps = @project.getDependenciesNotation()
-        else
-          deps = @project.getDependenciesNotation( scopes )
-        end
-        
+        deps = if scopes.nil?
+                 @project.getDependenciesNotation
+               else
+                 @project.getDependenciesNotation(scopes)
+               end
+
       elsif scopes
-        list = Naether::Java.convert_to_java_list( scopes )
+        list = Naether::Java.convert_to_java_list(scopes)
 
         deps = @project._invoke('getDependenciesNotation', 'Ljava.util.List;', list)
       else
-        deps = @project.getDependenciesNotation()
+        deps = @project.getDependenciesNotation
       end
 
-      
-      Naether::Java.convert_to_ruby_array( deps, true )
+      Naether::Java.convert_to_ruby_array(deps, true)
     end
-    
+
     # Add dependency by scope
     #
     # @param [String] notation
     # @param [String] scope
     #
-    def add_dependency( notation, scope = nil )
-      @project.addDependency( notation, scope )
+    def add_dependency(notation, scope = nil)
+      @project.addDependency(notation, scope)
     end
-      
-    
+
     # Set dependencies
     #
     # @param [Array] dependencies
     def dependencies=(dependencies)
-      @project.setDependencies( dependencies )
+      @project.setDependencies(dependencies)
     end
-    
+
     # Set repositories
     #
     # @param [Array] repositories of urls
-    def repositories=( repositories )
-      @project.setRepositories( repositories )
+    def repositories=(repositories)
+      @project.setRepositories(repositories)
     end
-  
+
     # Get the version
     #
     # return [String] version
-    def version()
-      return @project.getVersion()
+    def version
+      @project.getVersion
     end
-    
+
     # Load dependencies and remote repo from a {Naether} instance
-    def load_naether( naether )
-      self.dependencies= naether.resolver.currentDependencies()
-      self.repositories= naether.resolver.getRemoteRepositoryUrls()
+    def load_naether(naether)
+      self.dependencies = naether.resolver.currentDependencies
+      self.repositories = naether.resolver.getRemoteRepositoryUrls
     end
-    
+
     # Create the XML for a Maven Pom
     #
     # @return [String] pom xml
-    def build_pom()
-      @project.toXml()
+    def build_pom
+      @project.toXml
     end
-    
-  
+
     # Write Maven Pom
     #
     # @param [String] file_path
-    def write_pom( file_path )
-      @project.writePom( file_path )
+    def write_pom(file_path)
+      @project.writePom(file_path)
     end
 
     # Invoke a Maven goal
     #
     # @params [Array] Goals names
-    def invoke( *opts )
-      #defaults
+    def invoke(*opts)
+      # defaults
       config = {
         # Checks ENV for maven home, otherwise defaults /usr/share/maven
         # XXX: Reuse Eng.getMavenHome?
-        :maven_home => ENV['maven.home'] || ENV['MAVEN_HOME'] || '/usr/share/maven',
-        :local_repo => File.expand_path('~/.m2/repository')
+        maven_home: ENV['maven.home'] || ENV['MAVEN_HOME'] || '/usr/share/maven',
+        local_repo: File.expand_path('~/.m2/repository')
       }
 
-      if opts.last.is_a? Hash
-        config = config.merge( opts.pop )
-      end
+      config = config.merge(opts.pop) if opts.last.is_a? Hash
       goals = opts
 
-      pom = @project.getPomFile().getAbsolutePath()
+      pom = @project.getPomFile.getAbsolutePath
 
-      invoker = Naether::Java.create("com.tobedevoured.naether.maven.Invoker", config[:local_repo], config[:maven_home] )
+      invoker = Naether::Java.create('com.tobedevoured.naether.maven.Invoker', config[:local_repo],
+                                     config[:maven_home])
 
       java_list = Naether::Java.convert_to_java_list(goals)
       if Naether.platform == 'java'
-        invoker.execute( pom, java_list )
+        invoker.execute(pom, java_list)
       else
         invoker._invoke('execute', 'Ljava.lang.String;Ljava.util.List;', pom, java_list)
       end
     end
 
     def final_name
-      @project.getFinalName()
+      @project.getFinalName
     end
   end
 end

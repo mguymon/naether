@@ -75,10 +75,9 @@ public class ProjectTest {
         List<String> repositories = mavenProject.getRepositoryUrls();
 
         assertEquals(
-                Arrays.asList(
-                        "https://repository.jboss.org/nexus/content/groups/public-jboss",
-                        "https://repo.maven.apache.org/maven2"),
-                repositories);
+            List.of("https://repository.jboss.org/nexus/content/groups/public-jboss", "https://repo.maven.apache.org/maven2"),
+            repositories
+        );
     }
 
     @Test
@@ -113,7 +112,7 @@ public class ProjectTest {
     @Test
     public void getDependenciesNotation() throws ProjectException {
         Project mavenProject = new Project("src/test/resources/valid_pom.xml");
-        List<String> notations = new ArrayList<String>();
+        List<String> notations = new ArrayList<>();
         notations.add("ch.qos.logback:logback-classic:jar:0.9.29");
 
         assertEquals(notations, mavenProject.getDependenciesNotation());

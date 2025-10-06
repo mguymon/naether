@@ -1,1 +1,6 @@
 --default_path src/test/spec
+--require spec_helper
+--format documentation
+--color
+--warnings
+--backtrace

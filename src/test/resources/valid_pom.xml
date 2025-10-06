@@ -7,7 +7,8 @@
   <packaging>jar</packaging>
   <repositories>
     <repository>
-      <id>jboss</id>
+      <id>jboss-public</id>
+      <name>JBoss Public Repository</name>
       <url>https://repository.jboss.org/nexus/content/groups/public-jboss</url>
     </repository>
   </repositories>

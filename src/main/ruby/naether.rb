@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements. See the NOTICE file distributed with this
 # work for additional information regarding copyright ownership. The ASF
@@ -13,28 +15,24 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-
 #
 # Java dependency resolver
 #
 # @author Michael Guymon
 # @see https://github.com/mguymon/naether/tree/master/core
 #
-require_relative "naether/configuration"
-require_relative "naether/version"
+require_relative 'naether/configuration'
+require_relative 'naether/version'
 
 module Naether
-
-
   class << self
-
     # List of Java dependencies needed to bootstrap Naether
     #
     # @param [String] dep_file path
     # @see {Naether::Bootstrap#dependencies}
-    def bootstrap_dependencies( dep_file=nil )
+    def bootstrap_dependencies(dep_file = nil)
       require "#{File.dirname(__FILE__)}/naether/bootstrap"
-      Naether::Bootstrap.dependencies( dep_file )
+      Naether::Bootstrap.dependencies(dep_file)
     end
 
     #
@@ -49,9 +47,9 @@ module Naether
     #
     # @param [Array<String>] jars of paths
     # @return [Naether]
-    def create_from_jars( jars )
+    def create_from_jars(jars)
       require "#{File.dirname(__FILE__)}/naether/java"
-      Naether::Java.internal_load_paths( jars )
+      Naether::Java.internal_load_paths(jars)
       create
     end
 

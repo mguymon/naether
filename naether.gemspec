@@ -32,8 +32,9 @@ Gem::Specification.new do |spec|
 
   # Development dependencies
   spec.add_development_dependency "bundler", "~> 2.0"
+  spec.add_development_dependency "kramdown", "~> 2.0"
+  spec.add_development_dependency "pry", "~> 0.15"
   spec.add_development_dependency "rake", ">= 12.3.3", "< 14.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "yard", "~> 0.9"
-  spec.add_development_dependency "kramdown", "~> 2.0"
 end

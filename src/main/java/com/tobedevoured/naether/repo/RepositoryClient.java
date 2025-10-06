@@ -73,6 +73,7 @@ public class RepositoryClient {
                         .setTransferListener(new LogTransferListener())
                         .setRepositoryListener(new LogRepositoryListener())
                         .setConfigProperty("aether.artifactDescriptor.ignoreMissing", false)
+                        .setConfigProperty("aether.connector.basic.threads", 1)
                         .build();
     }
 
@@ -157,6 +158,11 @@ public class RepositoryClient {
                         .setTransferListener(new LogTransferListener())
                         .setRepositoryListener(new LogRepositoryListener())
                         .setConfigProperty("aether.artifactDescriptor.ignoreMissing", false)
+                        .setConfigProperty("aether.transport.http.connectTimeout", 10000)
+                        .setConfigProperty("aether.transport.http.requestTimeout", 30000)
+                        .setConfigProperty("aether.connector.basic.threads", 1)
+                        .setConfigProperty("aether.remoteRepositoryFilter.groupId", false)
+                        .setConfigProperty("aether.remoteRepositoryFilter.prefixes", false)
                         .build();
     }
 
@@ -196,6 +202,11 @@ public class RepositoryClient {
                             .setTransferListener(new LogTransferListener())
                             .setRepositoryListener(new LogRepositoryListener())
                             .setConfigProperty("aether.artifactDescriptor.ignoreMissing", false)
+                            .setConfigProperty("aether.transport.http.connectTimeout", 10000)
+                            .setConfigProperty("aether.transport.http.requestTimeout", 30000)
+                            .setConfigProperty("aether.connector.basic.threads", 1)
+                            .setConfigProperty("aether.remoteRepositoryFilter.groupId", false)
+                            .setConfigProperty("aether.remoteRepositoryFilter.prefixes", false)
                             .build();
         }
     }

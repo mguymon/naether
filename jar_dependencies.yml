@@ -15,6 +15,7 @@
 - org.jsoup:jsoup:jar:1.17.2
 - org.slf4j:slf4j-api:jar:1.7.36
 - org.slf4j:slf4j-simple:jar:1.7.36
+- org.slf4j:jcl-over-slf4j:jar:1.7.36
 - org.apache.maven.resolver:maven-resolver-api:jar:2.0.11
 - org.apache.maven.resolver:maven-resolver-util:jar:2.0.11
 - org.apache.maven.resolver:maven-resolver-impl:jar:2.0.11

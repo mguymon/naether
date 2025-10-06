@@ -369,7 +369,7 @@ public class NaetherTest {
             repos.add(repo.getId());
         }
 
-        assertEquals(Arrays.asList("central", "org.jboss.repository"), repos);
+        assertEquals(Arrays.asList("central"), repos);
     }
 
     @Test
